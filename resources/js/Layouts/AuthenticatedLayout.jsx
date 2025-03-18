@@ -5,6 +5,8 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
+import { ShoppingCartIcon } from '@heroicons/react/24/solid';
+
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
 
@@ -32,9 +34,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </NavLink>
                             </div>
                         </div>
-
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
+                            <div className="block relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <span className="inline-flex rounded-md">
@@ -76,8 +77,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
+                            <div className="flex shrink-0 items-center ml-auto">
+                                <Link href={route('cart')} >
+                                    <ShoppingCartIcon className="h-9 w-auto fill-current text-gray-500" />
+                                </Link>
+                            </div>
                         </div>
-
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
                                 onClick={() =>
@@ -133,6 +138,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('dashboard')}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('cart')}
+                            active={route().current('cart')}
+                        >
+                            Cart
                         </ResponsiveNavLink>
                     </div>
 
