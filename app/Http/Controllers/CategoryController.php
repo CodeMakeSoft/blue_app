@@ -4,55 +4,65 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Http\Requests\Category\StoreRequest;
+use App\Http\Requests\Category\UpdateRequest;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index()
     {
-        //
+        return Inertia::render('Category/Index', [
+            'categories' => Category::all()
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
-        //
+        return Inertia::render('Category/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+   
+    public function store(StoreRequest $request)
     {
-        //
+         $validated = $request->validated();
+
+        Category::create([
+        'name' => $validated['name'],
+        'description' => $validated['description'],
+        ]);
+
+        return redirect()->route('category.index')->with('success', 'Category created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+   
     public function show(Category $category)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(Category $category)
     {
-        //
+         return Inertia::render('Category/Edit', compact('category'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
+    
+    public function update(UpdateRequest $request, Category $category)
     {
-        //
+        $validated = $request->validated();
+
+        $category->update($validated);
+
+        return redirect()->route('category.index')->with('success', 'Categoría actualizada correctamente');
+    }
+
+    public function confirmDelete($categoryId)
+    {
+        $category = Category::findOrFail($categoryId);
+        return Inertia::render('Category/ConfirmDelete',['category' => $category]);
     }
 
     /**
@@ -60,6 +70,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+
+        return redirect()->route('category.index')->with('success', 'Categoría eliminada con éxito.');
     }
 }
