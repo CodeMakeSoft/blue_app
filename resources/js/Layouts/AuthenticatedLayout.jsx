@@ -78,7 +78,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </Dropdown>
                             </div>
                             <div className="flex shrink-0 items-center ml-auto">
-                                <Link href={route('cart')} >
+                                <Link href={route('cart.index')} >
                                     <ShoppingCartIcon className="h-9 w-auto fill-current text-gray-500" />
                                 </Link>
                             </div>
@@ -140,8 +140,8 @@ export default function AuthenticatedLayout({ header, children }) {
                             Dashboard
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('cart')}
-                            active={route().current('cart')}
+                            href={route('cart.index')}
+                            active={route().current('cart.index')}
                         >
                             Cart
                         </ResponsiveNavLink>

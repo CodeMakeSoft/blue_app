@@ -37,9 +37,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return Inertia::render('Cart/Show', [
-            'cartItems' => session('cart', []),
-        ]);
+        //
     }
 
     /**
