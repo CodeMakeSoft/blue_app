@@ -13,6 +13,8 @@ class CategoryController extends Controller
     
     public function index()
     {
+        $categories = Category::with('images')->get();
+
         return Inertia::render('Category/Index', [
             'categories' => Category::all()
         ]);
@@ -29,10 +31,22 @@ class CategoryController extends Controller
     {
          $validated = $request->validated();
 
-        Category::create([
-        'name' => $validated['name'],
-        'description' => $validated['description'],
+        $category = Category::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
         ]);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                
+                $path = $image->store('images', 'public'); 
+
+                
+                $category->images()->create([
+                    'url' => $path, 
+                ]);
+            }
+        }
 
         return redirect()->route('category.index')->with('success', 'Category created successfully.');
     }

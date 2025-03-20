@@ -37,6 +37,9 @@ export default function Index({auth,categories}) {
                                             Descripción
                                         </th>
                                         <th className="border border-gray-300 px-4 py-2">
+                                            Imágenes
+                                        </th>
+                                        <th className="border border-gray-300 px-4 py-2">
                                             Acciones
                                         </th>
                                     </tr>
@@ -53,6 +56,25 @@ export default function Index({auth,categories}) {
                                                   </td>
                                                   <td className="border border-gray-300 px-4 py-2">
                                                       {category.description}
+                                                  </td>
+                                                  <td className="border border-gray-300 px-4 py-2">
+                                                      <div className="flex justify-center space-x-2">
+                                                          {category.images
+                                                              ?.length > 0
+                                                              ? category.images.map(
+                                                                    (image) => (
+                                                                        <img
+                                                                            key={
+                                                                                image.id
+                                                                            }
+                                                                            src={`/storage/${image.url}`}
+                                                                            alt={`Imagen de ${category.name}`}
+                                                                            className="w-12 h-12 object-cover rounded"
+                                                                        />
+                                                                    )
+                                                                )
+                                                              : "No hay imágenes"}
+                                                      </div>
                                                   </td>
                                                   <td className="border border-gray-300 px-4 py-2">
                                                       <Link

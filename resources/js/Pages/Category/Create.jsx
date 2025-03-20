@@ -11,15 +11,21 @@ export default function Create(auth) {
     const initialValues = {
         name: "",
         description: "",
-        avatar: null,
+        images: [],
     };
 
     const { data, errors, setData, post } = useForm(initialValues);
 
+     const handleImageChange = (e) => {
+         const files = Array.from(e.target.files);
+         setData("images", files);
+     };
+
     const submit = (e) => {
         e.preventDefault();
         post(route("category.store"), data);
-    };
+    };   
+   
 
     return (
         <AuthenticatedLayout
@@ -84,7 +90,26 @@ export default function Create(auth) {
                                         className="mt-2"
                                     />
                                 </div>
-                               
+
+                                <div>
+                                    <InputLabel
+                                        htmlFor="images"
+                                        value="Images"
+                                    />
+                                    <input
+                                        id="images"
+                                        type="file"
+                                        name="images"
+                                        multiple
+                                        onChange={handleImageChange}
+                                        className="mt-1 block w-full"
+                                    />
+                                    <InputError
+                                        message={errors.images}
+                                        className="mt-2"
+                                    />
+                                </div>
+
                                 <div className="flex justify-between">
                                     <Link
                                         href={route("category.index")}
