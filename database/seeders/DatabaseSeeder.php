@@ -17,16 +17,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //Crear 10 roles 
-        $roles = Role::factory(10)->create();
-
-
-        //Posteriormente se crean 10 usuarios y se les asigna un rol aleatorio
-        User::factory(10)->create()->each(function ($user) use ($roles) {
-            $user->roles()->attach(
-                $roles->random(rand(1, 3))->pluck('id')->toArray()
-            );
-        });  
 
         Category::factory(10)->create();
         Brand::factory(10)->create();
