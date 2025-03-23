@@ -80,20 +80,28 @@ class CartController extends Controller
 
     public function update(Request $request, $productId)
     {
-         // Get authenticated user
+        // Obtener el usuario autenticado
         $user = Auth::user();
 
-         // Get cart of user
+        // Obtener el carrito del usuario
         $cart = $user->cart;
 
-        if($cart)
-        {
-            $cart->products()->updateExistingPivot($productId, [
-                'quantity' => $request->quantity,
-            ]);
+        if ($cart) {
+            // Obtener la cantidad actual del producto
+            $currentQuantity = $cart->products()->find($productId)?->pivot->quantity;
+
+            if ($currentQuantity > 0) {
+                // Actualizar la cantidad
+                $cart->products()->updateExistingPivot($productId, [
+                    'quantity' => $request->quantity,
+                ]);
+            } else {
+                // Eliminar el producto si la cantidad es 0
+                $cart->products()->detach($productId);
+            }
         }
 
-        // Redirect back with success message
+        // Redirigir de vuelta con un mensaje de éxito
         return redirect()->back()->with('success', 'Cantidad actualizada.');
     }
 }
