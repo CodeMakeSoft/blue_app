@@ -1,12 +1,14 @@
 import Sidebar, { SidebarItem } from '@/Components/Sidebar';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Accordion, {AccordionItem} from '@/Components/Accordion';
 import { Head } from '@inertiajs/react';
 
 import {
     UsersIcon,
-    HomeIcon
+    HomeIcon,
+    UserPlusIcon,
+    KeyIcon
 } from "@heroicons/react/24/solid";
-import Dropdown from '@/Components/Dropdown';
 
 export default function AdminPanel() {
     return (
@@ -22,14 +24,27 @@ export default function AdminPanel() {
             <div className="flex min-h-screen">
                 <Sidebar>
                     <SidebarItem
-                        icon={<HomeIcon className="h-5 w-5" />}
-                        text="Home"
-                    />
-                    <SidebarItem
                         icon={<UsersIcon className="h-5 w-5" />}
                         text="Users"
                     >
-                        
+                        <button
+                            className="w-full flex items-center text-left p-2 hover:bg-indigo-100 rounded-md"
+                            onClick={() =>
+                                console.log("Navegar a Lista de usuarios")
+                            }
+                        >
+                            <UserPlusIcon className="h-5 w-5 mr-2" />{" "}
+                            <span>Roles</span>{" "}
+                        </button>
+                        <button
+                            className="w-full flex items-center text-left p-2 hover:bg-indigo-100 rounded-md"
+                            onClick={() =>
+                                console.log("Navegar a Lista de usuarios")
+                            }
+                        >
+                            <KeyIcon className="h-5 w-5 mr-2" />{" "}
+                            <span>Permisos</span>{" "}
+                        </button>
                     </SidebarItem>
                 </Sidebar>
             </div>

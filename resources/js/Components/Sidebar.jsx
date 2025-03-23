@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
 import { usePage } from "@inertiajs/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
     EllipsisVerticalIcon,
 } from "@heroicons/react/24/solid";
 
-const SidebarContext = createContext();
+export const SidebarContext = createContext();
 
 export default function Sidebar({ children }) {
     const user = usePage().props.auth.user;
@@ -41,7 +42,8 @@ export default function Sidebar({ children }) {
 
                 <div className="border-t flex p-3">
                     <img
-                        src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+                        src={`https://ui-avatars.com/api/?name=${user.name.substring(0,2
+                        )}&background=c7d2fe&color=3730a3&bold=true`}
                         alt="Usuario"
                         className="w-10 h-10 rounded-md"
                     />
@@ -64,13 +66,16 @@ export default function Sidebar({ children }) {
     );
 }
 
+
+
 export function SidebarItem({ icon, text, active, alert, children }) {
     const { expanded } = useContext(SidebarContext);
+    const [isExpanded, setIsExpanded] = useState(false); // Estado para controlar si el acordeón está expandido
 
     return (
         <li
             className={`
-                relative flex items-center py-2 px-3 my-1
+                relative flex flex-col items-start py-2 px-3 my-1
                 font-medium rounded-md cursor-pointer
                 transition-colors group
                 ${
@@ -80,34 +85,49 @@ export function SidebarItem({ icon, text, active, alert, children }) {
                 }
             `}
         >
-            {icon}
-            <span
-                className={`overflow-hidden transition-all ${
-                    expanded ? "w-52 ml-3" : "w-0"
-                }`}
+            <div
+                className="w-full flex items-center"
+                onClick={() => setIsExpanded(!isExpanded)} // Alternar estado al hacer clic
             >
-                {text}
-            </span>
-            {alert && (
-                <div
-                    className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
-                        expanded ? "" : "top-2"
+                {icon}
+                <span
+                    className={`overflow-hidden transition-all ${
+                        expanded ? "w-52 ml-3" : "w-0"
                     }`}
-                />
+                >
+                    {text}
+                </span>
+                {children &&
+                    expanded && ( // Mostrar flecha solo si hay children y el Sidebar está expandido
+                        <ChevronDownIcon
+                            className={`h-5 w-5 text-gray-600 ml-auto transition-transform ${
+                                isExpanded ? "rotate-180" : ""
+                            }`}
+                        />
+                    )}
+                {alert && (
+                    <div
+                        className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+                            expanded ? "" : "top-2"
+                        }`}
+                    />
+                )}
+            </div>
+            {children && expanded && isExpanded && (
+                <div className="w-full pl-6">{children}</div>
             )}
             {!expanded && (
                 <div
                     className={`
-                absolute left-full rounded-md px-2 py-1 ml-6
-                bg-indigo-100 text-indigo-800 text-sm
-                invisible opacity-20 -translate-x-3 transition-all
-                group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
-            `}
+                        absolute left-full rounded-md px-2 py-1 ml-6
+                        bg-indigo-100 text-indigo-800 text-sm
+                        invisible opacity-20 -translate-x-3 transition-all
+                        group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+                    `}
                 >
                     {text}
                 </div>
             )}
-            {children && <div className="ml-auto">{children}</div>}
         </li>
     );
 }
