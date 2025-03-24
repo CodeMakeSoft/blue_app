@@ -14,15 +14,17 @@ class CategoryController extends Controller
      */
     public function index(): Response
     {
-       return Inertia::render('Admin/Category', [
-            'categories' => Category::all(),
-        ]);  
+       $categories = Category::all(); // Obtén las categorías desde tu base de datos
+        return Inertia::render('Admin/Category', [
+            'categories' => $categories,
+            'activeRoute' => request()->route()->getName(), // Pasa la ruta activa
+        ]); 
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create()  
     {
         //
     }

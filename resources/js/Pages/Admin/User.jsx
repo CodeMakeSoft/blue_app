@@ -1,39 +1,39 @@
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
-import CategoryFormModal from "@/components/CategoryFormModal";
+import UserFormModal from "@/components/UserFormModal"; // Asume que tienes un componente para el formulario de usuarios
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Toaster, toast } from "sonner";
 
-export default function Category({ activeRoute }) {
-    const { categories } = usePage().props;
+export default function User({ activeRoute }) {
+    const { users } = usePage().props;
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-    const openModal = (category = null) => {
-        setSelectedCategory(category);
+    const openModal = (user = null) => {
+        setSelectedUser(user);
         setIsModalOpen(true);
     };
 
     const handleDelete = (id) => {
-        router.delete(`/admin/categories/${id}`, {
+        router.delete(`/admin/users/${id}`, {
             onSuccess: () => {
-                toast.success("Category Deleted Successfully");
+                toast.success("User Deleted Successfully");
                 router.reload();
             },
             onError: () => {
-                toast.error("Failed to delete Category");
-                console.error("Failed to delete category.");
+                toast.error("Failed to delete User");
+                console.error("Failed to delete user.");
             },
         });
     };
 
     return (
         <AdminLayout activeRoute={activeRoute}>
-            <Head title="Category" />
+            <Head title="Users" />
             <Toaster position="top-right" richColors />
             <div className="card">
                 <div className="card-header">
-                    <h2 className="text-xl font-semibold">Categories</h2>
+                    <h2 className="text-xl font-semibold">Users</h2>
                 </div>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
@@ -41,16 +41,17 @@ export default function Category({ activeRoute }) {
                             onClick={() => openModal()}
                             className="bg-green-600 text-white rounded px-3 py-1 text-sm hover:bg-green-700 transition"
                         >
-                            Add Category
+                            Add User
                         </button>
                     </div>
                     <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg">
                         <thead>
                             <tr className="bg-gray-100 text-gray-800 border-b">
                                 {[
-                                    "Picture",
-                                    "Category",
-                                    "Description",
+                                    "Name",
+                                    "Email",
+                                    "Phone",
+                                    "Verified",
                                     "Actions",
                                 ].map((header) => (
                                     <th
@@ -63,36 +64,35 @@ export default function Category({ activeRoute }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {categories.length ? (
-                                categories.map((category) => (
-                                    <tr key={category.id} className="border-b">
+                            {users.length ? (
+                                users.map((user) => (
+                                    <tr key={user.id} className="border-b">
+                                        <td className="p-3">{user.name}</td>
+                                        <td className="p-3">{user.email}</td>
                                         <td className="p-3">
-                                            {category.picture ? (
-                                                <img
-                                                    src={category.picture}
-                                                    alt="Category"
-                                                    className="w-16 h-16 object-cover rounded-full"
-                                                />
-                                            ) : (
-                                                "No Picture"
-                                            )}
+                                            {user.phone || "N/A"}
                                         </td>
-                                        <td className="p-3">{category.name}</td>
                                         <td className="p-3">
-                                            {category.description}
+                                            {user.email_verified_at ? (
+                                                <span className="text-green-600">
+                                                    Verified
+                                                </span>
+                                            ) : (
+                                                <span className="text-red-600">
+                                                    Not Verified
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="p-3 flex gap-2">
                                             <button
-                                                onClick={() =>
-                                                    openModal(category)
-                                                }
+                                                onClick={() => openModal(user)}
                                                 className="bg-blue-500 text-sm text-white px-3 py-1 rounded"
                                             >
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() =>
-                                                    handleDelete(category.id)
+                                                    handleDelete(user.id)
                                                 }
                                                 className="bg-red-500 text-sm text-white px-3 py-1 rounded"
                                             >
@@ -104,10 +104,10 @@ export default function Category({ activeRoute }) {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan={4}
+                                        colSpan={5}
                                         className="text-center p-4 text-gray-600"
                                     >
-                                        No categories found.
+                                        No users found.
                                     </td>
                                 </tr>
                             )}
@@ -115,10 +115,10 @@ export default function Category({ activeRoute }) {
                     </table>
                 </div>
             </div>
-            <CategoryFormModal
+            <UserFormModal
                 isOpen={isModalOpen}
                 closeModal={() => setIsModalOpen(false)}
-                category={selectedCategory}
+                user={selectedUser}
             />
         </AdminLayout>
     );

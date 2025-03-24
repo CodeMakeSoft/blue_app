@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -20,7 +21,9 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/admin', function () {
-    return Inertia::render('Admin/AdminPanel');
+    return Inertia::render('Admin/AdminPanel', [
+        'activeRoute' => request()->route()->getName(),
+    ]);
 })->middleware(['auth', 'verified'])->name('admin.panel');
 
 Route::middleware('auth')->group(function () {
@@ -30,5 +33,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('admin/categories', CategoryController::class)->middleware(['auth', 'verified']);
+Route::resource('admin/users', UserController::class)->middleware(['auth', 'verified']);
+Route::resource("users", UserController::class);
 
 require __DIR__.'/auth.php';

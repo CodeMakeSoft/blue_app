@@ -66,11 +66,9 @@ export default function Sidebar({ children }) {
     );
 }
 
-
-
 export function SidebarItem({ icon, text, active, alert, children }) {
     const { expanded } = useContext(SidebarContext);
-    const [isExpanded, setIsExpanded] = useState(false); // Estado para controlar si el acordeón está expandido
+    const [isExpanded, setIsExpanded] = useState(false);
 
     return (
         <li
@@ -87,7 +85,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
         >
             <div
                 className="w-full flex items-center"
-                onClick={() => setIsExpanded(!isExpanded)} // Alternar estado al hacer clic
+                onClick={() => setIsExpanded(!isExpanded)}
             >
                 {icon}
                 <span
@@ -97,14 +95,13 @@ export function SidebarItem({ icon, text, active, alert, children }) {
                 >
                     {text}
                 </span>
-                {children &&
-                    expanded && ( // Mostrar flecha solo si hay children y el Sidebar está expandido
-                        <ChevronDownIcon
-                            className={`h-5 w-5 text-gray-600 ml-auto transition-transform ${
-                                isExpanded ? "rotate-180" : ""
-                            }`}
-                        />
-                    )}
+                {children && expanded && (
+                    <ChevronDownIcon
+                        className={`h-5 w-5 text-gray-600 ml-auto transition-transform ${
+                            isExpanded ? "rotate-180" : ""
+                        }`}
+                    />
+                )}
                 {alert && (
                     <div
                         className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
