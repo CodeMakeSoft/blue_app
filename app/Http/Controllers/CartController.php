@@ -104,6 +104,11 @@ class CartController extends Controller
         // Redirigir de vuelta con un mensaje de éxito
         return redirect()->back()->with('success', 'Cantidad actualizada.');
     }
+
+    public function confirm()
+    {
+        return Inertia::render('Cart/Confirm');
+    }
 }
 
 
