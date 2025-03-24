@@ -1,9 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import React from "react";
-import InputLabel from "@/Components/InputLabel";
-import TextInput from "@/Components/TextInput";
-import InputError from "@/Components/InputError";
+import Form from "@/Components/Category/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
 
 export default function Create(auth) {
@@ -45,84 +43,19 @@ export default function Create(auth) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
-                            <form onSubmit={submit} className="space-y-4">
-                                <div>
-                                    <InputLabel htmlFor="name" value="Name" />
+                            <Form
+                                data={data}
+                                errors={errors}
+                                setData={setData}
+                                submit={submit}
+                                handleImageChange={handleImageChange} 
+                            >
+                                <PrimaryButton type="submit">
+                                    Crear Categoria
+                                </PrimaryButton>
+                            </Form>
 
-                                    <TextInput
-                                        id="name"
-                                        type="text"
-                                        name="name"
-                                        value={data.name}
-                                        className="mt-1 block w-full"
-                                        onChange={(e) =>
-                                            setData("name", e.target.value)
-                                        }
-                                    />
-
-                                    <InputError
-                                        message={errors.name}
-                                        className="mt-2"
-                                    />
-                                </div>
-                                <div>
-                                    <InputLabel
-                                        htmlFor="description"
-                                        value="Description"
-                                    />
-
-                                    <TextInput
-                                        id="Description"
-                                        type="text"
-                                        name="Description"
-                                        value={data.description}
-                                        className="mt-1 block w-full"
-                                        onChange={(e) =>
-                                            setData(
-                                                "description",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-
-                                    <InputError
-                                        message={errors.name}
-                                        className="mt-2"
-                                    />
-                                </div>
-
-                                <div>
-                                    <InputLabel
-                                        htmlFor="images"
-                                        value="Images"
-                                    />
-                                    <input
-                                        id="images"
-                                        type="file"
-                                        name="images"
-                                        multiple
-                                        onChange={handleImageChange}
-                                        className="mt-1 block w-full"
-                                    />
-                                    <InputError
-                                        message={errors.images}
-                                        className="mt-2"
-                                    />
-                                </div>
-
-                                <div className="flex justify-between">
-                                    <Link
-                                        href={route("category.index")}
-                                        className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-                                    >
-                                        Volver
-                                    </Link>
-
-                                    <PrimaryButton type="submit">
-                                        Crear Producto
-                                    </PrimaryButton>
-                                </div>
-                            </form>
+                                
                         </div>
                     </div>
                 </div>

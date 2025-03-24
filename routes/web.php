@@ -24,8 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::get('categories/create',[CategoryController::class,'create'])->name('category.create');
     Route::post('/categories', [CategoryController::class, 'store'])->name('category.store');
     Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('category.edit');
-    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('category.update');
-    Route::get('categories/{category}/confirm-delete', [CategoryController::class, 'confirmDelete'])->name('category.confirmDelete');
+    Route::post('/categories/{category}', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

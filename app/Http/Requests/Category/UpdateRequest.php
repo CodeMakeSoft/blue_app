@@ -25,6 +25,9 @@ class UpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:50'],
             'description' => ['required', 'string', 'max:255'],
+            'new_images' => ['nullable', 'array'], 
+            'new_images.*' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // Validación para cada imagen
         ];
     }
 }
+    
