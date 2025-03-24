@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): Response
     {
-        //
+       return Inertia::render('Admin/Category', [
+            'categories' => Category::all(),
+        ]);  
     }
 
     /**
@@ -28,7 +32,22 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'picture' => 'nullable|image|max:2048',
+        ]);
+
+        $data = $request->only(['name', 'description']);
+        if($request->hasFile('picture')){
+            $file = $request->file('picture');
+            $filename = time(). ' '.$file->getClientOriginalName();
+            $path = $file->storeAs('uploads', $filename, 'public');
+            $data['picture'] = '/storage/'.$path;
+        }
+
+        Category::create($data);
+        return redirect()->route('categories.index')->with('success', 'Category Created Succesfully.');
     }
 
     /**
@@ -52,7 +71,23 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'picture' => 'nullable|image|max:2048',
+        ]);
+
+        $data = $request->only(['name', 'description']);
+
+        if($request->hasFile('picture')){
+            $file = $request->file('picture');
+            $filename = time(). ' '.$file->getClientOriginalName();
+            $path = $file->storeAs('uploads', $filename, 'public');
+            $data['picture'] = '/storage/'.$path;
+        }
+
+        $category->update($data);
+        return redirect()->route('categories.index')->with('success', 'Category Updated Succesfully.');
     }
 
     /**
@@ -60,6 +95,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return redirect()->route('categories.index')->with('success', 'Category Deleted Succesfully.');
     }
 }

@@ -1,13 +1,19 @@
 import Sidebar, { SidebarItem } from '@/Components/Sidebar';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import Accordion, {AccordionItem} from '@/Components/Accordion';
-import { Head } from '@inertiajs/react';
+import { Head} from "@inertiajs/react"; 
+import { Inertia } from "@inertiajs/inertia";
+import { route } from "ziggy-js";
+
 
 import {
     UsersIcon,
-    HomeIcon,
-    UserPlusIcon,
-    KeyIcon
+    TagIcon,
+    CubeIcon,
+    Squares2X2Icon,
+    BriefcaseIcon,
+    KeyIcon,
+    ClipboardDocumentListIcon,
+    UserCircleIcon
 } from "@heroicons/react/24/solid";
 
 export default function AdminPanel() {
@@ -19,13 +25,13 @@ export default function AdminPanel() {
                 </h2>
             }
         >
-            <Head title="Admin Panel" />
+            <Head title="AdminPanel" />
 
             <div className="flex min-h-screen">
                 <Sidebar>
                     <SidebarItem
                         icon={<UsersIcon className="h-5 w-5" />}
-                        text="Users"
+                        text="Roles and permissions"
                     >
                         <button
                             className="w-full flex items-center text-left p-2 hover:bg-indigo-100 rounded-md"
@@ -33,7 +39,16 @@ export default function AdminPanel() {
                                 console.log("Navegar a Lista de usuarios")
                             }
                         >
-                            <UserPlusIcon className="h-5 w-5 mr-2" />{" "}
+                            <UserCircleIcon className="h-5 w-5 mr-2" />{" "}
+                            <span>Users</span>{" "}
+                        </button>
+                        <button
+                            className="w-full flex items-center text-left p-2 hover:bg-indigo-100 rounded-md"
+                            onClick={() =>
+                                console.log("Navegar a Lista de usuarios")
+                            }
+                        >
+                            <BriefcaseIcon className="h-5 w-5 mr-2" />{" "}
                             <span>Roles</span>{" "}
                         </button>
                         <button
@@ -43,7 +58,39 @@ export default function AdminPanel() {
                             }
                         >
                             <KeyIcon className="h-5 w-5 mr-2" />{" "}
-                            <span>Permisos</span>{" "}
+                            <span>Permissions</span>{" "}
+                        </button>
+                    </SidebarItem>
+                    <SidebarItem
+                        icon={<ClipboardDocumentListIcon className="h-5 w-5" />}
+                        text="Manage E-commerce"
+                    >
+                        <button
+                            className="w-full flex items-center text-left p-2 hover:bg-indigo-100 rounded-md"
+                            onClick={() =>
+                                Inertia.visit(route("categories.index"))
+                            }
+                        >
+                            <Squares2X2Icon className="h-5 w-5 mr-2" />{" "}
+                            <span>Categories</span>{" "}
+                        </button>
+                        <button
+                            className="w-full flex items-center text-left p-2 hover:bg-indigo-100 rounded-md"
+                            onClick={() =>
+                                console.log("Navegar a Lista de usuarios")
+                            }
+                        >
+                            <TagIcon className="h-5 w-5 mr-2" />{" "}
+                            <span>Brands</span>{" "}
+                        </button>
+                        <button
+                            className="w-full flex items-center text-left p-2 hover:bg-indigo-100 rounded-md"
+                            onClick={() =>
+                                console.log("Navegar a Lista de usuarios")
+                            }
+                        >
+                            <CubeIcon className="h-5 w-5 mr-2" />{" "}
+                            <span>Products</span>{" "}
                         </button>
                     </SidebarItem>
                 </Sidebar>
