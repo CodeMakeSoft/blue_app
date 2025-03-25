@@ -77,31 +77,35 @@ class CartController extends Controller
          // Redirect back with success message
         return redirect()->back()->with('success', 'Producto eliminado del carrito.');
     }
-
+    
     public function update(Request $request, $productId)
     {
-        
+        // Validar que 'quantity' sea un número entero mayor o igual a 0
+        $request->validate([
+            'quantity' => 'required|integer|min:0',
+        ]);
+    
         // Obtener el usuario autenticado
         $user = Auth::user();
-
+    
         // Obtener el carrito del usuario
         $cart = $user->cart;
-
+    
         if ($cart) {
-            // Obtener la cantidad actual del producto
-            $currentQuantity = $cart->products()->find($productId)?->pivot->quantity;
-
-            if ($currentQuantity > 0) {
-                // Actualizar la cantidad
-                $cart->products()->updateExistingPivot($productId, [
-                    'quantity' => $request->quantity,
-                ]);
-            } else {
-                // Eliminar el producto si la cantidad es 0
-                $cart->products()->detach($productId);
+            // Verificar si el producto existe en el carrito
+            if ($cart->products()->where('product_id', $productId)->exists()) {
+                if ($request->quantity === 0) {
+                    // Si la cantidad es 0, eliminar el producto
+                    $cart->products()->detach($productId);
+                } else {
+                    // Actualizar la cantidad del producto
+                    $cart->products()->updateExistingPivot($productId, [
+                        'quantity' => $request->quantity,
+                    ]);
+                }
             }
         }
-
+    
         // Redirigir de vuelta con un mensaje de éxito
         return redirect()->back()->with('success', 'Cantidad actualizada.');
     }

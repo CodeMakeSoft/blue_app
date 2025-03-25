@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import Confirm from '@/Components/Cart/Confirm'; // Importamos el componente Confirm
+import { Inertia } from '@inertiajs/inertia'; // Importar Inertia
 
 export default function ProductList({ products }) {
     const [cartProducts, setCartProducts] = useState(products);
@@ -11,15 +12,21 @@ export default function ProductList({ products }) {
 
     // Función para actualizar la cantidad de un producto
     const handleQuantityUpdate = (productId, newQuantity) => {
-        // Validar que la cantidad sea un número válido y no sea negativa
-        const quantity = Math.max(0, parseInt(newQuantity) || 0);
-
+        // Convertir newQuantity a un número entero
+        const quantity = parseInt(newQuantity, 10);
+    
+        // Validar que quantity sea un número válido y no sea negativo
+        if (isNaN(quantity) || quantity < 0) {
+            console.error('Cantidad inválida:', newQuantity);
+            return;
+        }
+    
         // Si la cantidad es 0, manejar la eliminación
         if (quantity === 0) {
             handleRemoveProduct(productId);
             return;
         }
-
+    
         // Actualizar el estado local
         setCartProducts(
             cartProducts.map((product) =>
@@ -28,10 +35,10 @@ export default function ProductList({ products }) {
                     : product
             )
         );
-
+    
         // Enviar la actualización al servidor
-        post(route('cart.update', productId), {
-            data: { quantity }, // Asegúrate de que quantity sea un número
+        console.log('Enviando cantidad:', quantity);
+        Inertia.post(route('cart.update', productId), { quantity }, {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
@@ -39,10 +46,18 @@ export default function ProductList({ products }) {
             },
             onError: (error) => {
                 console.error('Error al actualizar el carrito:', error);
-                setCartProducts(products);
+                setCartProducts(products); // Restaurar el estado local en caso de error
+            },
+            transformRequest: (data) => {
+                // Convertir los datos a formato FormData
+                const formData = new FormData();
+                Object.keys(data).forEach((key) => {
+                    formData.append(key, data[key]);
+                });
+                return formData;
             },
         });
-    };
+    }; 
 
     // Función para manejar la eliminación de un producto
     const handleRemoveProduct = (productId) => {
@@ -89,13 +104,12 @@ export default function ProductList({ products }) {
                             {/* Botón "-" */}
                             <button
                                 onClick={() => {
-                                    const newQuantity = Math.max(product.pivot.quantity - 1, 0); // Evitar números negativos
+                                    const newQuantity = product.pivot.quantity - 1;
+                                    console.log(newQuantity);
                                     handleQuantityUpdate(product.id, newQuantity);
                                 }}
-                                className={`flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full hover:bg-gray-300 ${
-                                    product.pivot.quantity === 1 && 'cursor-not-allowed opacity-50'
-                                }`}
-                                disabled={product.pivot.quantity === 1}
+                                className=' flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full hover:bg-gray-300'
+                                //disabled={product.pivot.quantity === 1}
                             >
                                 <span className="text-sm">-</span>
                             </button>
