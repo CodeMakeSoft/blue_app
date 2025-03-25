@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Cart;
-use App\Models\User;
-use App\Models\Product;
 use Inertia\Inertia;
 
 class CartController extends Controller
@@ -57,8 +55,8 @@ class CartController extends Controller
             $cart->products()->attach($productId, ['quantity' => 1]);
         }
 
-        // Redirect back with success message
-        return redirect()->back()->with('success', 'Producto agregado al carrito.');
+         // Return success message without redirecting
+        return back()->with('success', 'Producto agregado al carrito.');
     }
 
     public function remove($productId)
@@ -74,8 +72,8 @@ class CartController extends Controller
             $cart->products()->detach($productId);
         }
 
-         // Redirect back with success message
-        return redirect()->back()->with('success', 'Producto eliminado del carrito.');
+        // Return success message without redirecting
+        return back()->with('success', 'Producto eliminado del carrito.');
     }
     
     public function update(Request $request, $productId)
@@ -106,8 +104,8 @@ class CartController extends Controller
             }
         }
     
-        // Redirigir de vuelta con un mensaje de éxito
-        return redirect()->back()->with('success', 'Cantidad actualizada.');
+        // Return success message without redirecting
+        return back()->with('success', 'Cantidad actualizada.');
     }
 }
 
