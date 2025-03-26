@@ -4,55 +4,92 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Http\Requests\Brand\StoreRequest;
+use App\Http\Requests\Brand\UpdateRequest;
+use Inertia\Response;
+use App\Http\Controllers\Storage;
+
 
 class BrandController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    
+    public function index(): Response 
     {
-        //
-    }
+    $brands = Brand::with('images')->get(); // Cargar las imágenes relacionadas
+    return Inertia::render('Brand/Index', [
+        'brands' => $brands,
+    ]);
+}
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    
     public function create()
     {
-        //
+        return Inertia::render('Brand/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+   
+    public function store(StoreRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $brand = Brand::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+        ]);
+
+         if ($request->hasFile('new_images')) {
+        foreach ($request->file('new_images') as $image) {
+            $path = $image->store('images', 'public');
+            $brand->images()->create([
+                'url' => $path,
+            ]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
+        return redirect()->route('brand.index')->with('success', 'Brand created successfully.');
+    }
+
+   
     public function show(Brand $brand)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(Brand $brand)
     {
-        //
+         return Inertia::render('Brand/Edit', compact('brand'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Brand $brand)
+    
+    public function update(UpdateRequest $request, Brand $brand)
     {
-        //
+        $validated = $request->validated();
+
+       $brand->update([
+        'name' => $validated['name'],
+        'description' => $validated['description'],
+    ]);
+
+        $brand->images()->delete();
+    
+    if ($request->hasFile('new_images')) {
+        foreach ($request->file('new_images') as $image) {
+            $path = $image->store('images', 'public'); // Almacena la imagen en storage/app/public/images
+            $brand->images()->create(['url' => $path]); // Crea un registro en la tabla `images`
+        }
+    }
+
+
+    return redirect()->route('brand.index')->with('success', 'Marca actualizada correctamente');
+}
+
+
+    public function confirmDelete($brandId)
+    {
+        $brand = Brand::findOrFail($brandId);
+         return response()->json($brand);
     }
 
     /**
@@ -60,6 +97,16 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        //
+    $brand->images()->delete(); 
+    $brand->delete(); 
+
+        return redirect()->route('brand.index')->with('success', 'Marca eliminada con éxito.');
+    }
+    public function catalog()
+    {
+        $brands = Brand::with('images')->get(); // Asegúrate de cargar las imágenes
+        return Inertia::render('Brand/Catalog', [
+            'brands' => $brands
+        ]);
     }
 }

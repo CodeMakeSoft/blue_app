@@ -27,9 +27,6 @@ class DatabaseSeeder extends Seeder
                 $roles->random(rand(1, 3))->pluck('id')->toArray()
             );
         });
-
-        Category::factory(10)->create();
-        Brand::factory(10)->create();
         Product::factory(10)->create();
     }
 }
