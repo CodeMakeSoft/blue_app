@@ -27,7 +27,9 @@ class CartController extends Controller
         $products = $cart->products()->with('images')->withPivot('quantity')->get();
 
         // Return the view of cart with products
-        return Inertia::render('Cart/Index', ['cart' => $products]);
+        return Inertia::render('Cart/Index', [
+            'cart' => $products
+        ]);
     }
 
     // Add to cart
@@ -56,7 +58,10 @@ class CartController extends Controller
         }
 
          // Return success message without redirecting
-        return back()->with('success', 'Producto agregado al carrito.');
+        return Inertia::render('Cart/Index', [
+            'cart' => $cart,
+            'success' => 'Producto agregado al carrito.',
+        ]);  
     }
 
     public function remove($productId)
