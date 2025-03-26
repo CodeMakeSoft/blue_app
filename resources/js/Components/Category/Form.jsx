@@ -26,12 +26,12 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
 
     const handleImageChange = (files) => {
         const fileArray = Array.from(files);
-        setData("new_images", [...(data.new_images || []), ...fileArray]);
+        setData("new_images", [...(data.images || []), ...fileArray]); // Cambiar a "images"
 
         const previews = fileArray.map((file) => URL.createObjectURL(file));
         setImagePreviews([...imagePreviews, ...previews]);
     };
-
+    
     const removeImage = (index) => {
         // Si es una imagen existente, agregar a deleted_images
         if (index < imagePreviews.length - (data.new_images?.length || 0)) {
@@ -109,15 +109,15 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                             value="Descripción"
                             className="text-gray-700 font-semibold"
                         />
-                        <TextInput
+                        <textarea
                             id="description"
-                            type="text"
                             name="description"
                             value={data.description || ""}
-                            className="mt-2 block w-3/4 h-64 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            className="w-full h-64 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2 resize-none whitespace-pre-wrap overflow-auto"
                             onChange={(e) =>
                                 setData("description", e.target.value)
                             }
+                            rows={10}
                         />
                         <InputError
                             message={errors.description}
@@ -139,7 +139,7 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                         <input
                             id="images"
                             type="file"
-                            name="images"
+                            name="new_images"
                             multiple
                             className="hidden"
                             onChange={(e) => handleImageChange(e.target.files)}
@@ -189,9 +189,7 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                                         type="button"
                                         className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
                                         onClick={() => removeImage(index)}
-                                    >
-                                        ×
-                                    </button>
+                                    ></button>
                                 </div>
                             ))}
                         </div>

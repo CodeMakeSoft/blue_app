@@ -38,17 +38,14 @@ class CategoryController extends Controller
             'description' => $validated['description'],
         ]);
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                
-                $path = $image->store('images', 'public'); 
-
-                
-                $category->images()->create([
-                    'url' => $path, 
-                ]);
-            }
+         if ($request->hasFile('new_images')) {
+        foreach ($request->file('new_images') as $image) {
+            $path = $image->store('images', 'public');
+            $category->images()->create([
+                'url' => $path,
+            ]);
         }
+    }
 
         return redirect()->route('category.index')->with('success', 'Category created successfully.');
     }

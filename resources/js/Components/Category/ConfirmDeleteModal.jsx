@@ -1,4 +1,5 @@
 import React from "react";
+import { TrashIcon } from "@heroicons/react/24/solid";
 
 export default function ConfirmDeleteModal({ category, onClose, onConfirm }) {
     if (!category) return null;
@@ -6,9 +7,12 @@ export default function ConfirmDeleteModal({ category, onClose, onConfirm }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h3 className="text-lg font-semibold text-gray-900">
-                    Confirmar Eliminación
-                </h3>
+                <div className="flex flex-col items-center">
+                    <TrashIcon className="w-20 h-20 text-gray-500 mb-10" />
+                    <h3 className="text-lg font-semibold text-gray-900">
+                        Confirmar Eliminación
+                    </h3>
+                </div>
                 <p className="mt-2 text-gray-700">
                     ¿Estás seguro de que deseas eliminar la categoría{" "}
                     <strong>{category.name}</strong>?
