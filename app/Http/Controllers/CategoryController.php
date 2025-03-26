@@ -14,7 +14,7 @@ class CategoryController extends Controller
      */
     public function index(): Response
     {
-       $categories = Category::all(); // Obtén las categorías desde tu base de datos
+       $categories = Category::paginate(10); // Obtén las categorías desde tu base de datos
         return Inertia::render('Admin/Category', [
             'categories' => $categories,
             'activeRoute' => request()->route()->getName(), // Pasa la ruta activa

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -15,11 +16,12 @@ class UserController extends Controller
      */
     public function index(): Response
     {
-        $users = User::all(); // Obtén las categorías desde tu base de datos
+        $users = User::paginate(10); // Paginar con 10 usuarios por página
         return Inertia::render('Admin/User', [
-            'users' => $users,
-            'activeRoute' => request()->route()->getName(), // Pasa la ruta activa
-        ]); 
+        'users' => User::with('roles')->paginate(10),
+        'roles' => Role::all(), 
+        'activeRoute' => request()->route()->getName(),
+    ]);
     }
 
     /**
@@ -35,21 +37,18 @@ class UserController extends Controller
      */
     public function store(Request $request, User $user)
     {
-         $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'phone' => 'nullable|string|unique:users,phone',
-        'password' => 'required|string|min:8',
-    ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+            'phone' => 'nullable|string',
+            'roles' => 'array',
+        ]);
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'phone' => $request->phone,
-        'password' => Hash::make($request->password), // Encriptar la contraseña
-    ]);
+        $user = User::create($request->only(['name', 'email', 'phone', 'password']));
+        $user->syncRoles($request->roles);
 
-    return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->back()->with('success', 'User created successfully');
     }
 
     /**
@@ -73,26 +72,23 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-    // Validar los datos del formulario
-    $request->validate([
+     $request->validate([
         'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'phone' => 'nullable|string|unique:users,phone,' . $user->id,
-        'password' => 'nullable|string|min:8', // La contraseña es opcional en la actualización
+        'email' => 'required|email|unique:users,email,'.$user->id,
+        'password' => 'nullable|string|min:8',
+        'phone' => 'nullable|string',
+        'roles' => 'array',
     ]);
-    // Preparar los datos para la actualización
-    $data = [
-        'name' => $request->name,
-        'email' => $request->email,
-        'phone' => $request->phone,
-    ];
-    if ($request->filled('password')) {
-        $data['password'] = bcrypt($request->password);
+
+    $data = $request->only(['name', 'email', 'phone']);
+    if ($request->password) {
+        $data['password'] = $request->password;
     }
-        $file = $request->file('avatar');
-    
+
     $user->update($data);
-    return redirect()->route('users.index')->with('success', 'User updated successfully.');
+    $user->syncRoles($request->roles);
+
+    return redirect()->back()->with('success', 'User updated successfully');
 }
 
     /**

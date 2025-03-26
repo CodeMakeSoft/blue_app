@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
@@ -34,6 +35,6 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('admin/categories', CategoryController::class)->middleware(['auth', 'verified']);
 Route::resource('admin/users', UserController::class)->middleware(['auth', 'verified']);
-Route::resource("users", UserController::class);
+Route::resource('admin/roles', RoleController::class)->middleware(['auth', 'verified']);
 
 require __DIR__.'/auth.php';

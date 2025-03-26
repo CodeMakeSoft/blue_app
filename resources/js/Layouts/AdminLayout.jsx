@@ -18,8 +18,9 @@ import {
 export default function AdminLayout({ children, activeRoute }) {
     return (
         <div className="flex min-h-screen">
-            {/* Sidebar */}
+            {/* Sidebar */}  
             <Sidebar>
+                
                 <SidebarItem
                     icon={<UsersIcon className="h-5 w-5" />}
                     text="Roles and permissions"
