@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useForm } from '@inertiajs/react';
-import Confirm from '@/Components/Cart/Confirm'; // Importamos el componente Confirm
-import { Inertia } from '@inertiajs/inertia'; // Importar Inertia
+import { Inertia } from '@inertiajs/inertia';
+import Confirm from '@/Components/Cart/Confirm';
 
 export default function ProductList({ products }) {
     const [cartProducts, setCartProducts] = useState(products);
     const [confirmProductId, setConfirmProductId] = useState(null);
 
-    // Función para actualizar la cantidad de un producto
     const handleQuantityUpdate = (productId, newQuantity) => {
         const quantity = parseInt(newQuantity, 10);
 
@@ -29,7 +27,7 @@ export default function ProductList({ products }) {
             )
         );
 
-        Inertia.post(route('cart.update', productId), { quantity }, {
+        Inertia.put(route('cart.update', productId), { quantity }, {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => console.log('Carrito actualizado'),
@@ -37,12 +35,11 @@ export default function ProductList({ products }) {
         });
     };
 
-    // Función para manejar la eliminación de un producto
     const handleRemoveProduct = (productId) => {
         setCartProducts(cartProducts.filter((product) => product.id !== productId));
         setConfirmProductId(null);
 
-        Inertia.post(route('cart.remove', productId), {}, {
+        Inertia.delete(route('cart.remove', productId), {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => console.log('Producto eliminado'),
@@ -50,18 +47,16 @@ export default function ProductList({ products }) {
         });
     };
 
-    // Función para cancelar la eliminación
     const handleCancelRemove = () => {
         setConfirmProductId(null);
     };
 
     return (
         <ul className="divide-y divide-slate-100 bg-white p-6 rounded-lg shadow-md mt-[1em]">
-            {cartProducts.map((product, index) => (
+            {cartProducts.map((product) => (
                 <React.Fragment key={product.id}>
-                    <div >
-                        <li className="flex gap-4 p-6 border_bottom">
-                            {/* Imagen del producto */}
+                    <div>
+                        <li className="flex gap-4 p-6 border-bottom my-[1em]">
                             <div className="w-24 h-24 shrink-0">
                                 <img
                                     src={product.images.length > 0 ? product.images[0].url : null}
@@ -70,7 +65,6 @@ export default function ProductList({ products }) {
                                 />
                             </div>
 
-                            {/* Detalles del producto */}
                             <div className="flex-1">
                                 <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
                                 <p className="text-sm text-gray-500">{product.description}</p>
@@ -78,9 +72,7 @@ export default function ProductList({ products }) {
                                 <p className="text-sm text-gray-500">Color: {product.color}</p>
                                 <p className="text-sm text-gray-500">Precio: ${product.price}</p>
 
-                                {/* Contador de cantidad */}
                                 <div className="mt-4 flex items-center gap-3">
-                                    {/* Botón "-" */}
                                     <button
                                         onClick={() => {
                                             const newQuantity = product.pivot.quantity - 1;
@@ -91,10 +83,8 @@ export default function ProductList({ products }) {
                                         <span className="text-sm">-</span>
                                     </button>
 
-                                    {/* Mostrar cantidad */}
                                     <span className="text-sm">{product.pivot.quantity}</span>
 
-                                    {/* Botón "+" */}
                                     <button
                                         onClick={() => {
                                             const newQuantity = product.pivot.quantity + 1;
@@ -107,7 +97,6 @@ export default function ProductList({ products }) {
                                 </div>
                             </div>
 
-                            {/* Botón para eliminar el producto */}
                             <div className="flex flex-col items-end justify-between">
                                 <button
                                     onClick={(e) => {
@@ -125,7 +114,6 @@ export default function ProductList({ products }) {
                                     </svg>
                                 </button>
 
-                                {/* Renderizar la ventana modal si confirmProductId coincide con el producto actual */}
                                 {confirmProductId === product.id && (
                                     <Confirm
                                         title={`Eliminar "${product.name}"`}
@@ -135,16 +123,15 @@ export default function ProductList({ products }) {
                                     />
                                 )}
 
-                                {/* Precio total del producto */}
                                 <p className="text-lg font-semibold text-gray-900">
                                     ${(product.price * product.pivot.quantity).toFixed(2)}
                                 </p>
                             </div>
                         </li>
                     </div>
-                    <hr className="my-3 border-t" />
                 </React.Fragment>
             ))}
         </ul>
+        
     );
 }

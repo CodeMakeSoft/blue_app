@@ -73,7 +73,10 @@ class CartController extends Controller
         }
 
         // Return success message without redirecting
-        return back()->with('success', 'Producto eliminado del carrito.');
+        return Inertia::render('Cart/Index', [
+            'cart' => $cart,
+            'success' => 'Producto eliminado del carrito.',
+        ]);  
     }
     
     public function update(Request $request, $productId)
@@ -105,7 +108,10 @@ class CartController extends Controller
         }
     
         // Return success message without redirecting
-        return back()->with('success', 'Cantidad actualizada.');
+        return Inertia::render('Cart/Index', [
+            'cart' => $cart,
+            'success' => 'Cantidad actualizada.',
+        ]);    
     }
 }
 

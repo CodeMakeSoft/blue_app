@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 
-.border_bottom {
+.border-bottom {
     border-bottom: 1px solid #222;
 }
