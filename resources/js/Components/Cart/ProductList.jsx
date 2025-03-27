@@ -2,37 +2,23 @@ import React, { useState } from 'react';
 import { Inertia } from '@inertiajs/inertia';
 import Confirm from '@/Components/Cart/Confirm';
 
-export default function ProductList({ products }) {
+export default function ProductList({ products, onQuantityChange }) {
     const [cartProducts, setCartProducts] = useState(products);
     const [confirmProductId, setConfirmProductId] = useState(null);
 
-    const handleQuantityUpdate = (productId, newQuantity) => {
-        const quantity = parseInt(newQuantity, 10);
-
-        if (isNaN(quantity) || quantity < 0) {
-            console.error('Cantidad inválida:', newQuantity);
-            return;
-        }
-
-        if (quantity === 0) {
-            handleRemoveProduct(productId);
-            return;
-        }
-
-        setCartProducts(
-            cartProducts.map((product) =>
-                product.id === productId 
-                    ? { ...product, pivot: { ...product.pivot, quantity: quantity } } 
+    const handleQuantityChangeLocal = (productId, newQuantity) => {
+        // Actualiza el estado local de cartProducts
+        newQuantity === 0 ? handleRemoveProduct(productId) :
+        setCartProducts((prevProducts) =>
+            prevProducts.map((product) =>
+                product.id === productId
+                    ? { ...product, pivot: { ...product.pivot, quantity: newQuantity } }
                     : product
             )
         );
-
-        Inertia.put(route('cart.update', productId), { quantity }, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: () => console.log('Carrito actualizado'),
-            onError: (error) => console.error('Error al actualizar el carrito:', error),
-        });
+    
+        // Llama a la función pasada como prop para actualizar el servidor
+        onQuantityChange(productId, newQuantity);
     };
 
     const handleRemoveProduct = (productId) => {
@@ -76,7 +62,7 @@ export default function ProductList({ products }) {
                                     <button
                                         onClick={() => {
                                             const newQuantity = product.pivot.quantity - 1;
-                                            handleQuantityUpdate(product.id, newQuantity);
+                                            handleQuantityChangeLocal(product.id, newQuantity);
                                         }}
                                         className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full hover:bg-gray-300"
                                     >
@@ -88,7 +74,7 @@ export default function ProductList({ products }) {
                                     <button
                                         onClick={() => {
                                             const newQuantity = product.pivot.quantity + 1;
-                                            handleQuantityUpdate(product.id, newQuantity);
+                                            handleQuantityChangeLocal(product.id, newQuantity);
                                         }}
                                         className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full hover:bg-gray-300"
                                     >

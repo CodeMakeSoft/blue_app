@@ -16,12 +16,12 @@ export default function CartSummary({ total }) {
                 </div>
                 <div className="flex justify-between">
                     <span className="text-gray-600">Impuestos</span>
-                    <span className="font-semibold">$2.00</span>
+                    <span className="font-semibold">${total.taxes.toFixed(2)}</span>
                 </div>
                 <hr className="border-gray-200" />
                 <div className="flex justify-between">
                     <span className="text-lg font-bold">Total</span>
-                    <span className="text-lg font-bold">${(total.subtotal + 7).toFixed(2)}</span>
+                    <span className="text-lg font-bold">${total.total.toFixed(2)}</span>
                 </div>
             </div>
 

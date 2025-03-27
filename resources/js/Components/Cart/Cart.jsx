@@ -4,7 +4,7 @@ import Navbar from '@/Components/Cart/Navbar';
 import ProductList from '@/Components/Cart/ProductList';
 import CartSummary from '@/Components/Cart/CartSummary';
 
-export default function Cart({ cart }) {
+export default function Cart({ cart, total, onQuantityChange }) {
     // Calcular el total del carrito
     const calculateTotal = () => {
         const subtotal = cart.reduce((total, product) => {
@@ -13,7 +13,7 @@ export default function Cart({ cart }) {
 
         return {
             subtotal,
-        };
+        }
     };
 
     // Estado para mostrar/ocultar la confirmación parcial
@@ -35,8 +35,8 @@ export default function Cart({ cart }) {
                 <p className="text-center text-gray-600 mt-[3em]">Tu carrito está vacío.</p>
             ) : (
                 <>
-                    <ProductList products={cart} />
-                    <CartSummary total={calculateTotal()} />
+                    <ProductList products={cart} onQuantityChange={onQuantityChange} />
+                    <CartSummary total={total} />
                 </>
             )}
         </div>
