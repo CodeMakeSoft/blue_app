@@ -6,9 +6,18 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Http\Controllers\Controller;
 
 class RoleController extends Controller
 {
+    /*
+    public function __construct()
+    {
+        $this->middleware('permission:manage roles', ['only' => ['index']]);
+        $this->middleware('permission:create roles', ['only' => ['create', 'store']]);
+        $this->middleware('permission:edit roles', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:delete roles', ['only' => ['destroy']]);
+    }*/
     /**
      * Display a listing of the resource.
      */

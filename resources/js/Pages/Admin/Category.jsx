@@ -11,7 +11,7 @@ import {
 } from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
 
-export default function Category({ activeRoute }) {
+export default function Category({ activeRoute, can}) {
     const { categories } = usePage().props; // categories ahora es un objeto paginado
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -48,13 +48,15 @@ export default function Category({ activeRoute }) {
                 </div>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
-                        <button
-                            onClick={() => openModal()}
-                            className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
-                        >
-                            <PlusCircleIcon className="h-6 w-6 mr-2" />
-                            Add Category
-                        </button>
+                        {can.category_create && (
+                            <button
+                                onClick={() => openModal()}
+                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
+                            >
+                                <PlusCircleIcon className="h-6 w-6 mr-2" />
+                                Add Category
+                            </button>
+                        )}
                     </div>
                     <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
                         <thead>
@@ -101,24 +103,28 @@ export default function Category({ activeRoute }) {
                                             {category.description}
                                         </td>
                                         <td className="p-3 flex gap-2">
-                                            <button
-                                                onClick={() =>
-                                                    openModal(category)
-                                                }
-                                                className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                            >
-                                                <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(category.id)
-                                                }
-                                                className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                            >
-                                                <TrashIcon className="h-5 w-5 mr-2" />
-                                                Delete
-                                            </button>
+                                            {can.category_edit && (
+                                                <button
+                                                    onClick={() =>
+                                                        openModal(category)
+                                                    }
+                                                    className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                                                >
+                                                    <PencilSquareIcon className="h-5 w-5 mr-2" />
+                                                    Edit
+                                                </button>
+                                            )}
+                                            {can.category_delete && (
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(category.id)
+                                                    }
+                                                    className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                                                >
+                                                    <TrashIcon className="h-5 w-5 mr-2" />
+                                                    Delete
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
@@ -137,7 +143,8 @@ export default function Category({ activeRoute }) {
                     {/* Paginación */}
                     <Pagination
                         data={categories}
-                        onPageChange={handlePageChange} />
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             </div>
             <CategoryFormModal

@@ -6,19 +6,27 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\User;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-       $categories = Category::paginate(10); // Obtén las categorías desde tu base de datos
+        $categories = Category::paginate(10);
+        
         return Inertia::render('Admin/Category', [
             'categories' => $categories,
-            'activeRoute' => request()->route()->getName(), // Pasa la ruta activa
-        ]); 
+            'activeRoute' => $request->route()->getName(),
+            'can' => [
+                'category_edit' => $request->user() ? $request->user()->can('category-edit') : false,
+                'category_delete' => $request->user() ? $request->user()->can('category-delete') : false,
+                'category_create' => $request->user() ? $request->user()->can('category-create') : false,
+                
+            ],
+        ]);
     }
 
     /**
