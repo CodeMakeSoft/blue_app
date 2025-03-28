@@ -14,12 +14,18 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            "role-view",
             "role-create",
             "role-edit",
             "role-delete",
+            "category-view",
             "category-create",
             "category-edit",
             "category-delete",
+            'permission-view',
+            'permission-create',
+            'permission-edit',
+            'permission-delete'
         ];
         foreach($permissions as $key => $permission){
             Permission::create(['name' => $permission]);

@@ -8,9 +8,21 @@ use Inertia\Response;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('role:Admin|Manager'),
+            new Middleware('permission:user-view', only: ['index']),
+            new Middleware('permission:user-create', only: ['store']),
+            new Middleware('permission:user-edit', only: ['update']),
+            new Middleware('permission:user-delete', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

@@ -7,17 +7,23 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class RoleController extends Controller
+
+class RoleController extends Controller implements HasMiddleware
 {
-    /*
-    public function __construct()
+    
+    public static function middleware(): array
     {
-        $this->middleware('permission:manage roles', ['only' => ['index']]);
-        $this->middleware('permission:create roles', ['only' => ['create', 'store']]);
-        $this->middleware('permission:edit roles', ['only' => ['edit', 'update']]);
-        $this->middleware('permission:delete roles', ['only' => ['destroy']]);
-    }*/
+        return [
+            new Middleware('role:Admin|Manager'),
+            new Middleware('permission:role-view', only: ['index']),
+            new Middleware('permission:role-create', only: ['store']),
+            new Middleware('permission:role-edit', only: ['update']),
+            new Middleware('permission:role-delete', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

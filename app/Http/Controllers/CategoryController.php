@@ -7,9 +7,21 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\User;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('role:Admin|Manager'),
+            new Middleware('permission:category-view', only: ['index']),
+            new Middleware('permission:category-create', only: ['store']),
+            new Middleware('permission:category-edit', only: ['update']),
+            new Middleware('permission:category-delete', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

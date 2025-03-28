@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\CategoryController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PermissionController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -25,7 +26,7 @@ Route::get('/admin', function () {
     return Inertia::render('Admin/AdminPanel', [
         'activeRoute' => request()->route()->getName(),
     ]);
-})->middleware(['auth', 'verified'])->name('admin.panel');
+})->middleware(['auth', 'verified', 'role:Admin|Manager'])->name('admin.panel');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -33,8 +34,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('admin/categories', CategoryController::class)->middleware(['auth', 'verified']);
-Route::resource('admin/users', UserController::class)->middleware(['auth', 'verified']);
-Route::resource('admin/roles', RoleController::class)->middleware(['auth', 'verified']);
+Route::group(['middleware' => ['auth']], function() {
+    Route::resource('admin/categories', CategoryController::class);
+    Route::resource('admin/users', UserController::class);
+    Route::resource('admin/roles', RoleController::class);
+    Route::resource('admin/permissions', PermissionController::class);
+});
+
+
 
 require __DIR__.'/auth.php';
