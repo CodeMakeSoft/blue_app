@@ -9,6 +9,32 @@ use Inertia\Inertia;
 
 class CartController extends Controller
 {
+    private $taxRate = 0.16;
+    private $shippingCost = 100;
+
+    // random shipping cost is a constructor (magic method)
+    public function __construct()
+    {
+        $this->shippingCost = rand(50, 200);
+    }
+
+    // Function to calculate total
+    private function calculateSubtotal($products)
+    {
+        return $products->sum(function ($product) {
+            return $product->price * $product->pivot->quantity;
+        });
+    }
+    private function calculateTaxes($subtotal)
+    {
+        return $subtotal * $this->taxRate;
+    }
+
+    private function calculateTotal($subtotal, $taxes)
+    {
+        return $subtotal + $taxes;
+    }
+
     // Show cart
     public function index()
     {
@@ -25,10 +51,20 @@ class CartController extends Controller
 
         // Get products with quantity (pivot)
         $products = $cart->products()->with('images')->withPivot('quantity')->get();
+        // Calculate subtotal, taxes, and total
+        $subtotal = $this->calculateSubtotal($products);
+        $taxes = $this->calculateTaxes($subtotal);
+        $total = $this->calculateTotal($subtotal, $taxes);
 
         // Return the view of cart with products
         return Inertia::render('Cart/Index', [
-            'cart' => $products
+            'cart' => $products,
+            'total' => [
+                'subtotal' => $subtotal,
+                'taxes' => $taxes,
+                'total' => $total,
+                'shipping' => $this->shippingCost,
+            ],
         ]);
     }
 
@@ -75,13 +111,23 @@ class CartController extends Controller
         if ($cart)
         {
             $cart->products()->detach($productId);
+
+            $products = $cart->products()->with('images')->withPivot('quantity')->get();
+            $subtotal = $this->calculateSubtotal($products);
+            $taxes = $this->calculateTaxes($subtotal);
+            $total = $this->calculateTotal($subtotal, $taxes);
         }
 
         // Return success message without redirecting
         return Inertia::render('Cart/Index', [
-            'cart' => $cart,
-            'success' => 'Producto eliminado del carrito.',
-        ]);  
+            'cart' => $products,
+            'total' => [
+                'subtotal' => $subtotal,
+                'taxes' => $taxes,
+                'total' => $total,
+                'shipping' => $this->shippingCost,
+            ],
+        ]);   
     }
     
     public function update(Request $request, $productId)
@@ -90,33 +136,38 @@ class CartController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:0',
         ]);
-    
-        // Obtener el usuario autenticado
+
         $user = Auth::user();
-    
-        // Obtener el carrito del usuario
         $cart = $user->cart;
     
         if ($cart) {
-            // Verificar si el producto existe en el carrito
             if ($cart->products()->where('product_id', $productId)->exists()) {
                 if ($request->quantity === 0) {
                     // Si la cantidad es 0, eliminar el producto
-                    $cart->products()->detach($productId);
+                    $cart->products()->detach($productId);  
                 } else {
                     // Actualizar la cantidad del producto
                     $cart->products()->updateExistingPivot($productId, [
                         'quantity' => $request->quantity,
                     ]);
-                }
-            }
+                }     
+            }  
+
+            $products = $cart->products()->with('images')->withPivot('quantity')->get();
+            $subtotal = $this->calculateSubtotal($products);
+            $taxes = $this->calculateTaxes($subtotal);
+            $total = $this->calculateTotal($subtotal, $taxes);  
+
+            return Inertia::render('Cart/Index', [
+                'cart' => $products,
+                'total' => [
+                    'subtotal' => $subtotal,
+                    'taxes' => $taxes,
+                    'total' => $total,
+                    'shipping' => $this->shippingCost,
+                ],
+            ]);   
         }
-    
-        // Return success message without redirecting
-        return Inertia::render('Cart/Index', [
-            'cart' => $cart,
-            'success' => 'Cantidad actualizada.',
-        ]);    
     }
 }
 

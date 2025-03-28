@@ -1,49 +1,62 @@
 import React, { useState } from 'react';
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/react';
 import Confirm from '@/Components/Cart/Confirm';
 
-export default function ProductList({ products }) {
+export default function ProductList({ products, onQuantityChange, onSummaryUpdate }) {
     const [cartProducts, setCartProducts] = useState(products);
     const [confirmProductId, setConfirmProductId] = useState(null);
 
-    const handleQuantityUpdate = (productId, newQuantity) => {
-        const quantity = parseInt(newQuantity, 10);
-
-        if (isNaN(quantity) || quantity < 0) {
-            console.error('Cantidad inválida:', newQuantity);
-            return;
-        }
-
-        if (quantity === 0) {
-            handleRemoveProduct(productId);
-            return;
-        }
-
-        setCartProducts(
-            cartProducts.map((product) =>
-                product.id === productId 
-                    ? { ...product, pivot: { ...product.pivot, quantity: quantity } } 
+    const handleQuantityChangeLocal = (productId, newQuantity) => {
+        // Actualiza el estado local de cartProducts
+        newQuantity === 0 ? handleRemoveProduct(productId) :
+        setCartProducts((prevProducts) =>
+            prevProducts.map((product) =>
+                product.id === productId
+                    ? { ...product, pivot: { ...product.pivot, quantity: newQuantity } }
                     : product
             )
         );
 
-        Inertia.put(route('cart.update', productId), { quantity }, {
+        router.visit(route('cart.update', productId), {
+            method: 'put',
+            data: { quantity: newQuantity },
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => console.log('Carrito actualizado'),
-            onError: (error) => console.error('Error al actualizar el carrito:', error),
+            onSuccess: (page) => {
+                // Update cart data from the page props
+                if (page.props.cart) {
+                    setCartProducts(page.props.cart);
+                }
+                if (page.props.total) {
+                    onSummaryUpdate(page.props.total);
+                }
+                onQuantityChange(productId, newQuantity);
+            },
+            onError: (error) => {
+                console.error('Error al actualizar la cantidad:', error);
+            },
         });
-    };
+};
 
     const handleRemoveProduct = (productId) => {
         setCartProducts(cartProducts.filter((product) => product.id !== productId));
         setConfirmProductId(null);
 
-        Inertia.delete(route('cart.remove', productId), {
+        router.visit(route('cart.remove', productId), {
+            method: 'delete',
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => console.log('Producto eliminado'),
-            onError: (error) => console.error('Error al eliminar el producto:', error),
+            onSuccess: (page) => {
+                if (page.props.cart) {
+                    setCartProducts(page.props.cart);
+                }
+                if (page.props.total) {
+                    onSummaryUpdate(page.props.total);
+                }
+            },
+            onError: (error) => {
+                console.error('Error al eliminar el producto:', error);
+            },
         });
     };
 
@@ -76,7 +89,7 @@ export default function ProductList({ products }) {
                                     <button
                                         onClick={() => {
                                             const newQuantity = product.pivot.quantity - 1;
-                                            handleQuantityUpdate(product.id, newQuantity);
+                                            handleQuantityChangeLocal(product.id, newQuantity);
                                         }}
                                         className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full hover:bg-gray-300"
                                     >
@@ -88,7 +101,7 @@ export default function ProductList({ products }) {
                                     <button
                                         onClick={() => {
                                             const newQuantity = product.pivot.quantity + 1;
-                                            handleQuantityUpdate(product.id, newQuantity);
+                                            handleQuantityChangeLocal(product.id, newQuantity);
                                         }}
                                         className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full hover:bg-gray-300"
                                     >
@@ -103,7 +116,7 @@ export default function ProductList({ products }) {
                                         e.preventDefault();
                                         setConfirmProductId(product.id);
                                     }}
-                                    className="text-gray-400 hover:text-red-500"
+                                    className="text-gray-400 hover:text-[#D1130F]"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path
