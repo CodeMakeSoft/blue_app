@@ -23,8 +23,8 @@ export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisib
                     <Link
                         href={route('cart.index')}
                         className={`block px-3 py-2 rounded-md ${
-                            activeLink === 'cart.index' ? 'bg-sky-500 text-white' : 'text-black'
-                        } hover:bg-sky-500 hover:text-white`}
+                            activeLink === 'cart.index' ? 'bg-slate-300 text-black' : 'text-black'
+                        } hover:bg-[#1F2937] hover:text-white`}
                     >
                         Seguir Comprando
                     </Link>
@@ -37,8 +37,8 @@ export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisib
                             setIsConfirmVisible(true); // Mostrar la ventana modal
                         }}
                         className={`block px-3 py-2 rounded-md ${
-                            activeLink === 'cart.confirm' ? 'bg-sky-500 text-white' : 'text-black'
-                        } hover:bg-sky-500 hover:text-white`}
+                            activeLink === 'cart.confirm' ? 'bg-slate-300 text-black' : 'text-black'
+                        } hover:bg-[#1F2937] hover:text-white`}
                     >
                         Proceder al Pago
                     </Link>

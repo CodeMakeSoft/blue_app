@@ -29,7 +29,7 @@ export default function CartSummary({ total }) {
             <div className="mt-6 space-y-2">
                 <button
                     type="button"
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                    className="w-full bg-[#1F2937] text-white py-2 rounded-lg hover:bg-gray-500"
                 >
                     Proceder al Pago
                 </button>

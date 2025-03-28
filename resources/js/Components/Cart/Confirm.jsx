@@ -23,7 +23,7 @@ export default function Confirm({ title, message, onConfirm, onCancel }) {
                     {/* Botón Confirmar */}
                     <button
                         onClick={onConfirm}
-                        className="block w-full sm:w-1/2 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                        className="block w-full sm:w-1/2 py-2 rounded-lg bg-[#1F2937] text-white hover:bg-gray-500"
                     >
                         Confirmar
                     </button>

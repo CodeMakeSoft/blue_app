@@ -89,7 +89,7 @@ export default function ProductList({ products, onQuantityChange }) {
                                         e.preventDefault();
                                         setConfirmProductId(product.id);
                                     }}
-                                    className="text-gray-400 hover:text-red-500"
+                                    className="text-gray-400 hover:text-[#D1130F]"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path
