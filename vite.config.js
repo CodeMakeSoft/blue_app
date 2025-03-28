@@ -10,4 +10,32 @@ export default defineConfig({
         }),
         react(),
     ],
-});
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+        },
+    },
+    optimizeDeps: {
+        include: [
+            '@inertiajs/react', 
+            '@stripe/stripe-js',
+            'prop-types'
+        ]
+    },
+    server: {
+        hmr: {
+            host: 'localhost',
+        },
+    },
+    build: {
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom', '@inertiajs/react', 'prop-types'],
+                    stripe: ['@stripe/stripe-js']
+                }
+            }
+        }
+    }
+})
