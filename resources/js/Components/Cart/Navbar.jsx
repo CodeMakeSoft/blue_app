@@ -2,11 +2,13 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import Confirm from '@/Components/Cart/Confirm'; // Importamos el componente Confirm
 
-export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisible }) {
+export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisible, isCartEmpty }) {
     // Función para manejar la confirmación
     const handleConfirm = () => {
-        // Aquí puedes agregar lógica para proceder con el pago (por ejemplo, redirigir al usuario)
-        console.log('Compra confirmada');
+        if (!isCartEmpty) {
+            // Lógica para proceder con el pago
+            console.log('Procediendo al pago...');
+        }
         setIsConfirmVisible(false); // Ocultar la ventana modal después de confirmar
     };
 
@@ -45,11 +47,15 @@ export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisib
                 </li>
             </ul>
 
-            {/* Renderizar la ventana modal si isConfirmVisible es true */}
+            {/* Modal de Confirmación condicional */}
             {isConfirmVisible && (
                 <Confirm
-                    title="Confirmación de Compra"
-                    message="¿Estás seguro de realizar esta compra?"
+                    title={isCartEmpty ? "Carrito Vacío" : "Confirmación de Compra"}
+                    message={
+                        isCartEmpty 
+                            ? "Debes agregar productos al carrito antes de proceder al pago."
+                            : "¿Estás seguro de realizar esta compra?"
+                    }
                     onConfirm={handleConfirm}
                     onCancel={handleCancel}
                 />

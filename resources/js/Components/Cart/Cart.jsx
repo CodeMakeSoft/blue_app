@@ -17,6 +17,7 @@ export default function Cart({ cart, total, onQuantityChange, onSummaryUpdate })
                 activeLink="cart.index" 
                 isConfirmVisible={isConfirmVisible} 
                 setIsConfirmVisible={setIsConfirmVisible} 
+                isCartEmpty={cart.length === 0}
             />
 
             {/* Lista de productos en el carrito */}
@@ -35,3 +36,4 @@ export default function Cart({ cart, total, onQuantityChange, onSummaryUpdate })
         </div>
     );
 }
+

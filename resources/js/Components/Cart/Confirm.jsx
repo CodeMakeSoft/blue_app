@@ -32,3 +32,4 @@ export default function Confirm({ title, message, onConfirm, onCancel }) {
         </div>
     );
 }   
+

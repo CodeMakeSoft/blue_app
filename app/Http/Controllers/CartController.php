@@ -10,6 +10,13 @@ use Inertia\Inertia;
 class CartController extends Controller
 {
     private $taxRate = 0.16;
+    private $shippingCost = 100;
+
+    // random shipping cost is a constructor (magic method)
+    public function __construct()
+    {
+        $this->shippingCost = rand(50, 200);
+    }
 
     // Function to calculate total
     private function calculateSubtotal($products)
@@ -56,6 +63,7 @@ class CartController extends Controller
                 'subtotal' => $subtotal,
                 'taxes' => $taxes,
                 'total' => $total,
+                'shipping' => $this->shippingCost,
             ],
         ]);
     }
@@ -117,6 +125,7 @@ class CartController extends Controller
                 'subtotal' => $subtotal,
                 'taxes' => $taxes,
                 'total' => $total,
+                'shipping' => $this->shippingCost,
             ],
         ]);   
     }
@@ -155,6 +164,7 @@ class CartController extends Controller
                     'subtotal' => $subtotal,
                     'taxes' => $taxes,
                     'total' => $total,
+                    'shipping' => $this->shippingCost,
                 ],
             ]);   
         }

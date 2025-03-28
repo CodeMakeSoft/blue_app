@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-//import { Inertia } from '@inertiajs/inertia';
 import { router } from '@inertiajs/react';
 import Confirm from '@/Components/Cart/Confirm';
 
