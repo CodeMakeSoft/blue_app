@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Inertia } from '@inertiajs/inertia';
+//import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/react';
 import Confirm from '@/Components/Cart/Confirm';
 
-export default function ProductList({ products, onQuantityChange }) {
+export default function ProductList({ products, onQuantityChange, onSummaryUpdate }) {
     const [cartProducts, setCartProducts] = useState(products);
     const [confirmProductId, setConfirmProductId] = useState(null);
 
@@ -16,20 +17,47 @@ export default function ProductList({ products, onQuantityChange }) {
                     : product
             )
         );
-    
-        // Llama a la función pasada como prop para actualizar el servidor
-        onQuantityChange(productId, newQuantity);
-    };
+
+        router.visit(route('cart.update', productId), {
+            method: 'put',
+            data: { quantity: newQuantity },
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: (page) => {
+                // Update cart data from the page props
+                if (page.props.cart) {
+                    setCartProducts(page.props.cart);
+                }
+                if (page.props.total) {
+                    onSummaryUpdate(page.props.total);
+                }
+                onQuantityChange(productId, newQuantity);
+            },
+            onError: (error) => {
+                console.error('Error al actualizar la cantidad:', error);
+            },
+        });
+};
 
     const handleRemoveProduct = (productId) => {
         setCartProducts(cartProducts.filter((product) => product.id !== productId));
         setConfirmProductId(null);
 
-        Inertia.delete(route('cart.remove', productId), {
+        router.visit(route('cart.remove', productId), {
+            method: 'delete',
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => console.log('Producto eliminado'),
-            onError: (error) => console.error('Error al eliminar el producto:', error),
+            onSuccess: (page) => {
+                if (page.props.cart) {
+                    setCartProducts(page.props.cart);
+                }
+                if (page.props.total) {
+                    onSummaryUpdate(page.props.total);
+                }
+            },
+            onError: (error) => {
+                console.error('Error al eliminar el producto:', error);
+            },
         });
     };
 

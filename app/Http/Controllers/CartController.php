@@ -127,30 +127,15 @@ class CartController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:0',
         ]);
-    
-        // Obtener el usuario autenticado
+
         $user = Auth::user();
-    
-        // Obtener el carrito del usuario
         $cart = $user->cart;
     
         if ($cart) {
-            $products = $cart->products()->with('images')->withPivot('quantity')->get();
-            $subtotal = $this->calculateSubtotal($products);
-            $taxes = $this->calculateTaxes($subtotal);
-            $total = $this->calculateTotal($subtotal, $taxes);  
             if ($cart->products()->where('product_id', $productId)->exists()) {
                 if ($request->quantity === 0) {
                     // Si la cantidad es 0, eliminar el producto
-                    $cart->products()->detach($productId);
-                    return Inertia::render('Cart/Index', [
-                        'cart' => $products,
-                        'total' => [
-                            'subtotal' => $subtotal,
-                            'taxes' => $taxes,
-                            'total' => $total,
-                        ],
-                    ]);   
+                    $cart->products()->detach($productId);  
                 } else {
                     // Actualizar la cantidad del producto
                     $cart->products()->updateExistingPivot($productId, [
@@ -158,6 +143,11 @@ class CartController extends Controller
                     ]);
                 }     
             }  
+
+            $products = $cart->products()->with('images')->withPivot('quantity')->get();
+            $subtotal = $this->calculateSubtotal($products);
+            $taxes = $this->calculateTaxes($subtotal);
+            $total = $this->calculateTotal($subtotal, $taxes);  
 
             return Inertia::render('Cart/Index', [
                 'cart' => $products,

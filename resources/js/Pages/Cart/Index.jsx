@@ -38,6 +38,7 @@ export default function Index({ cart, total }) {
                     cart={cart}
                     total={currentTotal}
                     onQuantityChange={handleQuantityChange}
+                    onSummaryUpdate={setCurrentTotal}
                 />
             </div>
         </AuthenticatedLayout>
