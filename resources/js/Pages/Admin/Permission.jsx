@@ -10,7 +10,7 @@ import {
 import PermissionFormModal from "@/Components/PermissionFormModal";
 import Pagination from "@/Components/Pagination";
 
-export default function Permission({ activeRoute }) {
+export default function Permission({ activeRoute, can}) {
     const { permissions } = usePage().props;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPermission, setSelectedPermission] = useState(null);
@@ -22,8 +22,14 @@ export default function Permission({ activeRoute }) {
 
     const handleDelete = (id) => {
         router.delete(`/admin/permissions/${id}`, {
-            onSuccess: () => toast.success("Permission deleted successfully"),
-            onError: () => toast.error("Failed to delete permission"),
+            onSuccess: () => {
+                toast.success("Permission Deleted Successfully");
+                router.reload();
+            },
+            onError: () => {
+                toast.error("Failed to delete Permission");
+                console.error("Failed to delete permission.");
+            },
         });
     };
 
@@ -33,7 +39,7 @@ export default function Permission({ activeRoute }) {
 
     return (
         <AdminLayout activeRoute={activeRoute}>
-            <Head title="Permissions Management" />
+            <Head title="Permissions " />
             <Toaster position="top-right" richColors />
 
             <div className="card">
@@ -42,13 +48,15 @@ export default function Permission({ activeRoute }) {
                 </div>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
-                        <button
-                            onClick={() => openModal()}
-                            className="flex items-center bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-                        >
-                            <PlusCircleIcon className="h-5 w-5 mr-2" />
-                            Add Permission
-                        </button>
+                        {can.permission_create && (
+                            <button
+                                onClick={() => openModal()}
+                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
+                            >
+                                <PlusCircleIcon className="h-6 w-6 mr-2" />
+                                Add Category
+                            </button>
+                        )}
                     </div>
 
                     <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
@@ -81,24 +89,30 @@ export default function Permission({ activeRoute }) {
                                             {permission.guard_name}
                                         </td>
                                         <td className="p-3 flex gap-2">
-                                            <button
-                                                onClick={() =>
-                                                    openModal(permission)
-                                                }
-                                                className="flex items-center bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                            >
-                                                <PencilSquareIcon className="h-4 w-4 mr-1" />
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(permission.id)
-                                                }
-                                                className="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                            >
-                                                <TrashIcon className="h-4 w-4 mr-1" />
-                                                Delete
-                                            </button>
+                                            {can.permission_edit && (
+                                                <button
+                                                    onClick={() =>
+                                                        openModal(permission)
+                                                    }
+                                                    className="flex items-center bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                                                >
+                                                    <PencilSquareIcon className="h-4 w-4 mr-1" />
+                                                    Edit
+                                                </button>
+                                            )}
+                                            {can.permission_delete && (
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            permission.id
+                                                        )
+                                                    }
+                                                    className="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                                                >
+                                                    <TrashIcon className="h-4 w-4 mr-1" />
+                                                    Delete
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

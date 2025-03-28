@@ -69,7 +69,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <Dropdown.Link
                                             href={route("admin.panel")}
                                         >
-                                            Admin 
+                                            Admin Panel
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route("logout")}

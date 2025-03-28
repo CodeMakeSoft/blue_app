@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Inertia\Response;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\Controller;
@@ -27,7 +28,7 @@ class RoleController extends Controller implements HasMiddleware
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): Response
     {
         $roles = Role::with('permissions')->paginate(10);
         $permissions = Permission::all(); // Obtener todos los permisos
@@ -36,6 +37,12 @@ class RoleController extends Controller implements HasMiddleware
             'roles' => $roles,
             'permissions' => $permissions,
             'activeRoute' => request()->route()->getName(),
+            'can' => [
+                'role_edit' => $request->user() ? $request->user()->can('role-edit') : false,
+                'role_delete' => $request->user() ? $request->user()->can('role-delete') : false,
+                'role_create' => $request->user() ? $request->user()->can('role-create') : false,
+                
+            ],
         ]);
     }
 

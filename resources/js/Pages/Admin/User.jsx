@@ -11,7 +11,7 @@ import {
 } from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
 
-export default function User({ activeRoute }) {
+export default function User({ activeRoute, can }) {
     const { users, roles } = usePage().props; // users ahora es un objeto paginado
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -48,13 +48,15 @@ export default function User({ activeRoute }) {
                 </div>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
-                        <button
-                            onClick={() => openModal()}
-                            className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
-                        >
-                            <PlusCircleIcon className="h-6 w-6 mr-2" />
-                            Add User
-                        </button>
+                        {can.user_create && (
+                            <button
+                                onClick={() => openModal()}
+                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
+                            >
+                                <PlusCircleIcon className="h-6 w-6 mr-2" />
+                                Add User
+                            </button>
+                        )}
                     </div>
                     <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
                         <thead>
@@ -102,22 +104,26 @@ export default function User({ activeRoute }) {
                                             )}
                                         </td>
                                         <td className="p-3 flex gap-2">
-                                            <button
-                                                onClick={() => openModal(user)}
-                                                className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                            >
-                                                <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(user.id)
-                                                }
-                                                className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                            >
-                                                <TrashIcon className="h-5 w-5 mr-2" />
-                                                Delete
-                                            </button>
+                                            {can.user_edit && (
+                                                <button
+                                                    onClick={() => openModal(user)}
+                                                    className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                                                >
+                                                    <PencilSquareIcon className="h-5 w-5 mr-2" />
+                                                    Edit
+                                                </button>
+                                            )}
+                                            {can.user_delete && (
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(user.id)
+                                                    }
+                                                    className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                                                >
+                                                    <TrashIcon className="h-5 w-5 mr-2" />
+                                                    Delete
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

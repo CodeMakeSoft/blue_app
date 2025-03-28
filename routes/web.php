@@ -26,7 +26,7 @@ Route::get('/admin', function () {
     return Inertia::render('Admin/AdminPanel', [
         'activeRoute' => request()->route()->getName(),
     ]);
-})->middleware(['auth', 'verified', 'role:Admin|Manager'])->name('admin.panel');
+})->middleware(['auth', 'verified', 'permission:can-access-admin-panel'])->name('admin.panel');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

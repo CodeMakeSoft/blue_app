@@ -26,14 +26,20 @@ class UserController extends Controller implements HasMiddleware
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $users = User::paginate(10); // Paginar con 10 usuarios por página
         return Inertia::render('Admin/User', [
-        'users' => User::with('roles')->paginate(10),
-        'roles' => Role::all(), 
-        'activeRoute' => request()->route()->getName(),
-    ]);
+            'users' => User::with('roles')->paginate(10),
+            'roles' => Role::all(),
+            'activeRoute' => $request->route()->getName(),
+            'can' => [
+                'user_view' => $request->user()?->can('user-view'),
+                'user_create' => $request->user()?->can('user-create'), 
+                'user_edit' => $request->user()?->can('user-edit'),
+                'user_delete' => $request->user()?->can('user-delete'),
+                'access_admin_panel' => $request->user()?->can('can-access-admin-panel'), // Nuevo permiso
+            ],
+        ]);
     }
 
     /**

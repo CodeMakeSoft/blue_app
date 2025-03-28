@@ -31,6 +31,12 @@ class PermissionController extends Controller implements HasMiddleware
         return Inertia::render('Admin/Permission', [
             'permissions' => $permissions,
             'activeRoute' => $request->route()->getName(),
+            'can' => [
+                'permission_edit' => $request->user() ? $request->user()->can('permission-edit') : false,
+                'permission_delete' => $request->user() ? $request->user()->can('permission-delete') : false,
+                'permission_create' => $request->user() ? $request->user()->can('permission-create') : false,
+                
+            ],
         ]);
     }
 
