@@ -65,13 +65,12 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
         }));
     };
 
-    const handleRoleChange = (roleId) => {
+    const handleRoleSelect = (roleId) => {
         setFormData((prev) => ({
             ...prev,
-            roles: prev.roles.includes(roleId)
-                ? prev.roles.filter((id) => id !== roleId)
-                : [...prev.roles, roleId],
+            roles: roleId ? [roleId] : [], // Solo permite un rol
         }));
+        setIsRolesOpen(false); // Cierra el dropdown al seleccionar
     };
 
     const handleSubmit = (e) => {
@@ -228,12 +227,10 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                         />
                     </div>
 
-                    {/* Menu de roles */}
+                    {/* Selector de Rol Único */}
                     <div className="mb-6 relative" ref={dropdownRef}>
-                        {" "}
-                        {/* Añadido relative aquí */}
                         <label className="block text-sm font-medium mb-2">
-                            Roles *
+                            Role *
                         </label>
                         <button
                             type="button"
@@ -241,14 +238,13 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             className="w-full flex justify-between items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <span className="truncate">
-                                {formData.roles.length > 0
+                                {formData.roles[0]
                                     ? roles
-                                          .filter((r) =>
-                                              formData.roles.includes(r.id)
+                                          .find(
+                                              (r) => r.id === formData.roles[0]
                                           )
-                                          .map((r) => r.name.replace("-", " "))
-                                          .join(", ")
-                                    : "Select roles"}
+                                          ?.name.replace("-", " ")
+                                    : "Select a role"}
                             </span>
                             <svg
                                 className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
@@ -265,79 +261,38 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                                 />
                             </svg>
                         </button>
+
                         {isRolesOpen && (
-                            <div
-                                className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 border border-gray-200 max-h-60 overflow-y-auto"
-                                style={{
-                                    maxHeight: "200px", // Altura máxima ajustable
-                                    width: "calc(100% - 1.5rem)", // Ajuste para no salirse
-                                }}
-                            >
+                            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 border border-gray-200 max-h-60 overflow-y-auto">
+                                <div
+                                    onClick={() => handleRoleSelect(null)}
+                                    className={`px-3 py-2 cursor-pointer hover:bg-blue-50 ${
+                                        formData.roles.length === 0
+                                            ? "bg-blue-50"
+                                            : ""
+                                    }`}
+                                >
+                                    No role
+                                </div>
+
                                 {roles.map((role) => (
                                     <div
                                         key={role.id}
                                         onClick={() =>
-                                            handleRoleChange(role.id)
+                                            handleRoleSelect(role.id)
                                         }
-                                        className={`px-3 py-2 cursor-pointer hover:bg-blue-50 flex items-center ${
+                                        className={`px-3 py-2 cursor-pointer hover:bg-blue-50 ${
                                             formData.roles.includes(role.id)
                                                 ? "bg-blue-50"
                                                 : ""
                                         }`}
                                     >
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.roles.includes(
-                                                role.id
-                                            )}
-                                            readOnly
-                                            className="h-4 w-4 text-blue-600 rounded mr-2"
-                                        />
-                                        <span className="capitalize">
-                                            {role.name.replace("-", " ")}
-                                        </span>
+                                        {role.name.replace("-", " ")}
                                     </div>
                                 ))}
                             </div>
                         )}
-                        {/* Tags de roles seleccionados */}
-                        <div className="mt-2 flex flex-wrap gap-2">
-                            {formData.roles.map((roleId) => {
-                                const role = roles.find((r) => r.id === roleId);
-                                return role ? (
-                                    <span
-                                        key={roleId}
-                                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                    >
-                                        {role.name.replace("-", " ")}
-                                        <button
-                                            type="button"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRoleChange(roleId);
-                                            }}
-                                            className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500"
-                                        >
-                                            <span className="sr-only">
-                                                Remove
-                                            </span>
-                                            <svg
-                                                className="w-2 h-2"
-                                                stroke="currentColor"
-                                                fill="none"
-                                                viewBox="0 0 8 8"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeWidth="1.5"
-                                                    d="M1 1l6 6m0-6L1 7"
-                                                />
-                                            </svg>
-                                        </button>
-                                    </span>
-                                ) : null;
-                            })}
-                        </div>
+
                         {errors.roles && (
                             <p className="text-red-500 text-xs mt-1">
                                 {errors.roles}
