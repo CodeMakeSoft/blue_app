@@ -10,6 +10,7 @@ import {
     TrashIcon,
 } from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
 export default function User({ activeRoute, can }) {
     const { users, roles } = usePage().props; // users ahora es un objeto paginado
@@ -58,92 +59,108 @@ export default function User({ activeRoute, can }) {
                             </button>
                         )}
                     </div>
-                    <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
-                        <thead>
-                            <tr className="bg-gray-100 text-gray-800 border-b">
-                                {[
-                                    "Name",
-                                    "Email",
-                                    "Phone",
-                                    "Roles",
-                                    "Verified",
-                                    "Actions",
-                                ].map((header) => (
-                                    <th
-                                        key={header}
-                                        className="p-3 text-left first:rounded-tl-lg last:rounded-tr-lg"
-                                    >
-                                        {header}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.data.length ? (
-                                users.data.map((user) => (
-                                    <tr key={user.id} className="border-b">
-                                        <td className="p-3">{user.name}</td>
-                                        <td className="p-3">{user.email}</td>
-                                        <td className="p-3">
-                                            {user.phone || "N/A"}
-                                        </td>
-                                        <td className="p-3">
-                                            {user.roles
-                                                ?.map((role) => role.name)
-                                                .join(", ") || "No roles"}
-                                        </td>
-                                        <td className="p-3">
-                                            {user.email_verified_at ? (
-                                                <span className="text-green-600">
-                                                    Verified
-                                                </span>
-                                            ) : (
-                                                <span className="text-red-600">
-                                                    Not Verified
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="p-3 flex gap-2">
-                                            {can.user_edit && (
-                                                <button
-                                                    onClick={() => openModal(user)}
-                                                    className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                                >
-                                                    <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                                    Edit
-                                                </button>
-                                            )}
-                                            {can.user_delete && (
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(user.id)
-                                                    }
-                                                    className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                                >
-                                                    <TrashIcon className="h-5 w-5 mr-2" />
-                                                    Delete
-                                                </button>
-                                            )}
+                    {/* Responsive table*/}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
+                            <thead>
+                                <tr className="bg-gray-100 text-gray-800 border-b">
+                                    {[
+                                        "Name",
+                                        "Email",
+                                        "Phone",
+                                        "Roles",
+                                        "Verified",
+                                        "Actions",
+                                    ].map((header) => (
+                                        <th
+                                            key={header}
+                                            className="p-2 sm:p-3 text-left"
+                                        >
+                                            {header}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.data.length ? (
+                                    users.data.map((user) => (
+                                        /*text-sm, o sm: es para responsive*/
+                                        <tr
+                                            key={user.id}
+                                            className="border-b text-sm sm:text-base"
+                                        >
+                                            <td className="p-2 sm:p-3">
+                                                {user.name}
+                                            </td>
+                                            <td className="p-2 sm:p-3">
+                                                {user.email}
+                                            </td>
+                                            <td className="p-2 sm:p-3">
+                                                {user.phone || "N/A"}
+                                            </td>
+                                            <td className="p-2 sm:p-3">
+                                                {user.roles
+                                                    ?.map((role) => role.name)
+                                                    .join(", ") || "No roles"}
+                                            </td>
+                                            <td className="p-2 sm:p-3">
+                                                {user.email_verified_at ? (
+                                                    <span className="text-green-600">
+                                                        Verified
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-red-600">
+                                                        Not Verified
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="p-2 sm:p-3 flex flex-wrap gap-1 sm:gap-2">
+                                                {can.user_edit && (
+                                                    <button
+                                                        onClick={() =>
+                                                            openModal(user)
+                                                        }
+                                                        className="flex items-center bg-blue-500 text-xs sm:text-sm text-white px-2 sm:px-3 py-1 rounded hover:bg-blue-600 transition"
+                                                    >
+                                                        <PencilSquareIcon className="h-4 sm:h-5 w-4 sm:w-5 mr-1" />
+                                                        Edit
+                                                    </button>
+                                                )}
+                                                {can.user_delete && (
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                user.id
+                                                            )
+                                                        }
+                                                        className="flex items-center bg-red-500 text-xs sm:text-sm text-white px-2 sm:px-3 py-1 rounded hover:bg-red-600 transition"
+                                                    >
+                                                        <TrashIcon className="h-4 sm:h-5 w-4 sm:w-5 mr-1" />
+                                                        Delete
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan={6}
+                                            className="text-center p-4 text-gray-600"
+                                        >
+                                            No users found.
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="text-center p-4 text-gray-600"
-                                    >
-                                        No users found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
                     {/* Paginación */}
                     <Pagination data={users} onPageChange={handlePageChange} />
                 </div>
             </div>
-            {/*Formulario de edicion y creación*/ }
+            {/*Formulario de edicion y creación*/}
             <UserFormModal
                 isOpen={isModalOpen}
                 closeModal={() => setIsModalOpen(false)}

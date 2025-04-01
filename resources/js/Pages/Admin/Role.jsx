@@ -58,11 +58,17 @@ export default function Role({ activeRoute, can }) {
                             </button>
                         )}
                     </div>
-                    <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
-                        <thead>
-                            <tr className="bg-gray-100 text-gray-800 border-b">
-                                {["ID", "Name", "Permissions", "Actions"].map(
-                                    (header) => (
+                     {/* Responsive table*/}
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
+                            <thead>
+                                <tr className="bg-gray-100 text-gray-800 border-b">
+                                    {[
+                                        "ID",
+                                        "Name",
+                                        "Permissions",
+                                        "Actions",
+                                    ].map((header) => (
                                         <th
                                             key={header}
                                             className={`p-3 text-left ${
@@ -73,70 +79,71 @@ export default function Role({ activeRoute, can }) {
                                         >
                                             {header}
                                         </th>
-                                    )
-                                )}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {roles.data.length ? (
-                                roles.data.map((role) => (
-                                    <tr
-                                        key={role.id}
-                                        className="border-b hover:bg-gray-50"
-                                    >
-                                        <td className="p-3 font-mono text-sm text-gray-500">
-                                            {role.id}
-                                        </td>
-                                        <td className="p-3 font-medium">
-                                            {role.name}
-                                        </td>
-                                        <td className="p-3">
-                                            {role.permissions
-                                                ?.map((p) => p.name)
-                                                .join(", ") || "No permissions"}
-                                        </td>
-                                        <td className="p-3">
-                                            <div className="flex justify-end gap-2">
-                                                {can.role_edit && (
-                                                    <button
-                                                        onClick={() =>
-                                                            openModal(role)
-                                                        }
-                                                        className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                                    >
-                                                        <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                                        Edit
-                                                    </button>
-                                                )}
-                                                {can.role_delete && (
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                role.id
-                                                            )
-                                                        }
-                                                        className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                                    >
-                                                        <TrashIcon className="h-5 w-5 mr-2" />
-                                                        Delete
-                                                    </button>
-                                                )}
-                                            </div>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {roles.data.length ? (
+                                    roles.data.map((role) => (
+                                        <tr
+                                            key={role.id}
+                                            className="border-b hover:bg-gray-50"
+                                        >
+                                            <td className="p-3 font-mono text-sm text-gray-500">
+                                                {role.id}
+                                            </td>
+                                            <td className="p-3 font-medium">
+                                                {role.name}
+                                            </td>
+                                            <td className="p-3">
+                                                {role.permissions
+                                                    ?.map((p) => p.name)
+                                                    .join(", ") ||
+                                                    "No permissions"}
+                                            </td>
+                                            <td className="p-3">
+                                                <div className="flex justify-end gap-2">
+                                                    {can.role_edit && (
+                                                        <button
+                                                            onClick={() =>
+                                                                openModal(role)
+                                                            }
+                                                            className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                                                        >
+                                                            <PencilSquareIcon className="h-5 w-5 mr-2" />
+                                                            Edit
+                                                        </button>
+                                                    )}
+                                                    {can.role_delete && (
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    role.id
+                                                                )
+                                                            }
+                                                            className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                                                        >
+                                                            <TrashIcon className="h-5 w-5 mr-2" />
+                                                            Delete
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan={3}
+                                            className="text-center p-4 text-gray-600"
+                                        >
+                                            No roles found.
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td
-                                        colSpan={3}
-                                        className="text-center p-4 text-gray-600"
-                                    >
-                                        No roles found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                     {/* Paginación */}
                     <Pagination data={roles} onPageChange={handlePageChange} />
                 </div>

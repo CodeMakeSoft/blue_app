@@ -17,6 +17,7 @@ class UserController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('role:Admin|Manager'),
+            new Middleware('permission:can-access-admin-panel'),
             new Middleware('permission:user-view', only: ['index']),
             new Middleware('permission:user-create', only: ['store']),
             new Middleware('permission:user-edit', only: ['update']),
@@ -37,7 +38,6 @@ class UserController extends Controller implements HasMiddleware
                 'user_create' => $request->user()?->can('user-create'), 
                 'user_edit' => $request->user()?->can('user-edit'),
                 'user_delete' => $request->user()?->can('user-delete'),
-                'access_admin_panel' => $request->user()?->can('can-access-admin-panel'), // Nuevo permiso
             ],
         ]);
     }

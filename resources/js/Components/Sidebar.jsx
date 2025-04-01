@@ -11,7 +11,17 @@ export const SidebarContext = createContext();
 
 export default function Sidebar({ children }) {
     const user = usePage().props.auth.user;
-    const [expanded, setExpanded] = useState(true);
+    const [expanded, setExpanded] = useState(false); // Cambiado a false para iniciar cerrado
+
+    // Función para alternar el estado
+    const toggleSidebar = () => {
+        setExpanded((curr) => !curr);
+    };
+
+    // Función para cerrar el sidebar
+    const closeSidebar = () => {
+        setExpanded(false);
+    };
 
     return (
         <aside className="h-screen">
@@ -25,7 +35,7 @@ export default function Sidebar({ children }) {
                         alt="Logo"
                     />
                     <button
-                        onClick={() => setExpanded((curr) => !curr)}
+                        onClick={toggleSidebar}
                         className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
                     >
                         {expanded ? (
@@ -36,13 +46,15 @@ export default function Sidebar({ children }) {
                     </button>
                 </div>
 
-                <SidebarContext.Provider value={{ expanded }}>
+                <SidebarContext.Provider value={{ expanded, closeSidebar }}>
                     <ul className="flex-1 px-3">{children}</ul>
                 </SidebarContext.Provider>
 
                 <div className="border-t flex p-3">
                     <img
-                        src={`https://ui-avatars.com/api/?name=${user.name.substring(0,2
+                        src={`https://ui-avatars.com/api/?name=${user.name.substring(
+                            0,
+                            2
                         )}&background=c7d2fe&color=3730a3&bold=true`}
                         alt="Usuario"
                         className="w-10 h-10 rounded-md"
@@ -67,8 +79,18 @@ export default function Sidebar({ children }) {
 }
 
 export function SidebarItem({ icon, text, active, alert, children }) {
-    const { expanded } = useContext(SidebarContext);
+    const { expanded, closeSidebar } = useContext(SidebarContext);
     const [isExpanded, setIsExpanded] = useState(false);
+
+    const handleClick = () => {
+        if (children) {
+            // Si tiene hijos, solo alterna la expansión
+            setIsExpanded(!isExpanded);
+        } else {
+            // Si no tiene hijos, cierra el sidebar
+            closeSidebar();
+        }
+    };
 
     return (
         <li
@@ -83,10 +105,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
                 }
             `}
         >
-            <div
-                className="w-full flex items-center"
-                onClick={() => setIsExpanded(!isExpanded)}
-            >
+            <div className="w-full flex items-center" onClick={handleClick}>
                 {icon}
                 <span
                     className={`overflow-hidden transition-all ${
