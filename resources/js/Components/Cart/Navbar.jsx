@@ -33,25 +33,23 @@ export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisib
                     </Link>
                 </li>
                 <li>
-                    <Link
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault(); // Evitar que la página se recargue
-                            if (isCartEmpty) {
-                                // Mostrar mensaje de error si el carrito está vacío
-                                alert('El carrito está vacío');
-                                return;
-                            }
-                            setIsConfirmVisible(true); // Mostrar la ventana modal
-                        }}
-                        className={`block px-3 py-2 rounded-md ${
-                            activeLink === 'cart.confirm' ? 'bg-slate-300 text-black' : 'text-black'
-                        } hover:bg-[#1F2937] hover:text-white ${
-                            isCartEmpty ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                    >
-                        Proceder al Pago
-                    </Link>
+                <Link
+                    href="#"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        if (isCartEmpty) {
+                            alert('El carrito está vacío');
+                            return;
+                        }
+                        setIsConfirmVisible(true);
+                    }}
+                    className={`block px-3 py-2 rounded-md ${
+                        activeLink === 'cart.confirm' ? 'bg-slate-300 text-black' : 'text-black'
+                    } hover:bg-[#1F2937] hover:text-white ${isCartEmpty ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                    disabled={isCartEmpty}
+                >
+                    Proceder al Pago
+                </Link>
                 </li>
             </ul>
 
