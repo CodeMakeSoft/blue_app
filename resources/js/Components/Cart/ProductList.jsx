@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react'; // Importa router
+import { Link } from '@inertiajs/react';
 import Confirm from '@/Components/Cart/Confirm';
 import { calculateCartTotals } from '@/Utils/CartUtils';
 
@@ -43,7 +44,7 @@ export default function ProductList({ products, onQuantityChange }) {
 
         // Notifica al backend usando router.visit
         router.visit(
-            route('cart.remove', productId),
+            route('cart.destroy', productId),
             {
                 method: 'delete',
                 preserveScroll: true, // Mantén la posición del scroll
@@ -166,7 +167,7 @@ export default function ProductList({ products, onQuantityChange }) {
 
             {/* Resumen del carrito */}
             {cartProducts.length > 0 && (
-                <div className="p-6 bg-white rounded-lg shadow-md mt-6">
+                <div className="p-6 bg-white rounded-lg shadow-md mt-1">
                     <div className="flex justify-between mb-4">
                         <span>Subtotal</span>
                         <span>${totals.subtotal.toFixed(2)}</span>

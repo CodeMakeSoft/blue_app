@@ -5,6 +5,8 @@ import { Head } from "@inertiajs/react";
 import { router } from "@inertiajs/react"; // Importa router
 import { calculateCartTotals } from "@/Utils/CartUtils";
 import { Link } from "@inertiajs/react";
+// import axios from "axios"; // Importa axios para hacer la solicitud POST
+// import loadStripe from "@stripe/stripe-js"; 
 
 export default function Index({ cart = [] }) {
     // Calcula los totales iniciales usando CartUtils
@@ -42,6 +44,7 @@ export default function Index({ cart = [] }) {
             }
         );
     };
+
 
     return (
         <AuthenticatedLayout

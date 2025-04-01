@@ -55,6 +55,15 @@ class CheckoutController extends Controller
             ], 400);
         }
 
+        // Validar stock antes de crear la sesión
+        foreach ($cart->products as $product) {
+            if ($product->stock < $product->pivot->quantity) {
+                return response()->json([
+                    'error' => 'Stock insuficiente para ' . $product->name
+                ], 400);
+            }
+        }
+
         $products = $cart->products;
 
         try {
@@ -66,7 +75,7 @@ class CheckoutController extends Controller
                             'currency' => 'mxn',
                             'product_data' => [
                                 'name' => $product->name,
-                                'images' => [$product->images->first()->url],
+                                'images' => [$product->images->first()?->url ?? null],
                             ],
                             'unit_amount' => $product->price * 100, // Stripe usa centavos
                         ],
@@ -99,7 +108,7 @@ class CheckoutController extends Controller
             $sessionId = $request->get('session_id');
             Stripe::setApiKey(config('services.stripe.secret'));
             $session = Session::retrieve($sessionId);
-            
+
             if ($session->payment_status !== 'paid') {
                 throw new \Exception('El pago no ha sido completado');
             }
@@ -114,10 +123,10 @@ class CheckoutController extends Controller
                     'user_id' => $user->id,
                     'status' => 'completed',
                     'payment_id' => $session->payment_intent,
-                    'shipping_address' => $session->shipping->address->line1 ?? '',
-                    'shipping_city' => $session->shipping->address->city ?? '',
-                    'shipping_state' => $session->shipping->address->state ?? '',
-                    'shipping_zip' => $session->shipping->address->postal_code ?? '',
+                    'shipping_address' => $session->shipping?->address?->line1 ?? '',
+                    'shipping_city' => $session->shipping?->address?->city ?? '',
+                    'shipping_state' => $session->shipping?->address?->state ?? '',
+                    'shipping_zip' => $session->shipping?->address?->postal_code ?? '',
                     'total' => $session->amount_total / 100
                 ]);
 
@@ -147,11 +156,12 @@ class CheckoutController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
+                Log::error('Error en checkout success: ' . $e->getMessage());
                 throw $e;
             }
 
         } catch (\Exception $e) {
-            Log::error('Error en checkout success: ' . $e->getMessage());
+            Log::error('Error general en checkout success: ' . $e->getMessage());
             return redirect()->route('cart.index')
                 ->with('error', 'Hubo un error al procesar tu orden: ' . $e->getMessage());
         }
@@ -161,12 +171,14 @@ class CheckoutController extends Controller
     {
         try {
             Log::info('Pago cancelado por el usuario', [
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
 
+            // Renderizar página de cancelación
             return Inertia::render('Checkout/Cancel', [
-                'error' => session('error') ?? 'El pago ha sido cancelado. Tu carrito se mantiene intacto.'
+                'message' => 'El pago ha sido cancelado. Tu carrito se mantiene intacto.',
             ]);
+
         } catch (\Exception $e) {
             Log::error('Error en checkout cancel: ' . $e->getMessage());
             return redirect()->route('cart.index')
