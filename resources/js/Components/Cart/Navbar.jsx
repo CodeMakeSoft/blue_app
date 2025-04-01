@@ -19,48 +19,51 @@ export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisib
         setIsConfirmVisible(false); // Ocultar la ventana modal después de cancelar
     };
 
+    const getActiveClass = () => activeLink === 'cart.index' ? 'bg-slate-300' : '';
+    const getConfirmClass = () => activeLink === 'cart.confirm' ? 'bg-slate-300 text-black' : 'text-black';
+
     return (
         <nav className="py-4 px-6 text-sm font-medium bg-slate-100">
             <ul className="flex space-x-3">
                 <li>
                     <Link
                         href={route('dashboard')}
-                        className={`block px-3 py-2 rounded-md ${
-                            activeLink === 'cart.index' ? 'bg-slate-300 text-black' : 'text-black'
-                        } hover:bg-[#1F2937] hover:text-white`}
+                        aria-label="Regresar a la tienda"
+                        role="link"
+                        className={`block px-3 py-2 rounded-md text-black hover:bg-[#1F2937] hover:text-white ${getActiveClass()}`}
                     >
                         Seguir Comprando
                     </Link>
                 </li>
                 <li>
-                <Link
-                    href="#"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        if (isCartEmpty) {
-                            alert('El carrito está vacío');
-                            return;
-                        }
-                        setIsConfirmVisible(true);
-                    }}
-                    className={`block px-3 py-2 rounded-md ${
-                        activeLink === 'cart.confirm' ? 'bg-slate-300 text-black' : 'text-black'
-                    } hover:bg-[#1F2937] hover:text-white ${isCartEmpty ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
-                    disabled={isCartEmpty}
-                >
-                    Proceder al Pago
-                </Link>
+                    <Link
+                        href="#"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (isCartEmpty) {
+                                setIsConfirmVisible(false);
+                            } else {
+                                setIsConfirmVisible(true);
+                            }
+                        }}
+                        aria-label="Proceder al pago"
+                        role="button"
+                        className={`block px-3 py-2 rounded-md ${getConfirmClass()} hover:bg-[#1F2937] hover:text-white ${isCartEmpty ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                        disabled={isCartEmpty}
+                    >
+                        Proceder al Pago
+                    </Link>
                 </li>
             </ul>
 
             {/* Modal de Confirmación condicional */}
             {isConfirmVisible && (
                 <Confirm
-                    title={isCartEmpty ? "Carrito Vacío" : "Confirmación de Compra"}
+                    title={isCartEmpty ? "Atención" : "Confirmación de Compra"}
                     message={
                         isCartEmpty 
-                            ? "Debes agregar productos al carrito antes de proceder al pago."
-                            : "¿Estás seguro de realizar esta compra?"
+                            ? "No puedes proceder al pago porque el carrito está vacío."
+                            : "Al confirmar, serás redirigido al proceso de pago. ¿Deseas continuar?"
                     }
                     onConfirm={handleConfirm}
                     onCancel={handleCancel}

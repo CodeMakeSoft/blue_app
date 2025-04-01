@@ -1,24 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Cart from "@/Components/Cart/Cart";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/react"; // Importa router
+import { calculateCartTotals } from "@/Utils/CartUtils";
+import { Link } from "@inertiajs/react";
 
-export default function Index({ cart, total }) {
-    const [currentTotal, setCurrentTotal] = useState(total || { subtotal: 0, taxes: 0, total: 0 });
+export default function Index({ cart = [] }) {
+    // Calcula los totales iniciales usando CartUtils
+    const [currentTotal, setCurrentTotal] = useState(
+        Array.isArray(cart) ? calculateCartTotals(cart) : calculateCartTotals([])
+    );
+
+    // Recalcula los totales cuando cambia el carrito
+    useEffect(() => {
+        if (Array.isArray(cart)) {
+            setCurrentTotal(calculateCartTotals(cart));
+        }
+    }, [cart]);
+
+    // Función para manejar cambios de cantidad usando router.visit
     const handleQuantityChange = (productId, quantity) => {
-        Inertia.put(
+        router.visit(
             route('cart.update', productId),
-            { quantity },
             {
-                preserveState: true,
-                preserveScroll: true,
+                method: 'put',
+                data: { quantity },
+                preserveScroll: true, // Mantén la posición del scroll
                 onSuccess: (response) => {
-                    // Actualiza el estado del resumen con los datos del servidor
-                    setCurrentTotal(response.props.total);
+                    const updatedCart = response.props.cart || [];
+                    if (!Array.isArray(updatedCart)) {
+                        console.error("El carrito devuelto por el backend no es un arreglo válido.");
+                        return;
+                    }
+
+                    setCurrentTotal(calculateCartTotals(updatedCart)); // Recalcula los totales
                 },
                 onError: (error) => {
-                    console.error('Error al actualizar el carrito:', error);
+                    console.error("Error al actualizar el carrito:", error);
                 },
             }
         );
@@ -34,14 +53,20 @@ export default function Index({ cart, total }) {
         >
             <Head title="Cart" />
             <div>
-                <Cart 
-                    cart={cart}
-                    total={currentTotal}
-                    onQuantityChange={handleQuantityChange}
-                    onSummaryUpdate={setCurrentTotal}
-                />
+                {cart.length > 0 ? (
+                    <Cart 
+                        cart={cart}
+                        onQuantityChange={handleQuantityChange}
+                    />
+                ) : (
+                    <div className="text-center text-gray-600 mt-6">
+                        <p>Tu carrito está vacío.</p>
+                        <Link href={route('dashboard')} className="underline text-blue-500">
+                            Continúa comprando
+                        </Link>
+                    </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );
 }
-

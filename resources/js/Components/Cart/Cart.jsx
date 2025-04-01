@@ -4,7 +4,7 @@ import Navbar from '@/Components/Cart/Navbar';
 import ProductList from '@/Components/Cart/ProductList';
 import CartSummary from '@/Components/Cart/CartSummary';
 
-export default function Cart({ cart, total, onQuantityChange, onSummaryUpdate }) {
+export default function Cart({ cart = [], onQuantityChange }) {
     // Estado para mostrar/ocultar la confirmación parcial
     const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
 
@@ -28,9 +28,7 @@ export default function Cart({ cart, total, onQuantityChange, onSummaryUpdate })
                     <ProductList 
                         products={cart} 
                         onQuantityChange={onQuantityChange}
-                        onSummaryUpdate={onSummaryUpdate}
                     />
-                    <CartSummary total={total} />
                 </>
             )}
         </div>

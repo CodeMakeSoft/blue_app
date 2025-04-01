@@ -9,166 +9,90 @@ use Inertia\Inertia;
 
 class CartController extends Controller
 {
-    private $taxRate = 0.16;
-    private $shippingCost = 100;
-
-    // random shipping cost is a constructor (magic method)
-    public function __construct()
-    {
-        $this->shippingCost = rand(50, 200);
-    }
-
-    // Function to calculate total
-    private function calculateSubtotal($products)
-    {
-        return $products->sum(function ($product) {
-            return $product->price * $product->pivot->quantity;
-        });
-    }
-    private function calculateTaxes($subtotal)
-    {
-        return $subtotal * $this->taxRate;
-    }
-
-    private function calculateTotal($subtotal, $taxes)
-    {
-        return $subtotal + $taxes;
-    }
-
     // Show cart
     public function index()
     {
-        // Get authenticated user
         $user = Auth::user();
-
-        // Get cart of user
         $cart = $user->cart;
 
-        // If user doesn't have a cart, create a new one
+         // If user doesn't have a cart, create a new one
         if (!$cart) {
             $cart = Cart::create(['user_id' => $user->id]);
         }
 
-        // Get products with quantity (pivot)
         $products = $cart->products()->with('images')->withPivot('quantity')->get();
-        // Calculate subtotal, taxes, and total
-        $subtotal = $this->calculateSubtotal($products);
-        $taxes = $this->calculateTaxes($subtotal);
-        $total = $this->calculateTotal($subtotal, $taxes);
 
-        // Return the view of cart with products
         return Inertia::render('Cart/Index', [
             'cart' => $products,
-            'total' => [
-                'subtotal' => $subtotal,
-                'taxes' => $taxes,
-                'total' => $total,
-                'shipping' => $this->shippingCost,
-            ],
         ]);
     }
 
     // Add to cart
     public function add(Request $request, $productId)
     {
-        // Get authenticated user
         $user = Auth::user();
-
-        // Get cart of user
         $cart = $user->cart;
 
-        // If user doesn't have a cart, create a new one
         if (!$cart) {
             $cart = Cart::create(['user_id' => $user->id]);
         }
 
-        // Verify if product already is in cart
         if ($cart->products()->where('product_id', $productId)->exists()) {
-            // If product is in cart, increment quantity
             $cart->products()->updateExistingPivot($productId, [
                 'quantity' => $cart->products()->find($productId)->pivot->quantity + 1,
             ]);
         } else {
-            // If product isn't in cart, add with quantity 1
             $cart->products()->attach($productId, ['quantity' => 1]);
         }
 
-         // Return success message without redirecting
-        return Inertia::render('Cart/Index', [
-            'cart' => $cart,
-            'success' => 'Producto agregado al carrito.',
-        ]);  
-    }
+        $products = $cart->products()->with('images')->withPivot('quantity')->get();
 
-    public function remove($productId)
-    {
-        // Get authenticated user
-        $user = Auth::user();
-
-        // Get cart of user
-        $cart = $user->cart;
-
-        if ($cart)
-        {
-            $cart->products()->detach($productId);
-
-            $products = $cart->products()->with('images')->withPivot('quantity')->get();
-            $subtotal = $this->calculateSubtotal($products);
-            $taxes = $this->calculateTaxes($subtotal);
-            $total = $this->calculateTotal($subtotal, $taxes);
-        }
-
-        // Return success message without redirecting
         return Inertia::render('Cart/Index', [
             'cart' => $products,
-            'total' => [
-                'subtotal' => $subtotal,
-                'taxes' => $taxes,
-                'total' => $total,
-                'shipping' => $this->shippingCost,
-            ],
-        ]);   
+        ]);
     }
-    
+
+    // Remove from cart
+    public function remove($productId)
+    {
+        $user = Auth::user();
+        $cart = $user->cart;
+
+        if ($cart) {
+            $cart->products()->detach($productId);
+        }
+
+        $products = $cart->products()->with('images')->withPivot('quantity')->get();
+
+        return Inertia::render('Cart/Index', [
+            'cart' => $products,
+        ]);
+    }
+
+    // Update cart quantity
     public function update(Request $request, $productId)
     {
-        // Validar que 'quantity' sea un número entero mayor o igual a 0
         $request->validate([
             'quantity' => 'required|integer|min:0',
         ]);
 
         $user = Auth::user();
         $cart = $user->cart;
-    
-        if ($cart) {
-            if ($cart->products()->where('product_id', $productId)->exists()) {
-                if ($request->quantity === 0) {
-                    // Si la cantidad es 0, eliminar el producto
-                    $cart->products()->detach($productId);  
-                } else {
-                    // Actualizar la cantidad del producto
-                    $cart->products()->updateExistingPivot($productId, [
-                        'quantity' => $request->quantity,
-                    ]);
-                }     
-            }  
 
-            $products = $cart->products()->with('images')->withPivot('quantity')->get();
-            $subtotal = $this->calculateSubtotal($products);
-            $taxes = $this->calculateTaxes($subtotal);
-            $total = $this->calculateTotal($subtotal, $taxes);  
-
-            return Inertia::render('Cart/Index', [
-                'cart' => $products,
-                'total' => [
-                    'subtotal' => $subtotal,
-                    'taxes' => $taxes,
-                    'total' => $total,
-                    'shipping' => $this->shippingCost,
-                ],
-            ]);   
+        if ($cart && $cart->products()->where('product_id', $productId)->exists()) {
+            if ($request->quantity === 0) {
+                $cart->products()->detach($productId);
+            } else {
+                $cart->products()->updateExistingPivot($productId, [
+                    'quantity' => $request->quantity,
+                ]);
+            }
         }
+
+        $products = $cart->products()->with('images')->withPivot('quantity')->get();
+
+        return Inertia::render('Cart/Index', [
+            'cart' => $products,
+        ]);
     }
 }
-
-
