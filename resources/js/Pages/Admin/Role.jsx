@@ -22,6 +22,13 @@ export default function Role({ activeRoute, can }) {
     };
 
     const handleDelete = (id) => {
+        const roleToDelete = roles.data.find((role) => role.id === id);
+
+        if (roleToDelete?.name === "Admin") {
+            toast.error("Cannot delete Admin role");
+            return;
+        }
+
         router.delete(`/admin/roles/${id}`, {
             onSuccess: () => {
                 toast.success("Role Deleted Successfully");

@@ -23,6 +23,13 @@ export default function User({ activeRoute, can }) {
     };
 
     const handleDelete = (id) => {
+        const userToDelete = users.data.find((user) => user.id === id);
+
+        if (userToDelete?.roles?.some((role) => role.name === "Admin")) {
+            toast.error("Cannot delete Admin users");
+            return;
+        }
+
         router.delete(`/admin/users/${id}`, {
             onSuccess: () => {
                 toast.success("User Deleted Successfully");
@@ -34,7 +41,7 @@ export default function User({ activeRoute, can }) {
             },
         });
     };
-
+    
     const handlePageChange = (url) => {
         router.visit(url); // Navegar a la página seleccionada
     };
@@ -126,6 +133,8 @@ export default function User({ activeRoute, can }) {
                                                         Edit
                                                     </button>
                                                 )}
+                                                {/*Por si se quiere retirar el botón de delete solo a Admin */}
+                                                {/*{can.user_delete && !user.roles?.some(role => role.name === 'Admin') && (*/}
                                                 {can.user_delete && (
                                                     <button
                                                         onClick={() =>

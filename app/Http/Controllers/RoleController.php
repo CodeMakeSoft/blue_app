@@ -107,6 +107,9 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function destroy(Role $role)
     {
+        if ($role->name === 'Admin') {
+        return back()->with('error', 'No se puede eliminar el rol Admin');
+    }
         $role->delete();
         return redirect()->route('roles.index')->with('success', 'Role Deleted Succesfully.');
     }

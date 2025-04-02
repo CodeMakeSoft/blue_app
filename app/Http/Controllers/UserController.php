@@ -22,6 +22,7 @@ class UserController extends Controller implements HasMiddleware
             new Middleware('permission:user-create', only: ['store']),
             new Middleware('permission:user-edit', only: ['update']),
             new Middleware('permission:user-delete', only: ['destroy']),
+            new Middleware('protect.last.admin', only: ['destroy']),
         ];
     }
     /**
@@ -114,9 +115,22 @@ class UserController extends Controller implements HasMiddleware
      */
     public function destroy(User $user)
     {
+       $adminRole = app('adminRole');
+        // Verificar si el usuario a eliminar es Admin
+        if ($user->hasRole($adminRole->name)) {
+            // Contar cuántos usuarios tienen el rol Admin
+            $adminUsersCount = $adminRole->users()->count();
+            // Si solo queda 1 admin, no permitir eliminarlo
+            if ($adminUsersCount <= 1) {
+                return redirect()->back()
+                    ->with('error', 'No puedes eliminar al último administrador.');
+            }
+        }
+        // Eliminar el usuario
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User Deleted Succesfully.');
-    }
+        return redirect()->route('users.index')
+            ->with('success', 'Usuario eliminado correctamente');
+        }
 
 }
 
