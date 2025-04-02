@@ -4,9 +4,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import { router } from "@inertiajs/react"; // Importa router
 import { calculateCartTotals } from "@/Utils/CartUtils";
-import { Link } from "@inertiajs/react";
-// import axios from "axios"; // Importa axios para hacer la solicitud POST
-// import loadStripe from "@stripe/stripe-js"; 
+import { Link } from '@inertiajs/react';
 
 export default function Index({ cart = [] }) {
     // Calcula los totales iniciales usando CartUtils
@@ -21,7 +19,7 @@ export default function Index({ cart = [] }) {
         }
     }, [cart]);
 
-    // Función para manejar cambios de cantidad usando router.visit
+    // Función para manejar cambios de cantidad
     const handleQuantityChange = (productId, quantity) => {
         router.visit(
             route('cart.update', productId),
@@ -45,6 +43,28 @@ export default function Index({ cart = [] }) {
         );
     };
 
+    // Función para iniciar el proceso de pago con Stripe
+    const createStripeSession = async () => {
+        try {
+            const response = await axios.post(route('checkout.createSession'), {
+                cartProducts: cart.map((product) => ({
+                    id: product.id,
+                    quantity: product.pivot.quantity,
+                })),
+                total: currentTotal.total * 100, // Multiplica por 100 para enviar el total en centavos
+            });
+
+            if (response.data.id) {
+                const stripe = await loadStripe(process.env.STRIPE_PUBLIC_KEY);
+                await stripe.redirectToCheckout({ sessionId: response.data.id });
+            } else {
+                alert("Ocurrió un error al iniciar el pago.");
+            }
+        } catch (error) {
+            console.error("Error al crear la sesión de Stripe:", error);
+            alert("No se pudo iniciar la sesión de pago. Inténtalo de nuevo más tarde.");
+        }
+    };
 
     return (
         <AuthenticatedLayout
@@ -60,6 +80,7 @@ export default function Index({ cart = [] }) {
                     <Cart 
                         cart={cart}
                         onQuantityChange={handleQuantityChange}
+                        onConfirmCheckout={createStripeSession} // Pasa la función para iniciar Stripe
                     />
                 ) : (
                     <div className="text-center text-gray-600 mt-6">

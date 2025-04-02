@@ -1,5 +1,5 @@
 export const TAX_RATE = 0.16;
-export const BASE_SHIPPING = 200;
+export const BASE_SHIPPING = 300;
 
 // This function calculates the total amount of the cart
 export const calculateCartTotals = (products = [] ) => {

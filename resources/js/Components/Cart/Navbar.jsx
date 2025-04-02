@@ -19,18 +19,19 @@ export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisib
         setIsConfirmVisible(false); // Ocultar la ventana modal después de cancelar
     };
 
-    const getActiveClass = () => activeLink === 'cart.index' ? 'bg-slate-300' : '';
-    const getConfirmClass = () => activeLink === 'cart.confirm' ? 'bg-slate-300 text-black' : 'text-black';
+    // Usamos la concatenación de cadenas para obtener las clases activas
+    const getActiveClass = () => (activeLink === 'cart.index' ? 'border-b-4 border-blue-600' : '');
+    const getConfirmClass = () => (activeLink === 'cart.confirm' ? 'bg-slate-200 text-black' : 'text-gray-700');
 
     return (
-        <nav className="py-4 px-6 text-sm font-medium bg-slate-100">
-            <ul className="flex space-x-3">
+        <nav className="py-4 px-6 bg-gradient-to-r from-gray-100 to-gray-200 shadow-lg rounded-lg">
+            <ul className="flex space-x-6 justify-center">
                 <li>
                     <Link
                         href={route('dashboard')}
                         aria-label="Regresar a la tienda"
                         role="link"
-                        className={`block px-3 py-2 rounded-md text-black hover:bg-[#1F2937] hover:text-white ${getActiveClass()}`}
+                        className={`block px-4 py-2 rounded-md text-gray-800 hover:bg-blue-500 hover:text-white transition-colors duration-300 ${getActiveClass()}`}
                     >
                         Seguir Comprando
                     </Link>
@@ -48,7 +49,7 @@ export default function Navbar({ activeLink, isConfirmVisible, setIsConfirmVisib
                         }}
                         aria-label="Proceder al pago"
                         role="button"
-                        className={`block px-3 py-2 rounded-md ${getConfirmClass()} hover:bg-[#1F2937] hover:text-white ${isCartEmpty ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                        className={`block px-4 py-2 rounded-md ${getConfirmClass()} hover:bg-blue-500 hover:text-white transition-colors duration-300 ${isCartEmpty ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                         disabled={isCartEmpty}
                     >
                         Proceder al Pago

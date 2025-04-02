@@ -4,7 +4,7 @@ import Navbar from '@/Components/Cart/Navbar';
 import ProductList from '@/Components/Cart/ProductList';
 import CartSummary from '@/Components/Cart/CartSummary';
 
-export default function Cart({ cart = [], onQuantityChange }) {
+export default function Cart({ cart = [], onQuantityChange, onConfirmCheckout }) {
     // Estado para mostrar/ocultar la confirmación parcial
     const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
 
@@ -16,7 +16,7 @@ export default function Cart({ cart = [], onQuantityChange }) {
             <Navbar 
                 activeLink="cart.index" 
                 isConfirmVisible={isConfirmVisible} 
-                setIsConfirmVisible={setIsConfirmVisible} 
+                setIsConfirmVisible={setIsConfirmVisible}
                 isCartEmpty={cart.length === 0}
             />
 
@@ -28,6 +28,8 @@ export default function Cart({ cart = [], onQuantityChange }) {
                     <ProductList 
                         products={cart} 
                         onQuantityChange={onQuantityChange}
+                        onConfirmCheckout={onConfirmCheckout}
+                        isCartEmpty={cart.length === 0}
                     />
                 </>
             )}
