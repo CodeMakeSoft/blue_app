@@ -23,7 +23,7 @@ export default function Role({ activeRoute, can }) {
 
     const handleDelete = (id) => {
         const roleToDelete = roles.data.find((role) => role.id === id);
-
+        //No borrar si es admin
         if (roleToDelete?.name === "Admin") {
             toast.error("Cannot delete Admin role");
             return;

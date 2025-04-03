@@ -24,7 +24,7 @@ export default function User({ activeRoute, can }) {
 
     const handleDelete = (id) => {
         const userToDelete = users.data.find((user) => user.id === id);
-
+        //Singleton admin mensaje
         if (userToDelete?.roles?.some((role) => role.name === "Admin")) {
             toast.error("Cannot delete Admin users");
             return;
