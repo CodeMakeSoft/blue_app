@@ -1,43 +1,43 @@
 import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
-import BrandCard from "@/Components/Brand/BrandCard";
+import CategoryCard from "@/Components/Category/CategoryCard";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import Pagination from "@/Components/Category/Pagination";
 
-export default function Catalog({ auth, brands = [] }) {
+export default function Catalog({ auth, categories = [] }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(4);
-    const [paginatedBrands, setPaginatedBrands] = useState([]);
+    const [paginatedCategories, setPaginatedCategories] = useState([]);
 
     // Opciones personalizadas para el catálogo
     const itemsPerPageOptions = [
         { value: 4, label: "4" },
         { value: 8, label: "8" },
         { value: 12, label: "12" },
-        { value: brands.length, label: "Todos" },
+        { value: categories.length, label: "Todos" },
     ];
 
-    // Filtrar y paginar marcas
+    // Filtrar y paginar categorías
     useEffect(() => {
-        const filtered = brands.filter(
-            (brand) =>
-                brand &&
-                [brand.name, brand.description || ""].some((text) =>
+        const filtered = categories.filter(
+            (category) =>
+                category &&
+                [category.name, category.description || ""].some((text) =>
                     text.toLowerCase().includes(searchTerm.toLowerCase())
                 )
         );
 
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        setPaginatedBrands(filtered.slice(startIndex, endIndex));
-    }, [brands, searchTerm, currentPage, itemsPerPage]);
+        setPaginatedCategories(filtered.slice(startIndex, endIndex));
+    }, [categories, searchTerm, currentPage, itemsPerPage]);
 
-    const filteredBrands = brands.filter(
-        (brand) =>
-            brand &&
-            [brand.name, brand.description || ""].some((text) =>
+    const filteredCategories = categories.filter(
+        (category) =>
+            category &&
+            [category.name, category.description || ""].some((text) =>
                 text.toLowerCase().includes(searchTerm.toLowerCase())
             )
     );
@@ -55,13 +55,13 @@ export default function Catalog({ auth, brands = [] }) {
 
     return (
         <AuthenticatedLayout user={auth.user} header={null}>
-            <Head title="Catálogo de Marcas" />
+            <Head title="Catálogo de Categorías" />
 
             <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Título */}
                     <h1 className="text-2xl font-bold text-gray-800 mb-6">
-                        Catálogo de Marcas
+                        Catálogo de Categorías
                     </h1>
 
                     {/* Barra de búsqueda a ancho completo */}
@@ -72,7 +72,7 @@ export default function Catalog({ auth, brands = [] }) {
                             </div>
                             <input
                                 type="text"
-                                placeholder="Buscar marcas por nombre o descripción..."
+                                placeholder="Buscar categorías por nombre o descripción..."
                                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 value={searchTerm}
                                 onChange={(e) => {
@@ -83,19 +83,19 @@ export default function Catalog({ auth, brands = [] }) {
                         </div>
                     </div>
 
-                    {/* Listado de marcas */}
-                    {filteredBrands.length > 0 ? (
+                    {/* Listado de categorías */}
+                    {filteredCategories.length > 0 ? (
                         <>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                                {paginatedBrands.map((brand) => (
-                                    <BrandCard
-                                        key={brand.id}
-                                        brand={{
-                                            ...brand,
-                                            image: brand.image
+                                {paginatedCategories.map((category) => (
+                                    <CategoryCard
+                                        key={category.id}
+                                        category={{
+                                            ...category,
+                                            image: category.image
                                                 ? {
-                                                      url: brand.image.url,
-                                                      id: brand.image.id,
+                                                      url: category.image.url,
+                                                      id: category.image.id,
                                                   }
                                                 : null,
                                         }}
@@ -132,11 +132,12 @@ export default function Catalog({ auth, brands = [] }) {
                                     <Pagination
                                         currentPage={currentPage}
                                         totalPages={Math.ceil(
-                                            filteredBrands.length / itemsPerPage
+                                            filteredCategories.length /
+                                                itemsPerPage
                                         )}
                                         onPageChange={handlePageChange}
                                         itemsPerPage={itemsPerPage}
-                                        totalItems={filteredBrands.length}
+                                        totalItems={filteredCategories.length}
                                         hideItemsPerPage={true}
                                     />
                                 </div>
@@ -146,15 +147,15 @@ export default function Catalog({ auth, brands = [] }) {
                         <div className="text-center py-12 bg-white rounded-lg shadow-sm">
                             <p className="text-gray-500 text-lg">
                                 {searchTerm
-                                    ? "No se encontraron marcas con ese criterio"
-                                    : "No hay marcas disponibles"}
+                                    ? "No se encontraron categorías con ese criterio"
+                                    : "No hay categorías disponibles"}
                             </p>
                             {!searchTerm && auth.user?.isAdmin && (
                                 <Link
-                                    href={route("brand.create")}
+                                    href={route("category.create")}
                                     className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
                                 >
-                                    Crear primera marca
+                                    Crear primera categoría
                                 </Link>
                             )}
                         </div>

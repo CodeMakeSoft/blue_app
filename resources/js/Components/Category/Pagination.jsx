@@ -7,6 +7,7 @@ export default function Pagination({
     itemsPerPage,
     setItemsPerPage,
     totalItems,
+    hideItemsPerPage = false,
 }) {
     const [clickedButton, setClickedButton] = useState(null);
 
@@ -39,27 +40,31 @@ export default function Pagination({
             : Math.ceil(totalItems / itemsPerPage);
 
     return (
-        <div className="flex justify-between items-center mt-4 w-full">
-            {/* Select de "Mostrar" */}
-            <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700">
-                    Mostrar:
-                </label>
-                <select
-                    className="border border-gray-300 rounded px-3 py-1 text-center w-40 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={itemsPerPage === totalItems ? "all" : itemsPerPage}
-                    onChange={handleSelectChange}
-                >
-                    <option value={5}>5</option>
-                    <option value={15}>15</option>
-                    <option value={50}>50</option>
-                    <option value="all">Todos</option>
-                </select>
-            </div>
+        <div className="flex flex-wrap justify-between items-center mt-4 w-full">
+            {/* Select de "Mostrar" - ahora condicional */}
+            {!hideItemsPerPage && (
+                <div className="flex items-center space-x-2 mb-4 sm:mb-0 w-full sm:w-auto">
+                    <label className="text-sm font-medium text-gray-700">
+                        Mostrar:
+                    </label>
+                    <select
+                        className="border border-gray-300 rounded px-3 py-1 text-center w-full sm:w-32 md:w-40 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={
+                            itemsPerPage === totalItems ? "all" : itemsPerPage
+                        }
+                        onChange={handleSelectChange}
+                    >
+                        <option value={5}>5</option>
+                        <option value={15}>15</option>
+                        <option value={50}>50</option>
+                        <option value="all">Todos</option>
+                    </select>
+                </div>
+            )}
 
             {/* Botones de paginación */}
             {itemsPerPage !== totalItems && computedTotalPages > 1 && (
-                <div className="flex space-x-2 ml-auto">
+                <div className="flex flex-wrap justify-center sm:justify-end space-x-2 ml-auto">
                     <button
                         className={`px-4 py-2 border rounded transition-all duration-200 ${
                             currentPage === 1

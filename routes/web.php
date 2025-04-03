@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('category.edit');
     Route::post('/categories/{category}', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
+    Route::get('/categories/catalog', [CategoryController::class, 'catalog'])->name('category.catalog');
+    Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('category.show');
 
     Route::get('brands',[BrandController::class,'index'])->name('brand.index');
     Route::get('brands/create',[BrandController::class,'create'])->name('brand.create');
@@ -35,7 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/brands/{brand}', [BrandController::class, 'update'])->name('brand.update');
     Route::delete('brands/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
     Route::get('/brands/catalog', [BrandController::class, 'catalog'])->name('brand.catalog');
-    Route::get('/brands/{id}', [BrandController::class, 'show'])->name('brand.show');
+    Route::get('/brands/{brand}', [BrandController::class, 'show'])->name('brand.show');
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

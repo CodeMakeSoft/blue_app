@@ -23,10 +23,9 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:50'],
-            'description' => ['required', 'string', 'max:255'],
-            'new_images' => 'nullable|array', 
-            'new_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        'name' => ['required', 'string', 'max:50', 'unique:categories,name'],
+        'description' => ['required', 'string', 'max:255'],
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

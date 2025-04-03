@@ -1,44 +1,60 @@
-// resources/js/Components/BrandCard.jsx
 import React from "react";
 import { Link } from "@inertiajs/react";
 
-export default function BrandCard({ brand, showLink = false }) {
-    // Obtener la URL de la imagen, manejando posibles errores en la estructura de datos
-    const imageUrl =
-        brand.images?.length > 0
-            ? brand.images[0].url.startsWith("images/")
-                ? `/${brand.images[0].url}` // Si ya incluye 'images/', no agregar 'storage/'
-                : `/storage/${brand.images[0].url}` // En caso contrario, agregar 'storage/'
-            : null;
+export default function BrandCard({ brand, showLink = true }) {
+    // Función para normalizar la URL de la imagen
+    const getImageUrl = () => {
+        if (!brand.image && !brand.images?.length) return null;
+
+        // Maneja tanto 'image' (uno-a-uno) como 'images' (uno-a-muchos)
+        const imageData = brand.image || brand.images?.[0];
+        if (!imageData?.url) return null;
+
+        // Normaliza la URL (elimina 'storage/' si ya está presente)
+        let url = imageData.url;
+        if (url.startsWith("storage/")) {
+            url = url.replace("storage/", "");
+        }
+
+        return `/storage/${url}`;
+    };
+
+    const imageUrl = getImageUrl();
 
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100">
-            {/* Imagen de la marca */}
-            {imageUrl ? (
-                <img
-                    src={`/storage/${brand.images[0].url}`}
-                    alt={`Logo ${brand.name}`}
-                />
-            ) : (
-                <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                    <span className="text-gray-400">Sin imagen</span>
-                </div>
-            )}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+            {/* Imagen de la marca - Mismo estilo que CategoryCard */}
+            <div className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                {imageUrl ? (
+                    <img
+                        src={imageUrl}
+                        alt={brand.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/images/placeholder-brand.png";
+                            e.target.className =
+                                "w-full h-full object-contain p-4";
+                        }}
+                    />
+                ) : (
+                    <span className="text-gray-500">Sin imagen</span>
+                )}
+            </div>
 
-            {/* Detalles de la marca */}
+            {/* Contenido de la tarjeta - Mismo estilo que CategoryCard */}
             <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
                     {brand.name}
                 </h3>
-                <p className="text-gray-600 mt-2 text-sm line-clamp-2">
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                     {brand.description || "Descripción no disponible"}
                 </p>
 
-                {/* Opcional: Enlace a detalles */}
                 {showLink && (
                     <Link
                         href={route("brand.show", brand.id)}
-                        className="mt-3 inline-block text-blue-600 text-sm font-medium hover:underline"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
                         Ver productos →
                     </Link>

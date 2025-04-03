@@ -3,90 +3,72 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import Form from "@/Components/Category/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 export default function Edit({ auth, category }) {
     const { data, setData, errors, post } = useForm({
         name: category?.name || "",
         description: category?.description || "",
-        existing_images: category?.images || [],
-        new_images: [],
-        deleted_images: [],
+        existing_image: category?.image || null,
+        image: null,
+        deleted_image: false,
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        if (!data.name || !data.description) {
-            console.log("Los campos nombre y descripción son obligatorios");
-            return;
-        }
-
         const formData = new FormData();
         formData.append("name", data.name);
         formData.append("description", data.description);
+        formData.append("_method", "PUT"); // Para método POST que simula PUT
 
-        // Agregar imágenes existentes que se mantienen
-        data.existing_images.forEach((image, index) => {
-            formData.append(`existing_images[${index}]`, image.id);
-        });
-
-        // Agregar nuevas imágenes
-        if (data.new_images && data.new_images.length > 0) {
-            data.new_images.forEach((file, index) => {
-                formData.append(`new_images[${index}]`, file);
-            });
+        if (data.image) {
+            formData.append("image", data.image);
         }
-
-        // Agregar imágenes eliminadas
-        if (data.deleted_images && data.deleted_images.length > 0) {
-            data.deleted_images.forEach((id, index) => {
-                formData.append(`deleted_images[${index}]`, id);
-            });
+        if (data.deleted_image) {
+            formData.append("deleted_image", true);
         }
 
         post(route("category.update", category.id), {
             data: formData,
             preserveScroll: true,
-            forceFormData: true, // Esto es importante para enviar FormData correctamente
-            onSuccess: () => console.log("Categoría actualizada"),
-            onError: (err) => console.log("Error al actualizar:", err),
+            forceFormData: true,
         });
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Actualizar Categoría
-                    </h2>
-                    <Link href={route("category.index")}>
-                        Lista de Categorías
-                    </Link>
-                </div>
-            }
-        >
-            <Head title="Categories" />
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <Form
-                                data={data}
-                                errors={errors}
-                                setData={setData}
-                                submit={submit}
-                                isEdit={true}
-                            >
-                                <PrimaryButton type="submit">
-                                    Actualizar Categoría
-                                </PrimaryButton>
-                            </Form>
+        <AuthenticatedLayout user={auth.user} header={null}>
+            <Head title="Crear Categoría" />
+
+            {/* Contenedor principal con márgenes de 3cm (3rem) */}
+            <div className="py-6 px-3">
+                <Link
+                    href={route("category.index")}
+                    className="inline-flex items-center p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                >
+                    <ChevronLeftIcon className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+                </Link>
+
+                <h1 className="text-2xl font-bold text-gray-800 mt-4 mb-6 ml-1">
+                    Actualizar Categoría
+                </h1>
+                <Form
+                    data={data}
+                    errors={errors}
+                    setData={setData}
+                    submit={submit}
+                    isEdit={true}
+                >
+                    <div className="w-[65%] ml-auto">
+                        <div className="flex justify-end">
+                            <PrimaryButton type="submit">
+                                Actualizar Categoría
+                            </PrimaryButton>
                         </div>
                     </div>
-                </div>
+                </Form>
             </div>
         </AuthenticatedLayout>
     );
 }
+

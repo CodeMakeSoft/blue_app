@@ -1,69 +1,64 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
-import Form from "@/Components/Brand/Form";
+import Form from "@/Components/Category/Form"; // Asegúrate de tener este componente
 import PrimaryButton from "@/Components/PrimaryButton";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 export default function Create({ auth }) {
     const { data, setData, errors, post } = useForm({
         name: "",
         description: "",
-        new_images: [], // Mantener 'images' para coincidir con el backend
+        image: null, // Cambiado de new_images[] a image
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        // Crear FormData para enviar archivos correctamente
         const formData = new FormData();
         formData.append("name", data.name);
         formData.append("description", data.description);
-
-        // Añadir imágenes si existen
-        if (data.new_images && data.new_images.length > 0) {
-            data.new_images.forEach((file, index) => {
-                formData.append(`new_images[${index}]`, file);
-            });
+        if (data.image) {
+            formData.append("image", data.image); // Cambiado a imagen única
         }
 
         post(route("brand.store"), {
             data: formData,
             preserveScroll: true,
-            forceFormData: true, // Importante para archivos
+            forceFormData: true,
         });
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <div className="flex justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Create Brand
-                    </h2>
-                    <Link href={route("brand.index")}>Brand</Link>
-                </div>
-            }
-        >
-            <Head title="Brand" />
+        <AuthenticatedLayout user={auth.user} header={null}>
+            <Head title="Crear Marca" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <Form
-                                data={data}
-                                errors={errors}
-                                setData={setData}
-                                submit={submit}
-                                isEdit={false}
-                            >
-                                <PrimaryButton type="submit">
-                                    Crear Marca
-                                </PrimaryButton>
-                            </Form>
+            <div className="py-6 px-3">
+                <Link
+                    href={route("brand.index")}
+                    className="inline-flex items-center p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                >
+                    <ChevronLeftIcon className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+                </Link>
+
+                <h1 className="text-2xl font-bold text-gray-800 mt-4 mb-6 ml-1">
+                    Crear Marca
+                </h1>
+
+                <Form
+                    data={data}
+                    errors={errors}
+                    setData={setData}
+                    submit={submit}
+                    isEdit={false}
+                >
+                    <div className="w-[65%] ml-auto">
+                        <div className="flex justify-end">
+                            <PrimaryButton type="submit">
+                                Crear Marca
+                            </PrimaryButton>
                         </div>
                     </div>
-                </div>
+                </Form>
             </div>
         </AuthenticatedLayout>
     );
