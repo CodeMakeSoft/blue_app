@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { toast } from "sonner";
+import ConfirmEdit from "@/Components/ConfirmEdit";
+import ConfirmAdd from "@/Components/ConfirmAdd";
 
 export default function UserFormModal({ isOpen, closeModal, user, roles }) {
     const [formData, setFormData] = useState({
@@ -14,6 +16,8 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
 
     const [errors, setErrors] = useState({});
     const [isRolesOpen, setIsRolesOpen] = useState(false);
+    const [showConfirmEdit, setShowConfirmEdit] = useState(false);
+    const [showConfirmAdd, setShowConfirmAdd] = useState(false);
     const dropdownRef = useRef(null);
 
     // Inicializar datos del formulario
@@ -68,14 +72,17 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
     const handleRoleSelect = (roleId) => {
         setFormData((prev) => ({
             ...prev,
-            roles: roleId ? [roleId] : [], // Solo permite un rol
+            roles: roleId ? [roleId] : [],
         }));
-        setIsRolesOpen(false); // Cierra el dropdown al seleccionar
+        setIsRolesOpen(false);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        user ? setShowConfirmEdit(true) : setShowConfirmAdd(true);
+    };
 
+    const handleConfirmAction = () => {
         const data = {
             name: formData.name,
             email: formData.email,
@@ -100,12 +107,15 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                 toast.error("Please correct the errors in the form");
             },
         });
+
+        user ? setShowConfirmEdit(false) : setShowConfirmAdd(false);
     };
 
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            {/* Formulario principal */}
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
                 <h2 className="text-lg font-semibold mb-4">
                     {user ? "Edit User" : "Create User"}
@@ -318,6 +328,19 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                     </div>
                 </form>
             </div>
+
+            {/* Componentes de confirmación */}
+            <ConfirmEdit
+                isOpen={showConfirmEdit}
+                onConfirm={handleConfirmAction}
+                onCancel={() => setShowConfirmEdit(false)}
+            />
+
+            <ConfirmAdd
+                isOpen={showConfirmAdd}
+                onConfirm={handleConfirmAction}
+                onCancel={() => setShowConfirmAdd(false)}
+            />
         </div>
     );
 }

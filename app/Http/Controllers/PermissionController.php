@@ -100,6 +100,6 @@ class PermissionController extends Controller implements HasMiddleware
     public function destroy(Permission $permission)
     {
         $permission->delete();
-        return redirect()->route('categories.index')->with('success', 'Category Deleted Succesfully.');
+        return redirect()->route('permissions.index')->with('success', 'Permission Deleted Succesfully.');
     }
 }
