@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
+import ConfirmAdd from "@/Components/ConfirmAdd";
+import ConfirmEdit from "@/Components/ConfirmEdit";
+import ConfirmDelete from "@/Components/ConfirmDelete";
 import { Toaster, toast } from "sonner";
 import {
     PlusCircleIcon,
@@ -20,7 +23,7 @@ export default function Permission({ activeRoute, can}) {
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id) => {
+    const handleDeletePermission = (id) => {
         router.delete(`/admin/permissions/${id}`, {
             onSuccess: () => {
                 toast.success("Permission Deleted Successfully");
@@ -28,10 +31,11 @@ export default function Permission({ activeRoute, can}) {
             },
             onError: () => {
                 toast.error("Failed to delete Permission");
-                console.error("Failed to delete permission.");
+                console.error("Failed to delete Permission.");
             },
         });
     };
+    
 
     const handlePageChange = (url) => {
             router.visit(url); // Navegar a la página seleccionada
@@ -49,13 +53,8 @@ export default function Permission({ activeRoute, can}) {
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.permission_create && (
-                            <button
-                                onClick={() => openModal()}
-                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
-                            >
-                                <PlusCircleIcon className="h-6 w-6 mr-2" />
-                                Add Category
-                            </button>
+                <ConfirmAdd onConfirm={openModal} label="Add Permission" />
+
                         )}
                     </div>
 
@@ -66,7 +65,11 @@ export default function Permission({ activeRoute, can}) {
                                     (header) => (
                                         <th
                                             key={header}
-                                            className="p-3 text-left"
+                                            className={`p-3 text-left ${
+                                                header === "Actions"
+                                                    ? "text-right-md w-40"
+                                                    : ""
+                                            }`}
                                         >
                                             {header}
                                         </th>
@@ -88,31 +91,15 @@ export default function Permission({ activeRoute, can}) {
                                         <td className="p-3">
                                             {permission.guard_name}
                                         </td>
-                                        <td className="p-3 flex gap-2">
+                                        < td className="p-3">
+                                        <div className="flex justify-end gap-2">
                                             {can.permission_edit && (
-                                                <button
-                                                    onClick={() =>
-                                                        openModal(permission)
-                                                    }
-                                                    className="flex items-center bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                                >
-                                                    <PencilSquareIcon className="h-4 w-4 mr-1" />
-                                                    Edit
-                                                </button>
+                                                <ConfirmEdit item={permission} onConfirm={openModal} />
                                             )}
                                             {can.permission_delete && (
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            permission.id
-                                                        )
-                                                    }
-                                                    className="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                                >
-                                                    <TrashIcon className="h-4 w-4 mr-1" />
-                                                    Delete
-                                                </button>
+                                                <ConfirmDelete  key={permission.id} id={permission.id} onConfirm={handleDeletePermission} />
                                             )}
+                                             </div>
                                         </td>
                                     </tr>
                                 ))

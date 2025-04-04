@@ -1,49 +1,46 @@
 import { useState } from "react";
-import { XMarkIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { XMarkIcon, PencilIcon } from "@heroicons/react/24/solid";
 
-export default function ConfirmDelete({ id, onConfirm, can}) {
+export default function ConfirmEdit({ item, onConfirm }) {
     const [open, setOpen] = useState(false);
 
     const handleConfirm = () => {
-    console.log("ID recibido en ConfirmDelete:", id);
-    if (!id) {
-        console.error("Error: el ID es inválido");
-        return;
-    }
-    onConfirm(id); // Llamamos a handleDelete con el ID
-    setOpen(false);
-};
-
+        console.log("Item recibido en ConfirmEdit:", item);
+        if (!item) {
+            console.error("Error: Item inválido");
+            return;
+        }
+        onConfirm(item); // Llamamos a `onConfirm` con el ítem seleccionado
+        setOpen(false);
+    };
 
     return (
         <>
-            {/* Botón de eliminar (se muestra directamente en CRUD) */}
             <button
                 onClick={() => setOpen(true)}
-                className="flex items-center border border-gray-500 bg-white text-gray-600 px-3 py-1 rounded hover:bg-gray-100 transition"
+                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
             >
-                <TrashIcon className="h-5 w-5 mr-2" />
-                Delete
+                <PencilIcon className="h-5 w-5 mr-2" />
+                Editar
             </button>
 
-            {/* Modal de confirmación */}
             {open && (
                 <div
                     onClick={() => setOpen(false)}
-                    className="fixed inset-0 flex justify-center items-center bg-black/20"
+                    className="fixed inset-0 flex justify-center items-center bg-black/20 backdrop-blur-sm"
                 >
                     <div
                         onClick={(e) => e.stopPropagation()}
-                        className="bg-white rounded-xl shadow p-6 transition-all relative w-[420px] max-w-full"
+                        className="bg-white rounded-xl shadow p-6 transition-all relative"
                     >
                         <button
-                            onClick={() => setOpen(false)}
+                         onClick={() => setOpen(false)}
                             className="absolute top-2 right-2 p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600"
                         >
                             <XMarkIcon className="h-5 w-5" />
                         </button>
-
-                        <p className="mb-4 text-gray-700">¿Estás seguro que deseas eliminar este registro?</p>
+                       
+                        <p className="mb-4 text-gray-700">¿Quieres realizar cambios?</p>
 
                         <div className="flex justify-end space-x-2">
                             <button

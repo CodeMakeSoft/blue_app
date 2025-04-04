@@ -3,6 +3,9 @@ import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import UserFormModal from "@/components/UserFormModal";
 import AdminLayout from "@/Layouts/AdminLayout";
+import ConfirmAdd from "@/Components/ConfirmAdd";
+import ConfirmDelete from "@/Components/ConfirmDelete";
+import ConfirmEdit from "@/Components/ConfirmEdit";
 import { Toaster, toast } from "sonner";
 import {
     PlusCircleIcon,
@@ -20,8 +23,13 @@ export default function User({ activeRoute, can }) {
         setSelectedUser(user);
         setIsModalOpen(true);
     };
-
-    const handleDelete = (id) => {
+    const handleSaveUser = (updatedUser) => {
+        router.put(`/admin/users/${updatedUser.id}`, updatedUser, {
+            onSuccess: () => toast.success("Usuario actualizado"),
+            onError: () => toast.error("Error al actualizar"),
+        });
+    };
+    const handleDeleteUser = (id) => {
         router.delete(`/admin/users/${id}`, {
             onSuccess: () => {
                 toast.success("User Deleted Successfully");
@@ -49,13 +57,7 @@ export default function User({ activeRoute, can }) {
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.user_create && (
-                            <button
-                                onClick={() => openModal()}
-                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
-                            >
-                                <PlusCircleIcon className="h-6 w-6 mr-2" />
-                                Add User
-                            </button>
+                            <ConfirmAdd onConfirm={openModal} label="Add User" />
                         )}
                     </div>
                     <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
@@ -71,7 +73,11 @@ export default function User({ activeRoute, can }) {
                                 ].map((header) => (
                                     <th
                                         key={header}
-                                        className="p-3 text-left first:rounded-tl-lg last:rounded-tr-lg"
+                                        className={`p-3 text-left ${
+                                            header === "Actions"
+                                                ? "text-right-md w-40"
+                                                : ""
+                                        }`}
                                     >
                                         {header}
                                     </th>
@@ -105,24 +111,18 @@ export default function User({ activeRoute, can }) {
                                         </td>
                                         <td className="p-3 flex gap-2">
                                             {can.user_edit && (
-                                                <button
-                                                    onClick={() => openModal(user)}
-                                                    className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                                >
-                                                    <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                                    Edit
-                                                </button>
+                                                <ConfirmEdit item={user}fields={[
+                                                    { name: "name", label: "Full Name", type: "text", required: true },
+                                                    { name: "email", label: "Email", type: "email", required: true },
+                                                    { name: "phone", label: "Phone Number", type: "tel" },
+                                                    { name: "password", label: user ? "New Password" : "Password", type: "password", minLength: 8 },
+                                                    { name: "password_confirmation", label: "Confirm Password", type: "password" },
+                                                    { name: "roles", label: "Roles", type: "multi-select", options: roles, optionLabel: "name", optionValue: "id" }
+                                                ]}
+                                                onSave={handleSaveUser} />
                                             )}
                                             {can.user_delete && (
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(user.id)
-                                                    }
-                                                    className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                                >
-                                                    <TrashIcon className="h-5 w-5 mr-2" />
-                                                    Delete
-                                                </button>
+                                                <ConfirmDelete  key={user.id} id={user.id} onConfirm={handleDeleteUser} />
                                             )}
                                         </td>
                                     </tr>

@@ -147,6 +147,7 @@ export default function CategoryFormModal({ isOpen, closeModal, category }) {
                             />
                         </div>
                     )}
+                    
                     <div className="flex justify-end gap-2">
                         <button
                             type="button"

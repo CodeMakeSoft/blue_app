@@ -2,6 +2,9 @@
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import RoleFormModal from "@/components/RoleFormModal";
+import ConfirmAdd from "@/Components/ConfirmAdd";
+import ConfirmDelete from "@/Components/ConfirmDelete";
+import ConfirmEdit from "@/Components/ConfirmEdit"
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Toaster, toast } from "sonner";
 import {
@@ -21,7 +24,7 @@ export default function Role({ activeRoute, can }) {
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id) => {
+    const handleDeleteRole = (id) => {
         router.delete(`/admin/roles/${id}`, {
             onSuccess: () => {
                 toast.success("Role Deleted Successfully");
@@ -33,6 +36,13 @@ export default function Role({ activeRoute, can }) {
             },
         });
     };
+    const handleSaveRole = (updatedRole) => {
+        router.put(`/admin/roles/${updatedRole.id}`, updatedRole, {
+            onSuccess: () => toast.success("Rol actualizado"),
+            onError: () => toast.error("Error al actualizar"),
+        });
+    };
+    
 
     const handlePageChange = (url) => {
         router.visit(url); // Navegar a la página seleccionada
@@ -49,13 +59,7 @@ export default function Role({ activeRoute, can }) {
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.role_create && (
-                            <button
-                                onClick={() => openModal()}
-                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
-                            >
-                                <PlusCircleIcon className="h-6 w-6 mr-2" />
-                                Add Role
-                            </button>
+                            <ConfirmAdd onConfirm={openModal} label="Agregar Rol" />
                         )}
                     </div>
                     <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
@@ -98,28 +102,10 @@ export default function Role({ activeRoute, can }) {
                                         <td className="p-3">
                                             <div className="flex justify-end gap-2">
                                                 {can.role_edit && (
-                                                    <button
-                                                        onClick={() =>
-                                                            openModal(role)
-                                                        }
-                                                        className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                                    >
-                                                        <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                                        Edit
-                                                    </button>
+                                                    <ConfirmEdit item={role} onConfirm={openModal} />
                                                 )}
                                                 {can.role_delete && (
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                role.id
-                                                            )
-                                                        }
-                                                        className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                                    >
-                                                        <TrashIcon className="h-5 w-5 mr-2" />
-                                                        Delete
-                                                    </button>
+                                                    <ConfirmDelete  key={role.id} id={role.id} onConfirm={handleDeleteRole} />
                                                 )}
                                             </div>
                                         </td>
