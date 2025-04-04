@@ -25,12 +25,24 @@ export default function User({ activeRoute, can }) {
 
 
     const handleDelete = (id) => {
+        // Encuentra al usuario que se quiere eliminar
         const userToDelete = users.data.find((user) => user.id === id);
+
+        // Contamos cuántos administradores hay
+        const adminCount = users.data.filter((user) =>
+            user.roles?.some((role) => role.name === "Admin")
+        ).length;
+
+        // Si el usuario a eliminar es un admin, verificamos si hay más de 1 admin
         if (userToDelete?.roles?.some((role) => role.name === "Admin")) {
-            toast.error("Cannot delete Admin users");
-            return;
+            if (adminCount <= 1) {
+                // Si solo queda un admin, no se permite eliminarlo
+                toast.error("Cannot delete the last Admin user");
+                return;
+            }
         }
 
+        // Si no es el último admin, procedemos con la eliminación
         router.delete(`/admin/users/${id}`, {
             onSuccess: () => {
                 toast.success("User Deleted Successfully");
@@ -42,7 +54,6 @@ export default function User({ activeRoute, can }) {
             },
         });
     };
-
     const handlePageChange = (url) => {
         router.visit(url);
     };
@@ -67,7 +78,7 @@ export default function User({ activeRoute, can }) {
                             </button>
                         )}
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="hidden md:block">
                         <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
                             <thead>
                                 <tr className="bg-gray-100 text-gray-800 border-b">
@@ -153,6 +164,87 @@ export default function User({ activeRoute, can }) {
                             </tbody>
                         </table>
                     </div>
+
+                    <div className="md:hidden">
+                        {users.data.length ? (
+                            users.data.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="bg-white rounded-lg shadow-sm mb-4 p-4"
+                                >
+                                    <div className="grid grid-cols-2 gap-2 mb-3">
+                                        <div className="font-semibold">ID:</div>
+                                        <div>{user.id}</div>
+
+                                        <div className="font-semibold">
+                                            Name:
+                                        </div>
+                                        <div>{user.name}</div>
+
+                                        <div className="font-semibold">
+                                            Email:
+                                        </div>
+                                        <div className="break-all overflow-hidden text-ellipsis">
+                                            {user.email}
+                                        </div>
+
+                                        <div className="font-semibold">
+                                            Phone:
+                                        </div>
+                                        <div>{user.phone || "N/A"}</div>
+
+                                        <div className="col-span-2">
+                                            <div className="text-xs text-gray-500 font-medium">
+                                                Roles
+                                            </div>
+                                            <div className="text-sm">
+                                                {user.roles
+                                                    ?.map((p) => p.name)
+                                                    .join(", ") || "No roles"}
+                                            </div>
+                                        </div>
+                                        <div className="font-semibold">
+                                            Verified:
+                                        </div>
+                                        <div>
+                                            {user.email_verified_at ? (
+                                                <span className="text-green-600">
+                                                    Verified
+                                                </span>
+                                            ) : (
+                                                <span className="text-red-600">
+                                                    Not Verified
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 pt-2 border-t">
+                                        {can.user_edit && (
+                                            <button
+                                                onClick={() => openModal(user)}
+                                                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                            >
+                                                <PencilSquareIcon className="h-4 w-4 mr-1" />
+                                                Edit
+                                            </button>
+                                        )}
+                                        {can.user_delete && (
+                                            <ConfirmDelete
+                                                id={user.id}
+                                                onConfirm={handleDelete}
+                                                className="flex items-center"
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center p-4 text-gray-600 bg-white rounded-lg">
+                                No users found
+                            </div>
+                        )}
+                    </div>
+
                     <Pagination data={users} onPageChange={handlePageChange} />
                 </div>
             </div>

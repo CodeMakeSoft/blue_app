@@ -1,10 +1,9 @@
-// resources/js/Pages/Admin/User.jsx
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import RoleFormModal from "@/components/RoleFormModal";
 import ConfirmAdd from "@/Components/ConfirmAdd";
 import ConfirmDelete from "@/Components/ConfirmDelete";
-import ConfirmEdit from "@/Components/ConfirmEdit"
+import ConfirmEdit from "@/Components/ConfirmEdit";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Toaster, toast } from "sonner";
 import {
@@ -15,7 +14,7 @@ import {
 import Pagination from "@/Components/Pagination";
 
 export default function Role({ activeRoute, can }) {
-    const { roles, permissions } = usePage().props; // users ahora es un objeto paginado
+    const { roles, permissions } = usePage().props;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRole, setSelectedRole] = useState(null);
 
@@ -26,7 +25,6 @@ export default function Role({ activeRoute, can }) {
 
     const handleDelete = (id) => {
         const roleToDelete = roles.data.find((role) => role.id === id);
-        //No borrar si es admin
         if (roleToDelete?.name === "Admin") {
             toast.error("Cannot delete Admin role");
             return;
@@ -44,9 +42,8 @@ export default function Role({ activeRoute, can }) {
         });
     };
 
-
     const handlePageChange = (url) => {
-        router.visit(url); // Navegar a la página seleccionada
+        router.visit(url);
     };
 
     return (
@@ -69,8 +66,9 @@ export default function Role({ activeRoute, can }) {
                             </button>
                         )}
                     </div>
-                    {/* Responsive table*/}
-                    <div className="overflow-x-auto">
+
+                    {/* Vista de tabla para desktop */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
                             <thead>
                                 <tr className="bg-gray-100 text-gray-800 border-b">
@@ -140,7 +138,7 @@ export default function Role({ activeRoute, can }) {
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan={3}
+                                            colSpan={4}
                                             className="text-center p-4 text-gray-600"
                                         >
                                             No roles found.
@@ -150,7 +148,71 @@ export default function Role({ activeRoute, can }) {
                             </tbody>
                         </table>
                     </div>
-                    {/* Paginación */}
+
+                    {/* Vista de tarjetas para móvil */}
+                    <div className="md:hidden space-y-4">
+                        {roles.data.length ? (
+                            roles.data.map((role) => (
+                                <div
+                                    key={role.id}
+                                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
+                                >
+                                    <div className="grid grid-cols-2 gap-4 mb-3">
+                                        <div>
+                                            <div className="text-xs text-gray-500 font-medium">
+                                                ID
+                                            </div>
+                                            <div className="font-mono text-sm">
+                                                {role.id}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xs text-gray-500 font-medium">
+                                                Name
+                                            </div>
+                                            <div className="font-medium">
+                                                {role.name}
+                                            </div>
+                                        </div>
+                                        <div className="col-span-2">
+                                            <div className="text-xs text-gray-500 font-medium">
+                                                Permissions
+                                            </div>
+                                            <div className="text-sm">
+                                                {role.permissions
+                                                    ?.map((p) => p.name)
+                                                    .join(", ") ||
+                                                    "No permissions"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 pt-3 border-t">
+                                        {can.role_edit && (
+                                            <button
+                                                onClick={() => openModal(role)}
+                                                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                            >
+                                                <PencilSquareIcon className="h-4 w-4 mr-1" />
+                                                Edit
+                                            </button>
+                                        )}
+                                        {can.role_delete && (
+                                            <ConfirmDelete
+                                                id={role.id}
+                                                onConfirm={handleDelete}
+                                                className="flex items-center"
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center p-4 text-gray-600 bg-white rounded-lg shadow-sm">
+                                No roles found.
+                            </div>
+                        )}
+                    </div>
+
                     <Pagination data={roles} onPageChange={handlePageChange} />
                 </div>
             </div>
