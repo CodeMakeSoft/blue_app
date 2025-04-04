@@ -2,6 +2,9 @@
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import RoleFormModal from "@/components/RoleFormModal";
+import ConfirmAdd from "@/Components/ConfirmAdd";
+import ConfirmDelete from "@/Components/ConfirmDelete";
+import ConfirmEdit from "@/Components/ConfirmEdit"
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Toaster, toast } from "sonner";
 import {
@@ -41,6 +44,7 @@ export default function Role({ activeRoute, can }) {
         });
     };
 
+
     const handlePageChange = (url) => {
         router.visit(url); // Navegar a la página seleccionada
     };
@@ -58,14 +62,14 @@ export default function Role({ activeRoute, can }) {
                         {can.role_create && (
                             <button
                                 onClick={() => openModal()}
-                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
+                                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
                             >
                                 <PlusCircleIcon className="h-6 w-6 mr-2" />
                                 Add Role
                             </button>
                         )}
                     </div>
-                     {/* Responsive table*/}
+                    {/* Responsive table*/}
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
                             <thead>
@@ -115,24 +119,19 @@ export default function Role({ activeRoute, can }) {
                                                             onClick={() =>
                                                                 openModal(role)
                                                             }
-                                                            className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                                                            className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
                                                         >
-                                                            <PencilSquareIcon className="h-5 w-5 mr-2" />
+                                                            <PencilSquareIcon className="h-4 sm:h-5 w-4 sm:w-5 mr-1" />
                                                             Edit
                                                         </button>
                                                     )}
                                                     {can.role_delete && (
-                                                        <button
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    role.id
-                                                                )
+                                                        <ConfirmDelete
+                                                            id={role.id}
+                                                            onConfirm={
+                                                                handleDelete
                                                             }
-                                                            className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                                        >
-                                                            <TrashIcon className="h-5 w-5 mr-2" />
-                                                            Delete
-                                                        </button>
+                                                        />
                                                     )}
                                                 </div>
                                             </td>

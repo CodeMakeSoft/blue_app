@@ -3,6 +3,9 @@ import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
 import CategoryFormModal from "@/components/CategoryFormModal";
 import AdminLayout from "@/Layouts/AdminLayout";
+import ConfirmAdd from "@/Components/ConfirmAdd";
+import ConfirmEdit from "@/Components/ConfirmEdit";
+import ConfirmDelete from "@/Components/ConfirmDelete";
 import { Toaster, toast } from "sonner";
 import {
     PlusCircleIcon,
@@ -29,10 +32,11 @@ export default function Category({ activeRoute, can}) {
             },
             onError: () => {
                 toast.error("Failed to delete Category");
-                console.error("Failed to delete category.");
+                console.error("Failed to delete Category.");
             },
         });
     };
+    
 
     const handlePageChange = (url) => {
         router.visit(url); // Navegar a la página seleccionada
@@ -49,13 +53,7 @@ export default function Category({ activeRoute, can}) {
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.category_create && (
-                            <button
-                                onClick={() => openModal()}
-                                className="flex items-center bg-green-600 text-white rounded px-4 py-2 text-base hover:bg-green-700 transition"
-                            >
-                                <PlusCircleIcon className="h-6 w-6 mr-2" />
-                                Add Category
-                            </button>
+                            <ConfirmAdd onConfirm={openModal} label="Agregar Categoría" />
                         )}
                     </div>
                     <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
@@ -69,7 +67,11 @@ export default function Category({ activeRoute, can}) {
                                 ].map((header) => (
                                     <th
                                         key={header}
-                                        className="p-3 text-left first:rounded-tl-lg last:rounded-tr-lg"
+                                        className={`p-3 text-left ${
+                                            header === "Actions"
+                                                ? "text-right-md w-40"
+                                                : ""
+                                        }`}
                                     >
                                         {header}
                                     </th>
@@ -102,29 +104,15 @@ export default function Category({ activeRoute, can}) {
                                         <td className="p-3">
                                             {category.description}
                                         </td>
-                                        <td className="p-3 flex gap-2">
+                                        <td className="p-3">
+                                        <div className="flex justify-end gap-2">
                                             {can.category_edit && (
-                                                <button
-                                                    onClick={() =>
-                                                        openModal(category)
-                                                    }
-                                                    className="flex items-center bg-blue-500 text-sm text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                                                >
-                                                    <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                                    Edit
-                                                </button>
+                                                 <ConfirmEdit item={category} onConfirm={openModal} />
                                             )}
-                                            {can.category_delete && (
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(category.id)
-                                                    }
-                                                    className="flex items-center bg-red-500 text-sm text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                                                >
-                                                    <TrashIcon className="h-5 w-5 mr-2" />
-                                                    Delete
-                                                </button>
-                                            )}
+                                               {can.category_delete && (
+                                                <ConfirmDelete key={category.id} id={category.id} onConfirm={handleDelete} />
+                                               )}
+                                               </div>
                                         </td>
                                     </tr>
                                 ))

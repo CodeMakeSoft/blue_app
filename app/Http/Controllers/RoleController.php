@@ -19,7 +19,6 @@ class RoleController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('role:Admin|Manager'),
-            new Middleware('permission:role-view', only: ['index']),
             new Middleware('permission:role-create', only: ['store']),
             new Middleware('permission:role-edit', only: ['update']),
             new Middleware('permission:role-delete', only: ['destroy']),
