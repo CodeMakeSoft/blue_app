@@ -10,7 +10,7 @@ import {
     TrashIcon,
 } from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import ConfirmDelete from "@/Components/ConfirmDelete";
 
 export default function User({ activeRoute, can }) {
     const { users, roles } = usePage().props; // users ahora es un objeto paginado
@@ -133,20 +133,12 @@ export default function User({ activeRoute, can }) {
                                                         Edit
                                                     </button>
                                                 )}
-                                                {/*Por si se quiere retirar el botón de delete solo a Admin */}
-                                                {/*{can.user_delete && !user.roles?.some(role => role.name === 'Admin') && (*/}
+
                                                 {can.user_delete && (
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                user.id
-                                                            )
-                                                        }
-                                                        className="flex items-center bg-red-500 text-xs sm:text-sm text-white px-2 sm:px-3 py-1 rounded hover:bg-red-600 transition"
-                                                    >
-                                                        <TrashIcon className="h-4 sm:h-5 w-4 sm:w-5 mr-1" />
-                                                        Delete
-                                                    </button>
+                                                    <ConfirmDelete
+                                                        id={user.id}
+                                                        onConfirm={handleDelete}
+                                                    />
                                                 )}
                                             </td>
                                         </tr>
