@@ -89,7 +89,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
             phone: formData.phone,
             password: formData.password,
             password_confirmation: formData.password_confirmation,
-            roles: formData.roles,
+            roles: formData.roles,  
         };
 
         const url = user ? `/admin/users/${user.id}` : "/admin/users";

@@ -186,7 +186,7 @@ export default function User({ activeRoute, can }) {
                                         </div>
                                         <div className="break-all overflow-hidden text-ellipsis">
                                             {user.email}
-                                        </div>
+                                        </div> 
 
                                         <div className="font-semibold">
                                             Phone:
