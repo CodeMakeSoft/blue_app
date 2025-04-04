@@ -89,7 +89,7 @@ export function Sidebar({ children }) {
 
                         {/* User Footer */}
                         <div className="px-3 pb-4 relative">
-                            <div
+                             <div
                                 className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                                 onClick={toggleProfileMenu}
                             >
