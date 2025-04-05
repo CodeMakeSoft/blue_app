@@ -15,19 +15,19 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->decimal('price');
+            $table->string('image')->nullable();
+            $table->decimal('price',8,2);// Precio del Producto
             $table->integer('stock');
-            $table->string('size')->nullable();
-            $table->string('color')->nullable();
-            $table->boolean('status')->default(true);
-            $table->timestamp('availability')->nullable();
-
-            $table->foreignId('category_id')->constrained();
-            $table->foreignId('brand_id')->constrained();
-            
+            $table->string('size')->nullable(); //Talla del producto: S, M, L, XL
+            $table->string('color')->nullable(); //Color del producto
+            $table->boolean('status')->default(true); //Estado del producto: 1 = Activo, 0 = Inactivo	
+            $table->timestamp('availability')->nullable(); //Fecha de disponibilidad del producto
+            $table->foreignId('category_id')->constrained()->onDelete('cascade'); //Clave foránea de la tabla categories
+            $table->foreignId('brand_id')->constrained(); //Clave foránea de la tabla brands
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
