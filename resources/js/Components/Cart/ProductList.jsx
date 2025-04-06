@@ -90,7 +90,7 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
     };
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md mt-4">
+        <div className="p-6 bg-white rounded-lg shadow-md mt-[1rem]">
             {/* Lista de productos */}
             <ul className="divide-y divide-slate-100">
                 {cartProducts.map((product) => (
@@ -146,13 +146,13 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
                             
                             {/* Características */}
                             <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
-                                <span className="bg-gray-600 text-white rounded-lg text-sm font-semibold px-3 py-1">
+                                <span className="bg-[#1F2937] text-white rounded-lg text-sm font-semibold px-3 py-1">
                                     Talla: {product.size}
                                 </span>
-                                <span className="bg-gray-600 text-white rounded-lg text-sm font-semibold px-3 py-1">
+                                <span className="bg-[#1F2937] text-white rounded-lg text-sm font-semibold px-3 py-1">
                                     Color: {product.color}
                                 </span>
-                                <span className="bg-gray-600 text-white rounded-lg text-sm font-semibold px-3 py-1">
+                                <span className="bg-[#1F2937] text-white rounded-lg text-sm font-semibold px-3 py-1">
                                     Precio: ${product.price}
                                 </span>
                                 <span className="bg-green-500 text-white rounded-lg text-sm font-semibold px-3 py-1 flex items-center">

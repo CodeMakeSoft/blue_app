@@ -1,54 +1,25 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+const OrderSummary = ({ cart }) => (
+    <>
+        <div className="space-y-4 mb-6">
+            {cart.map(product => (
+                <div key={product.id} className="flex justify-between border-b pb-2">
+                    <span>{product.name} (x{product.pivot.quantity})</span>
+                    <span>${(product.price * product.pivot.quantity).toFixed(2)}</span>
+                </div>
+            ))}
+        </div>
 
-export default function OrderSummary({ 
-    cart, 
-    total = {
-        subtotal: 0,
-        shipping: 0,
-        taxes: 0,
-        total: 0
-    }
-}) {
-    // Ensure safe access to total values
-    const safeTotal = {
-        subtotal: total?.subtotal ?? 0,
-        shipping: total?.shipping ?? 0,
-        taxes: total?.taxes ?? 0,
-        total: total?.total ?? 0
-    };
-
-    return (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="space-y-4">
-                <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-semibold">${safeTotal.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-gray-600">Envío</span>
-                    <span className="font-semibold">${safeTotal.shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-gray-600">Impuestos</span>
-                    <span className="font-semibold">${safeTotal.taxes.toFixed(2)}</span>
-                </div>
-                <hr className="border-gray-200" />
-                <div className="flex justify-between">
-                    <span className="text-lg font-bold">Total</span>
-                    <span className="text-lg font-bold">${safeTotal.total.toFixed(2)}</span>
-                </div>
+        <div className="border-t pt-4">
+            <div className="flex justify-between font-semibold text-lg">
+                <span>Total:</span>
+                <span>$
+                    {cart.reduce((sum, product) => 
+                        sum + (product.price * product.pivot.quantity), 0
+                    ).toFixed(2)}
+                </span>
             </div>
         </div>
-    );
-}
+    </>
+);
 
-OrderSummary.propTypes = {
-    cart: PropTypes.array.isRequired,
-    total: PropTypes.shape({
-        subtotal: PropTypes.number,
-        shipping: PropTypes.number,
-        taxes: PropTypes.number,
-        total: PropTypes.number
-    })
-};
+export default OrderSummary;

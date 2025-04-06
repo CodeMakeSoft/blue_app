@@ -27,18 +27,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    // Cart
-    // Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    // Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    // Route::delete('/cart/remove/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
-    // Route::put('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
     Route::resource('cart', CartController::class)->only(['index', 'update', 'destroy']);
 
-    // Checkout
-    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
-    Route::post('/checkout/create-session', [CheckoutController::class, 'createSession'])->name('checkout.createSession');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('checkout.createOrder');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
+    Route::post('/checkout/cod', [CheckoutController::class, 'checkout'])->name('checkout.cod');
 });
 
 require __DIR__.'/auth.php';

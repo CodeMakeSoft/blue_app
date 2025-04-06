@@ -6,38 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('transaction_id')->nullable();
             $table->decimal('total', 10, 2);
-            $table->string('status');
-            $table->string('payment_id')->nullable();
-            $table->string('shipping_address');
-            $table->string('shipping_city');
-            $table->string('shipping_state');
-            $table->string('shipping_zip');
-            $table->timestamps();
-        });
-
-        Schema::create('order_product', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained();
-            $table->foreignId('product_id')->constrained();
-            $table->integer('quantity');
-            $table->decimal('price', 10, 2);
+            $table->string('status')->default('pending'); // pending, completed, cancelled, etc.
+            $table->string('shipping_address')->nullable();
+            $table->string('billing_address')->nullable();
+            $table->string('contact_email');
+            $table->string('contact_phone')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('orders');
     }

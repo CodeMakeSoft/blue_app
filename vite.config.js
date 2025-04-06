@@ -18,9 +18,9 @@ export default defineConfig({
     optimizeDeps: {
         include: [
             '@inertiajs/react', 
-            '@stripe/stripe-js',
             'prop-types'
-        ]
+        ],
+        exclude: [] // Puedes añadir exclusiones si es necesario
     },
     server: {
         hmr: {
@@ -32,10 +32,9 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks: {
-                    vendor: ['react', 'react-dom', '@inertiajs/react', 'prop-types'],
-                    stripe: ['@stripe/stripe-js']
+                    vendor: ['react', 'react-dom', '@inertiajs/react', 'prop-types']
                 }
             }
         }
     }
-})
+});

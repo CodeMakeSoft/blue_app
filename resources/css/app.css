@@ -6,3 +6,89 @@
 .border-bottom {
     border-bottom: 1px solid #2223;
 }
+
+/* NAVBAR STYLES */
+.navbar {
+    background: linear-gradient(to top, #1F2937, #1F293f);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.navbar-list {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.navbar-item {
+    display: inline-block;
+}
+
+.navbar-link, .navbar-button {
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.navbar-link:hover, .navbar-button:hover {
+    background-color: white;
+    color: #1F2937;
+}
+
+.navbar-link.active {
+    border-bottom: 4px solid white;
+}
+
+.navbar-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-list {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .navbar {
+        padding: 0.75rem;
+    }
+}
+
+/* Modal Styles (para el componente Confirm) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

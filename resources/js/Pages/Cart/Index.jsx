@@ -43,29 +43,6 @@ export default function Index({ cart = [] }) {
         );
     };
 
-    // Función para iniciar el proceso de pago con Stripe
-    const createStripeSession = async () => {
-        try {
-            const response = await axios.post(route('checkout.createSession'), {
-                cartProducts: cart.map((product) => ({
-                    id: product.id,
-                    quantity: product.pivot.quantity,
-                })),
-                total: currentTotal.total * 100, // Multiplica por 100 para enviar el total en centavos
-            });
-
-            if (response.data.id) {
-                const stripe = await loadStripe(process.env.STRIPE_PUBLIC_KEY);
-                await stripe.redirectToCheckout({ sessionId: response.data.id });
-            } else {
-                alert("Ocurrió un error al iniciar el pago.");
-            }
-        } catch (error) {
-            console.error("Error al crear la sesión de Stripe:", error);
-            alert("No se pudo iniciar la sesión de pago. Inténtalo de nuevo más tarde.");
-        }
-    };
-
     return (
         <AuthenticatedLayout
             header={
@@ -80,7 +57,6 @@ export default function Index({ cart = [] }) {
                     <Cart 
                         cart={cart}
                         onQuantityChange={handleQuantityChange}
-                        onConfirmCheckout={createStripeSession} // Pasa la función para iniciar Stripe
                     />
                 ) : (
                     <div className="text-center text-gray-600 mt-6">

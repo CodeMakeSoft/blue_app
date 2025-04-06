@@ -3,186 +3,183 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Stripe\Stripe;
-use Stripe\Checkout\Session;
-use Inertia\Inertia;
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Core\ProductionEnvironment;
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 use App\Models\Order;
+use App\Models\OrderProduct;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderConfirmation;
 
 class CheckoutController extends Controller
 {
-    public function show()
+    private $client;
+
+    public function __construct()
+    {
+        $clientId = config('services.paypal.client_id');
+        $clientSecret = config('services.paypal.secret');
+        
+        $environment = config('services.paypal.mode') === 'live'
+            ? new ProductionEnvironment($clientId, $clientSecret)
+            : new SandboxEnvironment($clientId, $clientSecret);
+
+        $this->client = new PayPalHttpClient($environment);
+    }
+
+    public function index()
     {
         $user = Auth::user();
         $cart = $user->cart;
-    
-        if (!$cart || $cart->products->isEmpty()) {
-            return redirect()->route('cart.index')
-                ->with('error', 'El carrito está vacío');
-        }
-    
-        $products = $cart->products()->with('images')->withPivot('quantity')->get();
+        $products = $cart->products()->withPivot('quantity')->get();
         
-        // Ensure totals are calculated and not null
-        $subtotal = $cart->subtotal ?? 0;
-        $taxes = $cart->taxes ?? 0;
-        $shipping = $cart->shipping_cost ?? 0;
-        
-        return Inertia::render('Checkout/Index', [
+        return inertia('Checkout/Index', [
             'cart' => $products,
-            'total' => [
-                'subtotal' => (float) $subtotal,
-                'taxes' => (float) $taxes,
-                'shipping' => (float) $shipping,
-                'total' => (float) ($subtotal + $taxes + $shipping)
-            ],
-            'stripeKey' => config('services.stripe.key')
+            'paypalClientId' => config('services.paypal.client_id'),
+            'paymentMethods' => ['paypal' => 'PayPal', 'cod' => 'Pago contra entrega'] // Nuevo
         ]);
     }
-    
-    public function createSession(Request $request)
-    {
-        Stripe::setApiKey(config('services.stripe.secret'));
 
+    // Método para crear orden PayPal (existente)
+    public function createOrder(Request $request)
+    {
+        $request->validate([
+            'total' => 'required|numeric|min:0.1'
+        ]);
+
+        $paypalRequest = new OrdersCreateRequest();
+        $paypalRequest->prefer('return=representation');
+        
+        $paypalRequest->body = [
+            "intent" => "CAPTURE",
+            "purchase_units" => [[
+                "amount" => [
+                    "currency_code" => "MXN",
+                    "value" => $request->total
+                ]
+            ]],
+            "application_context" => [
+                "cancel_url" => route('checkout.cancel'),
+                "return_url" => route('checkout.success')
+            ]
+        ];
+
+        try {
+            $response = $this->client->execute($paypalRequest);
+            return response()->json($response->result);
+        } catch (\Exception $e) {
+            report($e);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // Nuevo método para procesar COD
+    public function processCod(Request $request)
+    {
         $user = Auth::user();
         $cart = $user->cart;
 
-        if (!$cart || $cart->products->isEmpty()) {
-            return response()->json([
-                'error' => 'El carrito está vacío'
-            ], 400);
-        }
-
-        // Validar stock antes de crear la sesión
-        foreach ($cart->products as $product) {
-            if ($product->stock < $product->pivot->quantity) {
-                return response()->json([
-                    'error' => 'Stock insuficiente para ' . $product->name
-                ], 400);
-            }
-        }
-
-        $products = $cart->products;
-
         try {
-            $session = Session::create([
-                'payment_method_types' => ['card'],
-                'line_items' => $products->map(function ($product) {
-                    return [
-                        'price_data' => [
-                            'currency' => 'mxn',
-                            'product_data' => [
-                                'name' => $product->name,
-                                'images' => [$product->images->first()?->url ?? null],
-                            ],
-                            'unit_amount' => $product->price * 100, // Stripe usa centavos
-                        ],
-                        'quantity' => $product->pivot->quantity,
-                    ];
-                })->toArray(),
-                'mode' => 'payment',
-                'success_url' => route('checkout.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('checkout.cancel'),
+            DB::beginTransaction();
+
+            $order = Order::create([
+                'user_id' => $user->id,
+                'payment_method' => 'cod',
+                'total' => $cart->products->sum(function ($product) {
+                    return $product->price * $product->pivot->quantity;
+                }),
+                'status' => 'pending' // Estado inicial para COD
             ]);
 
-            return response()->json([
-                'id' => $session->id
+            foreach ($cart->products as $product) {
+                OrderProduct::create([
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'quantity' => $product->pivot->quantity,
+                    'price' => $product->price
+                ]);
+            }
+
+            $cart->products()->detach();
+
+            // Opcional: Enviar email diferente para COD
+            Mail::to($user->email)->send(new OrderConfirmation($order, true));
+
+            DB::commit();
+
+            return inertia('Checkout/Success', [
+                'order' => $order,
+                'isCod' => true // Para mostrar mensaje diferente en la vista
             ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
+            DB::rollBack();
+            report($e);
+            return redirect()->route('checkout.cancel')->withErrors([
+                'message' => 'Ocurrió un error al procesar tu orden. Por favor intenta nuevamente.'
+            ]);
         }
     }
 
+    // Método success modificado para manejar ambos casos
     public function success(Request $request)
     {
-        try {
-            if (!$request->has('session_id')) {
-                throw new \Exception('No se proporcionó ID de sesión');
-            }
+        // Solo procesa PayPal si viene con token
+        if ($request->has('token') || $request->has('paymentId')) {
+            $user = Auth::user();
+            $cart = $user->cart;
+            $orderId = $request->input('token') ?? $request->input('paymentId');
 
-            $sessionId = $request->get('session_id');
-            Stripe::setApiKey(config('services.stripe.secret'));
-            $session = Session::retrieve($sessionId);
-
-            if ($session->payment_status !== 'paid') {
-                throw new \Exception('El pago no ha sido completado');
-            }
-
-            DB::beginTransaction();
             try {
-                $user = Auth::user();
-                $cart = $user->cart;
+                DB::beginTransaction();
 
-                // Crear la orden
                 $order = Order::create([
                     'user_id' => $user->id,
-                    'status' => 'completed',
-                    'payment_id' => $session->payment_intent,
-                    'shipping_address' => $session->shipping?->address?->line1 ?? '',
-                    'shipping_city' => $session->shipping?->address?->city ?? '',
-                    'shipping_state' => $session->shipping?->address?->state ?? '',
-                    'shipping_zip' => $session->shipping?->address?->postal_code ?? '',
-                    'total' => $session->amount_total / 100
+                    'transaction_id' => $orderId,
+                    'payment_method' => 'paypal',
+                    'total' => $cart->products->sum(function ($product) {
+                        return $product->price * $product->pivot->quantity;
+                    }),
+                    'status' => 'completed'
                 ]);
 
                 foreach ($cart->products as $product) {
-                    if ($product->stock < $product->pivot->quantity) {
-                        throw new \Exception('Stock insuficiente para ' . $product->name);
-                    }
-
-                    $order->products()->attach($product->id, [
+                    OrderProduct::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
                         'quantity' => $product->pivot->quantity,
                         'price' => $product->price
                     ]);
-
-                    $product->decrement('stock', $product->pivot->quantity);
                 }
 
                 $cart->products()->detach();
+                Mail::to($user->email)->send(new OrderConfirmation($order));
+
                 DB::commit();
 
-                // Enviar email de confirmación
-                // Event::dispatch(new OrderCreated($order));
-
-                return Inertia::render('Checkout/Success', [
-                    'order' => $order->load(['products.images']),
-                    'message' => '¡Gracias por tu compra!'
+                return inertia('Checkout/Success', [
+                    'order' => $order,
+                    'isCod' => false
                 ]);
 
             } catch (\Exception $e) {
                 DB::rollBack();
-                Log::error('Error en checkout success: ' . $e->getMessage());
-                throw $e;
+                report($e);
+                return redirect()->route('checkout.cancel')->withErrors([
+                    'message' => 'Ocurrió un error al procesar tu orden. Por favor intenta nuevamente.'
+                ]);
             }
-
-        } catch (\Exception $e) {
-            Log::error('Error general en checkout success: ' . $e->getMessage());
-            return redirect()->route('cart.index')
-                ->with('error', 'Hubo un error al procesar tu orden: ' . $e->getMessage());
         }
+
+        return redirect()->route('checkout.index');
     }
 
     public function cancel()
     {
-        try {
-            Log::info('Pago cancelado por el usuario', [
-                'user_id' => Auth::id(),
-            ]);
-
-            // Renderizar página de cancelación
-            return Inertia::render('Checkout/Cancel', [
-                'message' => 'El pago ha sido cancelado. Tu carrito se mantiene intacto.',
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Error en checkout cancel: ' . $e->getMessage());
-            return redirect()->route('cart.index')
-                ->with('error', 'Hubo un error al procesar la cancelación');
-        }
+        return inertia('Checkout/Cancel');
     }
 }
