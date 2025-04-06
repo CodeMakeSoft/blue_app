@@ -9,7 +9,7 @@ const Create = ({ categories, brands }) => {
         description: "",
         price: "",
         image: null,
-        status: true, // Asegúrate de inicializar con true si el producto está activo por defecto
+        status: true,
         category_id: "",
         brand_id: "",
         stock: 0,
@@ -38,18 +38,17 @@ const Create = ({ categories, brands }) => {
         formData.append("size", data.size);
         formData.append("color", data.color);
 
-        // Realizar la petición POST para crear el producto
         post(route("products.store"), formData);
     };
 
     return (
         <AuthenticatedLayout header={<Head title="Crear Producto" />}>
-            <div className="max-w-5xl mx-auto mt-10 bg-white shadow-md rounded-lg">
-                <div className="overflow-hidden rounded-lg border border-gray-200">
-                    <div className="bg-gray-200 text-gray-600  uppercase text-sm font-semibold px-6 py-3 rounded-t-lg">
+            <div className="max-w-5xl mx-auto mt-10 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+                <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-sm font-semibold px-6 py-3 rounded-t-lg">
                         Crear Producto
                     </div>
-                    <div className="p-6">
+                    <div className="p-6 text-gray-900 dark:text-gray-100">
                         <Form
                             data={data}
                             setData={setData}

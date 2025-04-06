@@ -2,7 +2,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export default function Form({
     data,
@@ -16,23 +16,37 @@ export default function Form({
     const [previewImages, setPreviewImages] = useState([]);
     const fileInputRef = useRef(null);
     const [imagesToDelete, setImagesToDelete] = useState([]);
+    const [descriptionStatus, setDescriptionStatus] = useState("");
+    const [descriptionLength, setDescriptionLength] = useState(0);
+
+    useEffect(() => {
+        // Calcular longitud y estado de la descripción
+        const length = data.description?.length || 0;
+        setDescriptionLength(length);
+
+        if (length === 0) {
+            setDescriptionStatus("");
+        } else if (length < 50) {
+            setDescriptionStatus("Corta");
+        } else if (length < 150) {
+            setDescriptionStatus("Regular");
+        } else {
+            setDescriptionStatus("Buena");
+        }
+    }, [data.description]);
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
-
         const newPreviews = files.map((file) => ({
             file,
             preview: URL.createObjectURL(file),
         }));
-
         setPreviewImages([...previewImages, ...newPreviews]);
         setData("images", [...(data.images || []), ...files]);
     };
 
     const removeImage = (index, imageId = null) => {
-        if (imageId) {
-            setImagesToDelete([...imagesToDelete, imageId]);
-        }
+        if (imageId) setImagesToDelete([...imagesToDelete, imageId]);
 
         const updatedPreviews = [...previewImages];
         updatedPreviews.splice(index, 1);
@@ -50,7 +64,6 @@ export default function Form({
             deleted_images: imagesToDelete,
         });
     };
-
     return (
         <form
             onSubmit={submit}
@@ -87,13 +100,53 @@ export default function Form({
                         id="description"
                         name="description"
                         value={data.description}
-                        className="w-full border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                        className="w-full border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 min-h-[120px]"
                         onChange={(e) => setData("description", e.target.value)}
                     />
                     <InputError
                         message={errors.description}
                         className="dark:text-red-400"
                     />
+
+                    <div className="mt-2 text-sm">
+                        <div
+                            className={`h-1 rounded-md ${
+                                descriptionStatus === "Buena"
+                                    ? "bg-green-500"
+                                    : descriptionStatus === "Regular"
+                                    ? "bg-yellow-500"
+                                    : descriptionStatus === "Corta"
+                                    ? "bg-red-500"
+                                    : "bg-gray-200 dark:bg-gray-600"
+                            }`}
+                            style={{
+                                width: `${Math.min(
+                                    (descriptionLength / 200) * 100,
+                                    100
+                                )}%`,
+                                maxWidth: "100%",
+                            }}
+                        ></div>
+                        <p
+                            className={`mt-1 ${
+                                descriptionStatus === "Buena"
+                                    ? "text-green-600 dark:text-green-400"
+                                    : descriptionStatus === "Regular"
+                                    ? "text-yellow-600 dark:text-yellow-400"
+                                    : descriptionStatus === "Corta"
+                                    ? "text-red-600 dark:text-red-400"
+                                    : "text-gray-500 dark:text-gray-400"
+                            }`}
+                        >
+                            {descriptionStatus === "Buena"
+                                ? "Descripción adecuada"
+                                : descriptionStatus === "Regular"
+                                ? "Descripción aceptable (recomendado añadir más detalles)"
+                                : descriptionStatus === "Corta"
+                                ? "Descripción muy corta (mínimo 50 caracteres)"
+                                : "Escribe una descripción detallada (recomendado 150-200 caracteres)"}
+                        </p>
+                    </div>
                 </div>
 
                 <InputLabel
@@ -380,7 +433,14 @@ export default function Form({
             <div className="col-span-1 md:col-span-2 flex justify-end mt-4 gap-4">
                 <PrimaryButton
                     type="submit"
-                    className="dark:bg-blue-500 dark:hover:bg-blue-400"
+                    className="
+                        bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500
+                        text-white font-medium py-2 px-4 rounded-full shadow-sm
+                        hover:shadow-lg transition duration-300
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                        dark:focus:ring-offset-gray-800
+                        active:scale-95 active:shadow-inner active:bg-blue-800 dark:active:bg-blue-700
+                    "
                 >
                     Guardar cambios
                 </PrimaryButton>

@@ -140,7 +140,7 @@ export default function Footer({
                                         rel="noopener noreferrer"
                                         className="hover:text-blue-600 dark:hover:text-blue-400"
                                     >
-                                        emmanuelislas@micorreo.upp.edu.mx
+                                        cod3cr4fts0ft@gmail.com
                                     </a>
                                 </p>
                                 <p className="transition-all duration-300 transform hover:scale-105 hover:text-blue-600 dark:hover:text-blue-400">

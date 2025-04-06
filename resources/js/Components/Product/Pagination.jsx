@@ -20,18 +20,18 @@ export default function Pagination({
     };
 
     return (
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
             {/* Selector de cantidad de registros por página */}
             <div className="flex items-center space-x-2"></div>
 
             {/* Controles de paginación */}
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-1">
                 <button
-                    className={`px-4 py-2 border rounded ${
+                    className={`px-3 py-1 sm:px-4 sm:py-2 border rounded-md transition-all duration-200 ${
                         currentPage === 1
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:bg-red-400"
-                    }`}
+                            ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 cursor-not-allowed"
+                            : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md"
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 active:scale-95 active:bg-gray-200 dark:active:bg-gray-600`}
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                 >
@@ -41,11 +41,11 @@ export default function Pagination({
                 {[...Array(totalPages)].map((_, index) => (
                     <button
                         key={index}
-                        className={`px-4 py-2 border rounded ${
+                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border rounded-md transition-all duration-200 mx-1 ${
                             currentPage === index + 1
-                                ? "bg-blue-500 text-white"
-                                : "hover:bg-blue-400"
-                        }`}
+                                ? "bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700 shadow-inner"
+                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 active:scale-95 active:bg-blue-500 dark:active:bg-blue-600`}
                         onClick={() => onPageChange(index + 1)}
                     >
                         {index + 1}
@@ -53,11 +53,11 @@ export default function Pagination({
                 ))}
 
                 <button
-                    className={`px-4 py-2 border rounded ${
+                    className={`px-3 py-1 sm:px-4 sm:py-2 border rounded-md transition-all duration-200 ${
                         currentPage === totalPages
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:bg-blue-400"
-                    }`}
+                            ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 cursor-not-allowed"
+                            : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md"
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 active:scale-95 active:bg-gray-200 dark:active:bg-gray-600`}
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                 >
