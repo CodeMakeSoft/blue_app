@@ -81,7 +81,10 @@ export default function Footer({
                                     }}
                                 />
                             )}
-                            <span className="text-xl font-bold text-gray-900 dark:text-white transition-all duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                            <span
+                                className="text-xl font-bold text-gray-900 dark:text-white transition-all duration-300 group-hover:text-blue-600 
+                            dark:group-hover:text-blue-400"
+                            >
                                 {companyName}
                             </span>
                         </Link>
@@ -92,7 +95,10 @@ export default function Footer({
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 py-8">
                         {linkGroups.map((group, index) => (
                             <div key={index} className="mb-4 sm:mb-0">
-                                <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                <h3
+                                    className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 
+                                dark:hover:text-blue-400"
+                                >
                                     {group.title}
                                 </h3>
                                 <ul className="space-y-2">
@@ -102,7 +108,8 @@ export default function Footer({
                                                 href={link.url}
                                                 target={link.target || "_blank"}
                                                 rel="noopener noreferrer"
-                                                className="text-gray-600 dark:text-gray-400 text-sm transition-all duration-300 transform hover:scale-105 hover:text-blue-600 dark:hover:text-blue-400 flex items-start"
+                                                className="text-gray-600 dark:text-gray-400 text-sm transition-all duration-300 transform hover:scale-105 
+                                                hover:text-blue-600 dark:hover:text-blue-400 flex items-start"
                                             >
                                                 {link.target === "_blank" && (
                                                     <svg
@@ -129,7 +136,10 @@ export default function Footer({
                         ))}
 
                         <div className="mb-4 sm:mb-0">
-                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400">
+                            <h3
+                                className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 
+                            dark:hover:text-blue-400"
+                            >
                                 Contacto
                             </h3>
                             <address className="text-gray-600 dark:text-gray-400 not-italic text-sm">
@@ -151,7 +161,10 @@ export default function Footer({
 
                         {showSocial && (
                             <div className="mb-4 sm:mb-0">
-                                <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                <h3
+                                    className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 
+                                dark:hover:text-blue-400"
+                                >
                                     Síguenos
                                 </h3>
                                 <div className="flex flex-col space-y-3">
@@ -161,7 +174,8 @@ export default function Footer({
                                             href={social.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-gray-600 dark:text-gray-400 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center space-x-3 group"
+                                            className="text-gray-600 dark:text-gray-400 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 
+                                            flex items-center space-x-3 group"
                                             aria-label={social.name}
                                         >
                                             <FontAwesomeIcon
