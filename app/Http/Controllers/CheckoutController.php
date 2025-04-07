@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmation;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
@@ -44,38 +45,57 @@ class CheckoutController extends Controller
         ]);
     }
 
-    // Método para crear orden PayPal (existente)
     public function createOrder(Request $request)
     {
-        $request->validate([
-            'total' => 'required|numeric|min:0.1'
+        // Validamos que vengan productos, total y direcciones si son necesarias
+        $validated = $request->validate([
+            'products' => 'required|array',
+            'products.*.id' => 'required|integer|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.price' => 'required|numeric|min:0',
+            'total' => 'required|numeric|min:0',
+            'shipping_address' => 'required|string|max:255', // Si es necesario
+            'billing_address' => 'required|string|max:255', // Si es necesario
+            'contact_email' => 'required|email',
+            'contact_phone' => 'nullable|string|max:15'
         ]);
-
-        $paypalRequest = new OrdersCreateRequest();
-        $paypalRequest->prefer('return=representation');
-        
-        $paypalRequest->body = [
-            "intent" => "CAPTURE",
-            "purchase_units" => [[
-                "amount" => [
-                    "currency_code" => "MXN",
-                    "value" => $request->total
-                ]
-            ]],
-            "application_context" => [
-                "cancel_url" => route('checkout.cancel'),
-                "return_url" => route('checkout.success')
-            ]
-        ];
-
+    
         try {
-            $response = $this->client->execute($paypalRequest);
-            return response()->json($response->result);
-        } catch (\Exception $e) {
-            report($e);
-            return response()->json(['error' => $e->getMessage()], 500);
+            // Crear la orden
+            $order = Order::create([
+                'user_id' => Auth::id(), // o usa un ID fijo si no tienes autenticación
+                'total' => $validated['total'],
+                'status' => 'pending',
+                'shipping_address' => $validated['shipping_address'], // Asegurándonos de incluir las direcciones
+                'billing_address' => $validated['billing_address'],
+                'contact_email' => $validated['contact_email'],
+                'contact_phone' => $validated['contact_phone'],
+            ]);
+    
+            // Asociamos los productos a la orden
+            foreach ($validated['products'] as $item) {
+                $order->products()->attach($item['id'], [
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price']
+                ]);
+            }
+    
+            // Respondemos con el ID de la orden para que PayPal lo use
+            return response()->json([
+                'id' => $order->id // Este es el id que PayPal espera
+            ]);
+    
+        } catch (\Throwable $e) {
+            Log::error('Error al crear la orden: ' . $e->getMessage());
+    
+            // Devolver error adecuado en caso de excepción
+            return response()->json([
+                'error' => 'No se pudo crear la orden.',
+                'exception' => $e->getMessage() // Agrega el mensaje de error aquí
+            ], 500);
         }
     }
+    
 
     // Nuevo método para procesar COD
     public function processCod(Request $request)
@@ -107,7 +127,7 @@ class CheckoutController extends Controller
             $cart->products()->detach();
 
             // Opcional: Enviar email diferente para COD
-            Mail::to($user->email)->send(new OrderConfirmation($order, true));
+            //Mail::to($user->email)->send(new OrderConfirmation($order, true));
 
             DB::commit();
 

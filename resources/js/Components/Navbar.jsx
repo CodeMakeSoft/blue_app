@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import Confirm from '@/Components/Cart/Confirm';
+import Confirm from '@/Components/Confirm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faShoppingCart, 
+  faArrowLeft, 
+  faCreditCard, 
+  faSignOutAlt,
+  faCheckCircle
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function Navbar({ 
     activeLink, 
@@ -33,6 +41,7 @@ export default function Navbar({
                         href={route('dashboard')}
                         className="navbar-link"
                     >
+                        <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
                         Seguir Comprando
                     </Link>
                 </li>
@@ -42,6 +51,7 @@ export default function Navbar({
                             onClick={() => setIsCheckoutConfirmVisible(true)}
                             className="navbar-button"
                         >
+                            <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
                             Volver al Carrito
                         </button>
                     ) : (
@@ -49,6 +59,7 @@ export default function Navbar({
                             href={route('cart.index')}
                             className={`navbar-link ${getActiveClass('cart.index')}`}
                         >
+                            <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
                             Carrito
                         </Link>
                     )}
@@ -63,6 +74,7 @@ export default function Navbar({
                             className={`navbar-button ${isCartEmpty ? 'disabled' : ''}`}
                             disabled={isCartEmpty}
                         >
+                            <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
                             Proceder al Pago
                         </button>
                     ) : (
@@ -70,6 +82,7 @@ export default function Navbar({
                             href={route('checkout.index')}
                             className={`navbar-link ${getActiveClass('checkout.index')}`}
                         >
+                            <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
                             Finalizar Compra
                         </Link>
                     )}
@@ -81,7 +94,12 @@ export default function Navbar({
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <Confirm
-                            title="Confirmación de Compra"
+                            title={
+                                <>
+                                    <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
+                                    Confirmación de Compra
+                                </>
+                            }
                             message="¿Deseas proceder al pago?"
                             onConfirm={handleConfirmCheckout}
                             onCancel={() => setIsConfirmVisible(false)}
@@ -95,7 +113,12 @@ export default function Navbar({
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <Confirm
-                            title="Abandonar Compra"
+                            title={
+                                <>
+                                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                                    Abandonar Compra
+                                </>
+                            }
                             message="¿Estás seguro que deseas volver al carrito? Los datos ingresados no se guardarán."
                             onConfirm={handleAbandonCheckout}
                             onCancel={() => setIsCheckoutConfirmVisible(false)}

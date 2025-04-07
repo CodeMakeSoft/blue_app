@@ -64,9 +64,10 @@ class CartController extends Controller
 
         $products = $cart->products()->with('images')->withPivot('quantity')->get();
 
-        return Inertia::render('Cart/Index', [
-            'cart' => $products,
-        ]);
+        // return Inertia::render('Cart/Index', [
+        //     'cart' => $products,
+        // ]);
+        return redirect()->route('cart.index');
     }
 
     // Update cart quantity
@@ -91,8 +92,9 @@ class CartController extends Controller
 
         $products = $cart->products()->with('images')->withPivot('quantity')->get();
 
-        return Inertia::render('Cart/Index', [
-            'cart' => $products,
-        ]);
+        // return Inertia::render('Cart/Index', [
+        //     'cart' => $products,
+        // ]);
+        return redirect()->route('cart.index');
     }
 }

@@ -1,94 +1,55 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from '@inertiajs/react';
-import Confirm from '@/Components/Cart/Confirm';
-import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faCreditCard, faReceipt, faTruck } from "@fortawesome/free-solid-svg-icons";
 
-export default function CartSummary({ total }) {
-    // Add null check for total
-    if (!total) {
-        return null; // or a loading state
-    }
-
-    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
-
-    // Función para manejar la confirmación
-    const handleConfirm = () => {
-        console.log('Compra confirmada');
-        setIsConfirmVisible(false);
-    };
-
-    // Función para manejar la cancelación
-    const handleCancel = () => {
-        console.log('Compra cancelada');
-        setIsConfirmVisible(false);
-    };
-
+const CartSummary = ({ totals, isCartEmpty, onCheckout }) => {
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md my-[1em]">
-            <h2 className="text-xl font-bold mb-4">Resumen del Carrito</h2>
-            <div className="space-y-4">
-                <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-semibold">${total.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-gray-600">Envío</span>
-                    <span className="font-semibold">${total.shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-gray-600">Impuestos</span>
-                    <span className="font-semibold">${total.taxes.toFixed(2)}</span>
-                </div>
-                <hr className="border-gray-200" />
-                <div className="flex justify-between">
-                    <span className="text-lg font-bold">Total</span>
-                    <span className="text-lg font-bold">${total.total.toFixed(2)}</span>
-                </div>
+        <div className="mt-8 p-5 bg-gray-50 rounded-lg border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <FontAwesomeIcon icon={faReceipt} className="mr-2 text-gray-600" />
+            Resumen del pedido
+        </h3>
+        
+        <div className="space-y-3 mb-5">
+            <div className="flex justify-between">
+                <span className="text-gray-600">Subtotal</span>
+                <span className="font-medium">${totals.subtotal.toFixed(2)}</span>
             </div>
-
-            {/* Botones de acción */}
-            <div className="mt-6 space-y-2">
-                <button
-                    type="button"
-                    onClick={() => setIsConfirmVisible(true)}
-                    className="w-full bg-[#1F2937] text-white py-2 rounded-lg hover:bg-gray-500"
-                >
-                    Proceder al Pago
-                </button>
-                <Link
-                    href={route('dashboard')}
-                    className="block w-full text-center bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
-                >
-                    Seguir Comprando
-                </Link>
+            <div className="flex justify-between">
+                <span className="text-gray-600 flex items-center">
+                    <FontAwesomeIcon icon={faTruck} className="mr-1.5 w-3 h-3" />
+                    Envío
+                </span>
+                <span className="font-medium">${totals.shipping.toFixed(2)}</span>
             </div>
+            <div className="flex justify-between pt-3 border-t border-gray-200">
+                <span className="font-semibold">Total</span>
+                <span className="font-bold text-lg">${totals.total.toFixed(2)}</span>
+            </div>
+        </div>
 
-            {isConfirmVisible && (
-                <Confirm
-                    title="Confirmación de Compra"
-                    message="¿Estás seguro de realizar esta compra?"
-                    onConfirm={handleConfirm}
-                    onCancel={handleCancel}
-                />
-            )}
+        <div className="flex flex-col sm:flex-row gap-3">
+            <Link 
+                href={route('dashboard')} 
+                className="flex-1 px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 text-center font-medium flex items-center justify-center"
+            >
+            <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                Seguir Comprando
+            </Link>
+            <button
+                onClick={onCheckout}
+                disabled={isCartEmpty}
+                className={`flex-1 px-5 py-2.5 text-white rounded-lg text-center font-medium transition duration-200 flex items-center justify-center ${
+                    isCartEmpty ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
+                }`}
+            >
+            <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
+                Proceder al Pago
+            </button>
+        </div>
         </div>
     );
-}
-
-CartSummary.propTypes = {
-    total: PropTypes.shape({
-        subtotal: PropTypes.number.isRequired,
-        taxes: PropTypes.number.isRequired,
-        shipping: PropTypes.number.isRequired,
-        total: PropTypes.number.isRequired
-    }).isRequired
 };
 
-CartSummary.defaultProps = {
-    total: {
-        subtotal: 0,
-        taxes: 0,
-        shipping: 0,
-        total: 0
-    }
-};
+export default CartSummary;

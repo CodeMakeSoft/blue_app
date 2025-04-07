@@ -13,19 +13,19 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
-    'paypal' => [
-        'client_id' => env('PAYPAL_CLIENT_ID'),
-        'secret' => env('PAYPAL_SECRET'),
-        'mode' => env('PAYPAL_MODE', 'sandbox'), // Default a sandbox si no está configurado
-        'sandbox' => [
+        'paypal' => [
             'client_id' => env('PAYPAL_CLIENT_ID'),
             'secret' => env('PAYPAL_SECRET'),
+            'mode' => env('PAYPAL_MODE', 'sandbox'), // Default a sandbox si no está configurado
+            'sandbox' => [
+                'client_id' => env('PAYPAL_CLIENT_ID'),
+                'secret' => env('PAYPAL_SECRET'),
+            ],
+            'live' => [
+                'client_id' => env('PAYPAL_CLIENT_ID'),
+                'secret' => env('PAYPAL_SECRET'),
+            ],
         ],
-        'live' => [
-            'client_id' => env('PAYPAL_CLIENT_ID'),
-            'secret' => env('PAYPAL_SECRET'),
-        ],
-    ],
 
 
     'postmark' => [

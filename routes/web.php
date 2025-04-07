@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('checkout.createOrder');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
-    Route::post('/checkout/cod', [CheckoutController::class, 'checkout'])->name('checkout.cod');
+    Route::post('/checkout/cod', [CheckoutController::class, 'processCod'])->name('checkout.cod');
 });
 
 require __DIR__.'/auth.php';

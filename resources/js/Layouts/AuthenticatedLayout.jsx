@@ -4,21 +4,30 @@ import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-
 import { ShoppingCartIcon } from '@heroicons/react/24/solid';
+import Navbar from '@/Components/Navbar'; // Tu componente Navbar personalizado
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
-
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+    const [isCheckoutConfirmVisible, setIsCheckoutConfirmVisible] = useState(false);
+    
+    // Detecta si estamos en rutas de carrito o checkout
+    const { url } = usePage();
+    const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout');
+    const cart = usePage().props.cart || [];
+    const activeLink = route().current('checkout.index') ? 'checkout.index' : 'cart.index';
 
     return (
         <div className="min-h-screen bg-gray-100">
             <meta name="csrf-token" content={window.csrfToken} />
+            
+            {/* Navbar Principal (siempre visible) */}
             <nav className="border-b border-gray-100 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
+                        {/* Logo y navegación izquierda */}
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
                                 <Link href="/">
@@ -35,8 +44,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </NavLink>
                             </div>
                         </div>
+
+                        {/* Parte derecha - Usuario y carrito */}
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="block relative ms-3">
+                            <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <span className="inline-flex rounded-md">
@@ -45,7 +56,6 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
                                                 {user.name}
-
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -63,34 +73,35 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
+                                        <Dropdown.Link href={route('profile.edit')}>
+                                            Perfil
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
                                             as="button"
                                         >
-                                            Log Out
+                                            Cerrar Sesión
                                         </Dropdown.Link>
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
-                            <div className="flex shrink-0 items-center ml-auto">
-                                <Link href={route('cart.index')} >
-                                    <ShoppingCartIcon className="h-9 w-auto fill-current text-gray-500" />
+                            <div className="flex shrink-0 items-center ml-4">
+                                <Link href={route('cart.index')}>
+                                    <ShoppingCartIcon className="h-6 w-6 text-gray-500 hover:text-gray-700" />
+                                    {cart.length > 0 && (
+                                        <span className="absolute -mt-2 ml-3 rounded-full bg-red-500 text-white text-xs h-5 w-5 flex items-center justify-center">
+                                            {cart.length}
+                                        </span>
+                                    )}
                                 </Link>
                             </div>
                         </div>
+
+                        {/* Menú móvil */}
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
+                                onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
                                 className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
                             >
                                 <svg
@@ -100,22 +111,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                     viewBox="0 0 24 24"
                                 >
                                     <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
+                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
                                         d="M4 6h16M4 12h16M4 18h16"
                                     />
                                     <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
+                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
@@ -127,12 +130,8 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
 
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
+                {/* Contenido del menú móvil */}
+                <div className={`${showingNavigationDropdown ? 'block' : 'hidden'} sm:hidden`}>
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
                             href={route('dashboard')}
@@ -144,7 +143,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('cart.index')}
                             active={route().current('cart.index')}
                         >
-                            Cart
+                            Carrito
                         </ResponsiveNavLink>
                     </div>
 
@@ -160,29 +159,46 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         <div className="mt-3 space-y-1">
                             <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
+                                Perfil
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 method="post"
                                 href={route('logout')}
                                 as="button"
                             >
-                                Log Out
+                                Cerrar Sesión
                             </ResponsiveNavLink>
                         </div>
                     </div>
                 </div>
             </nav>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            {/* Contenedor principal */}
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {/* Header opcional */}
+                {header && (
+                    <header className="bg-white shadow-sm rounded-lg mb-6 p-4">
                         {header}
-                    </div>
-                </header>
-            )}
+                    </header>
+                )}
+                
+                {/* Navbar de Carrito/Checkout (solo visible en esas rutas) */}
+                {showCartNavbar && (
+                    <Navbar 
+                        activeLink={activeLink}
+                        isConfirmVisible={isConfirmVisible}
+                        setIsConfirmVisible={setIsConfirmVisible}
+                        isCheckoutConfirmVisible={isCheckoutConfirmVisible}
+                        setIsCheckoutConfirmVisible={setIsCheckoutConfirmVisible}
+                        isCartEmpty={cart.length === 0}
+                    />
+                )}
 
-            <main>{children}</main>
+                {/* Contenido principal */}
+                <main className="bg-white shadow-sm rounded-lg overflow-hidden">
+                    {children}
+                </main>
+            </div>
         </div>
     );
 }

@@ -1,3 +1,5 @@
+// src/components/PayPalButton.jsx
+
 import { useEffect } from 'react';
 import { loadScript } from '@paypal/paypal-js';
 

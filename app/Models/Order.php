@@ -18,7 +18,8 @@ class Order extends Model
         'billing_address',
         'contact_email',
         'contact_phone',
-        'notes'
+        'notes',
+        'payment_method',
     ];
 
     public function user()
