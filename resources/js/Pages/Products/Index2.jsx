@@ -1,8 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useState } from "react";
 import { Head, router } from "@inertiajs/react";
-import { usePage } from "@inertiajs/react";
-import { SwatchIcon } from "@heroicons/react/24/solid";
 
 export default function Dashboard({ products = [] }) {
     console.log(products);
@@ -58,10 +56,6 @@ export default function Dashboard({ products = [] }) {
                                     </h3>
                                     <p className="text-gray-700 dark:text-gray-300">
                                         ${product.price}
-                                    </p>
-
-                                    <p className="text-gray-500 dark:text-gray-400">
-                                        Likes: {likes[product.id] || 0}
                                     </p>
                                 </div>
                             </div>

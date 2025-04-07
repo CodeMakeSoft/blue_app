@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
     // Product resource routes
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('/products/index2', [ProductController::class, 'index2'])->name('products.index2');
     
     // Routes with parameters should come after fixed routes
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');

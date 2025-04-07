@@ -126,8 +126,12 @@ public function show($id)
 {
     $product = Product::with('images')->findOrFail($id);
 
-    // Tomar la primera imagen (si existe)
-    $image = $product->images->first()?->url ?? null;
+    // Añadir una imagen principal para mostrar fácilmente
+    if ($product->images->isNotEmpty()) {
+        $product->image = asset('storage/' . $product->images[0]->url);
+    } else {
+        $product->image = 'https://via.placeholder.com/150';
+    }
 
     return Inertia::render('Products/Show', [
         'product' => [
@@ -137,7 +141,7 @@ public function show($id)
             'description' => $product->description,
             'stock' => $product->stock,
             'deliveryTime' => $product->delivery_time,
-            'image' => $image,
+            'image' => $product->image,
         ],
     ]);
 }
@@ -147,9 +151,22 @@ public function index2()
 {
     $products = Product::all(); // Puedes paginar si quieres
 
+    $products = Product::with('images')->get(); // 👈 Esto carga las imágenes
+
+    // Agregar una propiedad 'image' para facilitar el acceso desde React
+    foreach ($products as $product) {
+        if ($product->images->isNotEmpty()) {
+            $product->image = asset('storage/' . $product->images[0]->url); // solo la primera imagen
+        } else {
+            $product->image = 'https://via.placeholder.com/150'; // imagen por defecto
+        }
+    }
+
     return Inertia::render('Products/Index2', [
         'products' => $products,
     ]);
 }
-
 }
+
+
+
