@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GoogleApiController;
 use App\Http\Controllers\PermissionController;
 
 Route::get('/', function () {
@@ -41,7 +43,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/permissions', PermissionController::class);
 });
 
+Route::get('/google-api-key', [GoogleApiController::class, 'getApiKey'])->middleware('auth');
 
-
+Route::post('/addresses', [AddressController::class, 'store'])->middleware('auth')->name('addresses.store');
 
 require __DIR__.'/auth.php';
