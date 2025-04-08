@@ -9,26 +9,42 @@ use App\Http\Requests\Category\StoreRequest;
 use App\Http\Requests\Category\UpdateRequest;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
-    
-    public function index(): Response 
+    public static function middleware(): array
     {
-        $categories = Category::with('image')->get(); 
-        return Inertia::render('Category/Index', [
+        return [
+            new Middleware('role:Admin|Manager'),
+            new Middleware('permission:category-view', only: ['index', 'show', 'catalog']),
+            new Middleware('permission:category-create', only: ['create', 'store']),
+            new Middleware('permission:category-edit', only: ['edit', 'update']),
+            new Middleware('permission:category-delete', only: ['destroy', 'confirmDelete']),
+        ];
+    }
+
+    public function index(Request $request): Response
+    {
+        $categories = Category::with('image')->paginate(10);
+        
+        return Inertia::render('Admin/Category', [
             'categories' => $categories,
+            'activeRoute' => $request->route()->getName(),
+            'can' => [
+                'category_edit' => $request->user()?->can('category-edit') ?? false,
+                'category_delete' => $request->user()?->can('category-delete') ?? false,
+                'category_create' => $request->user()?->can('category-create') ?? false,
+            ],
         ]);
     }
 
-    
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('Category/Create');
     }
 
-   
     public function store(StoreRequest $request)
     {
         $validated = $request->validated();
@@ -47,31 +63,27 @@ class CategoryController extends Controller
         return redirect()->route('category.index')->with('success', 'Categoría creada exitosamente.');
     }
 
-   
- public function show(Category $category)
+    public function show(Category $category): Response
     {
         return Inertia::render('Category/Show', [
             'category' => $category->load('image')
         ]);
     }
 
- public function edit(Category $category)
+    public function edit(Category $category): Response
     {
         return Inertia::render('Category/Edit', [
             'category' => $category->load('image')
         ]);
     }
-    
 
-    
-   public function update(UpdateRequest $request, Category $category)
+    public function update(UpdateRequest $request, Category $category)
     {
         $category->update([
             'name' => $request->name,
             'description' => $request->description
         ]);
 
-        // Eliminar imagen existente si se solicitó
         if ($request->deleted_image) {
             if ($category->image) {
                 Storage::disk('public')->delete($category->image->url);
@@ -79,9 +91,7 @@ class CategoryController extends Controller
             }
         }
 
-        // Agregar nueva imagen si se proporcionó
         if ($request->hasFile('image')) {
-            // Eliminar imagen anterior si existe
             if ($category->image) {
                 Storage::disk('public')->delete($category->image->url);
                 $category->image()->delete();
@@ -95,16 +105,6 @@ class CategoryController extends Controller
         return redirect()->route('category.index');
     }
 
-
-    public function confirmDelete($categoryId)
-    {
-        $category = Category::findOrFail($categoryId);
-         return response()->json($category);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Category $category)
     {
         if ($category->image) {
@@ -116,7 +116,13 @@ class CategoryController extends Controller
         return redirect()->route('category.index')->with('success', 'Categoría eliminada con éxito.');
     }
 
-    public function catalog()
+    public function confirmDelete($categoryId)
+    {
+        $category = Category::findOrFail($categoryId);
+        return response()->json($category);
+    }
+
+    public function catalog(): Response
     { 
         $categories = Category::with('image')->get();
         return Inertia::render('Category/Catalog', [

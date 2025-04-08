@@ -1,12 +1,16 @@
-import ApplicationLogo from "@/Components/ApplicationLogo";
-import Dropdown from "@/Components/Dropdown";
-import NavLink from "@/Components/NavLink";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
-import { Link, usePage } from "@inertiajs/react";
-import { useState } from "react";
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import Dropdown from '@/Components/Dropdown';
+import NavLink from '@/Components/NavLink';
+import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import { Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    const { auth } = usePage().props;
+    const user = auth.user;
+    const userCanAccessAdminPanel = auth.permissions.includes(
+        "can-access-admin-panel"
+    );
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -55,7 +59,6 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
                                                 {user.name}
-
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -78,6 +81,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Profile
                                         </Dropdown.Link>
+
+                                        {userCanAccessAdminPanel && (
+                                            <Dropdown.Link
+                                                href={route("admin.panel")}
+                                            >
+                                                Admin
+                                            </Dropdown.Link>
+                                        )}
+
                                         <Dropdown.Link
                                             href={route("logout")}
                                             method="post"
@@ -162,6 +174,13 @@ export default function AuthenticatedLayout({ header, children }) {
                             <ResponsiveNavLink href={route("profile.edit")}>
                                 Profile
                             </ResponsiveNavLink>
+
+                            {userCanAccessAdminPanel && (
+                                <ResponsiveNavLink href={route("admin.panel")}>
+                                    Admin
+                                </ResponsiveNavLink>
+                            )}
+
                             <ResponsiveNavLink
                                 method="post"
                                 href={route("logout")}
