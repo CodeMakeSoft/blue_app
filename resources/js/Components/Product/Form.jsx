@@ -35,6 +35,28 @@ export default function Form({
         }
     }, [data.description]);
 
+    // Nueva función para manejar el cambio de precio y evitar NaN
+    const handlePriceChange = (e) => {
+        const value = e.target.value;
+        const price = value ? parseFloat(value) : 0; // Si no hay valor, asigna 0
+        setData("price", price);
+    };
+
+    // Función modificada para calcular el precio con IVA e IEPS
+    const calculatePriceWithTaxes = (price) => {
+        const validPrice = price && !isNaN(price) && price > 0 ? price : 0; // Valida el precio
+
+        if (validPrice === 0) {
+            return "0.00"; // Si el precio no es válido, retorna 0.00
+        }
+
+        const iva = 0.16; // 16% IVA
+        const ieps = 0.05; // 5% IEPS
+        const priceWithIva = validPrice * (1 + iva);
+        const priceWithIeps = priceWithIva * (1 + ieps);
+        return priceWithIeps.toFixed(2); // Formatear a dos decimales
+    };
+
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         const newPreviews = files.map((file) => ({
@@ -150,31 +172,35 @@ export default function Form({
                     </div>
                 </div>
 
-                <InputLabel
-                    htmlFor="price"
-                    value="Precio*"
-                    className="dark:text-white"
-                />
-                <div className="relative">
-                    <div className="flex items-center">
-                        <span className="absolute left-3 text-gray-500 dark:text-gray-300">
-                            $
-                        </span>
-                        <TextInput
-                            id="price"
-                            type="number"
-                            name="price"
-                            value={data.price}
-                            className="w-full pl-7 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                            onChange={(e) =>
-                                setData("price", parseFloat(e.target.value))
-                            }
+                <div>
+                    <InputLabel
+                        htmlFor="price"
+                        value="Precio*"
+                        className="dark:text-white"
+                    />
+                    <div className="relative">
+                        <div className="flex items-center">
+                            <span className="absolute left-3 text-gray-500 dark:text-gray-300">
+                                $
+                            </span>
+                            <TextInput
+                                id="price"
+                                type="number"
+                                name="price"
+                                value={data.price}
+                                className="w-full pl-7 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                                onChange={handlePriceChange}
+                            />
+                        </div>
+                        <InputError
+                            message={errors.price}
+                            className="dark:text-red-400"
                         />
                     </div>
-                    <InputError
-                        message={errors.price}
-                        className="dark:text-red-400"
-                    />
+                    <div className="text-sm text-gray-500 dark:text-gray-300 mt-2">
+                        Precio con IVA e IEPS: $
+                        {calculatePriceWithTaxes(data.price)}
+                    </div>
                 </div>
 
                 <div>

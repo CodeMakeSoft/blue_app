@@ -10,12 +10,14 @@ const Edit = ({ product, categories, brands }) => {
     const { data, errors, setData, put } = useForm({
         name: product.name || "",
         description: product.description || "",
+        stock: product.stock || 0,
         price: product.price || "",
-        image: null, // Mantén la imagen como null inicialmente
+        image: [], // Mantén la imagen como null inicialmente
+        delete_images: [], // Mantén la imagen como null inicialmente
         status: product.status || true,
         category_id: product.category_id || "",
         brand_id: product.brand_id || "",
-        stock: product.stock || 0,
+
         availability: product.availability || "",
         size: product.size || "", // Verifica que se cargue correctamente
         color: product.color || "", // Verifica que se cargue correctamente

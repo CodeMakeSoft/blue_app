@@ -28,6 +28,8 @@ public function rules()
         'price' => 'required|numeric',
         'stock' => 'required|integer',
         'category_id' => 'required|exists:categories,id',
+        'color'=> 'required|string',
+        'size'=> 'required|string',
         'brand_id' => 'required|exists:brands,id',
         'new_image' => 'nullable|array',  
         'new_image.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', 

@@ -13,7 +13,7 @@ export default function Footer({
     showSocial = true,
     showLinks = true,
     className = "",
-    logo = "/images/logo.png",
+    logo = "/images/Logo2.jpg",
     socialLinks = [
         {
             name: "Facebook",
@@ -28,7 +28,7 @@ export default function Footer({
         {
             name: "Instagram",
             icon: faInstagram,
-            url: "https://www.instagram.com/upp_store_official/",
+            url: "https://www.instagram.com/codemakesoft/",
         },
     ],
     linkGroups = [
