@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
+use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Address;
 
 
 
@@ -12,14 +13,7 @@ class AddressController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        dd($user->addresses); 
-
-        $addresses = Auth::user()->addresses;
-        
-        return inertia('Addresses/Index', [
-            'addresses' => $addresses
-        ]);
+        return Inertia::render('Address/AddressForm');
     }
 
     public function store(Request $request)
@@ -37,13 +31,13 @@ class AddressController extends Controller
         $user = Auth::user();
 
         // Si es la primera dirección o se marca como predeterminada
-        if ($request->is_default || !$user->addresses()->exists()) {
+        /*if ($request->is_default || !$user->addresses()->exists()) {
             // Primero quitamos el predeterminado de otras direcciones
             $user->addresses()->update(['is_default' => false]);
             $validated['is_default'] = true;
         }
 
-        $user->addresses()->create($validated);
+        $user->addresses()->create($validated);*/
 
         return back()->with('success', 'Dirección guardada correctamente');
     }

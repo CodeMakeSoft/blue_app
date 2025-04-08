@@ -51,13 +51,6 @@ Route::group(['middleware' => ['auth']], function() {
 
 Route::get('/google-api-key', [GoogleApiController::class, 'getApiKey'])->middleware('auth');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/addresses/create', function () {
-        return Inertia::render('AddressForm');
-    })->name('addresses.create');
-
-    // Ruta para almacenar direcciones
-    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
-});
+Route::get('address', [AddressController::class, 'index']);
 
 require __DIR__.'/auth.php';

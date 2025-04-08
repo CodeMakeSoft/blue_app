@@ -9,7 +9,7 @@ class GoogleApiController extends Controller
     public function getApiKey()
     {
         return response()->json([
-            'key' => env('GOOGLE_MAPS_API_KEY')
+            'key' => env('VITE_GOOGLE_API_KEY')
         ]);
     }
 }

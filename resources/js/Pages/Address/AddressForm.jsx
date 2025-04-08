@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
-import { usePage } from "@inertiajs/inertia-react";
+import { usePage } from "@inertiajs/react";
 import Layout from "@/Layouts/AuthenticatedLayout";
 import AddressAutocomplete from "@/Components/AddressAutocomplete";
 

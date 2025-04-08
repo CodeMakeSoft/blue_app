@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { LoadScript, Autocomplete } from "@react-google-maps/api";
 import axios from "axios";
-import { usePage } from "@inertiajs/inertia-react";
+import { usePage } from "@inertiajs/react";
 
 const AddressAutocomplete = ({ onAddressSelect }) => {
     const { props } = usePage();
