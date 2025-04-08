@@ -6,6 +6,7 @@ import {
     faTwitter,
     faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
+import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function Footer({
     companyName = "UPP STORE",
@@ -17,17 +18,17 @@ export default function Footer({
         {
             name: "Facebook",
             icon: faFacebook,
-            url: "https://www.facebook.com/share/v/1GAhPW4AtK/",
+            url: "https://www.facebook.com/share/1AD6e2Ac1B/",
         },
         {
             name: "Twitter",
             icon: faTwitter,
-            url: "https://x.com/MarcoGrandFleet/status/1907834198087418128",
+            url: "https://x.com/theuppstore",
         },
         {
             name: "Instagram",
             icon: faInstagram,
-            url: "https://www.instagram.com/luciaaferrato?igsh=MWR4bmFmbzFsbnJ1Zg==",
+            url: "https://www.instagram.com/upp_store_official/",
         },
     ],
     linkGroups = [
@@ -57,6 +58,7 @@ export default function Footer({
             ],
         },
     ],
+    location = "Presilla 10, San Francisco, Del. La Magdalena Contreras, Ciudad de México, CP 10810 ",
 }) {
     return (
         <footer
@@ -81,10 +83,7 @@ export default function Footer({
                                     }}
                                 />
                             )}
-                            <span
-                                className="text-xl font-bold text-gray-900 dark:text-white transition-all duration-300 group-hover:text-blue-600 
-                            dark:group-hover:text-blue-400"
-                            >
+                            <span className="text-xl font-bold text-gray-900 dark:text-white transition-all duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
                                 {companyName}
                             </span>
                         </Link>
@@ -92,13 +91,10 @@ export default function Footer({
                 </div>
 
                 {showLinks && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 py-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 py-8">
                         {linkGroups.map((group, index) => (
                             <div key={index} className="mb-4 sm:mb-0">
-                                <h3
-                                    className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 
-                                dark:hover:text-blue-400"
-                                >
+                                <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400">
                                     {group.title}
                                 </h3>
                                 <ul className="space-y-2">
@@ -108,8 +104,7 @@ export default function Footer({
                                                 href={link.url}
                                                 target={link.target || "_blank"}
                                                 rel="noopener noreferrer"
-                                                className="text-gray-600 dark:text-gray-400 text-sm transition-all duration-300 transform hover:scale-105 
-                                                hover:text-blue-600 dark:hover:text-blue-400 flex items-start"
+                                                className="text-gray-600 dark:text-gray-400 text-sm transition-all duration-300 transform hover:scale-105 hover:text-blue-600 dark:hover:text-blue-400 flex items-start"
                                             >
                                                 {link.target === "_blank" && (
                                                     <svg
@@ -136,10 +131,7 @@ export default function Footer({
                         ))}
 
                         <div className="mb-4 sm:mb-0">
-                            <h3
-                                className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 
-                            dark:hover:text-blue-400"
-                            >
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400">
                                 Contacto
                             </h3>
                             <address className="text-gray-600 dark:text-gray-400 not-italic text-sm">
@@ -159,12 +151,27 @@ export default function Footer({
                             </address>
                         </div>
 
+                        {/* Nueva columna solo para ubicación */}
+                        <div className="mb-4 sm:mb-0">
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                Ubicación
+                            </h3>
+                            <div className="group">
+                                <div className="flex items-start transition-all duration-300 transform hover:scale-105">
+                                    <FontAwesomeIcon
+                                        icon={faMapMarkerAlt}
+                                        className="mt-0.5 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400 transition-all duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                                    />
+                                    <span className="text-gray-600 dark:text-gray-400 text-sm transition-all duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                        {location}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         {showSocial && (
                             <div className="mb-4 sm:mb-0">
-                                <h3
-                                    className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 
-                                dark:hover:text-blue-400"
-                                >
+                                <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-4 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400">
                                     Síguenos
                                 </h3>
                                 <div className="flex flex-col space-y-3">
@@ -174,8 +181,7 @@ export default function Footer({
                                             href={social.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-gray-600 dark:text-gray-400 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 
-                                            flex items-center space-x-3 group"
+                                            className="text-gray-600 dark:text-gray-400 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center space-x-3 group"
                                             aria-label={social.name}
                                         >
                                             <FontAwesomeIcon
@@ -192,13 +198,15 @@ export default function Footer({
                         )}
                     </div>
                 )}
+            </div>
 
-                <div className="pt-6 text-center md:text-left text-gray-500 dark:text-gray-400 text-sm">
-                    <p className="transition-all duration-300 transform hover:scale-102 hover:text-gray-700 dark:hover:text-gray-300">
-                        © {new Date().getFullYear()} {companyName}. Todos los
-                        derechos reservados.
-                    </p>
-                </div>
+            {/* Línea divisoria */}
+
+            <div className="pt-6 text-center md:text-left text-gray-500 dark:text-gray-400 text-sm">
+                <p className="transition-all duration-300 transform hover:scale-102 hover:text-gray-700 dark:hover:text-gray-300">
+                    © {new Date().getFullYear()} {companyName}. Todos los
+                    derechos reservados.
+                </p>
             </div>
         </footer>
     );

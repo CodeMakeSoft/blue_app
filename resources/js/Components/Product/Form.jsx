@@ -64,6 +64,7 @@ export default function Form({
             deleted_images: imagesToDelete,
         });
     };
+
     return (
         <form
             onSubmit={submit}
