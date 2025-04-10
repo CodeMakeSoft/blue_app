@@ -12,6 +12,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
         password: "",
         roles: [],
         password_confirmation: "",
+        email_verified_at: null, // <- nuevo campo
     });
 
     const [errors, setErrors] = useState({});
@@ -30,6 +31,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                 password: "",
                 password_confirmation: "",
                 roles: user.roles?.map((r) => r.id) || [],
+                email_verified_at: user.email_verified_at,
             });
         } else {
             setFormData({
@@ -39,6 +41,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                 password: "",
                 password_confirmation: "",
                 roles: [],
+                email_verified_at: null,
             });
         }
         setErrors({});
@@ -89,7 +92,8 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
             phone: formData.phone,
             password: formData.password,
             password_confirmation: formData.password_confirmation,
-            roles: formData.roles,  
+            roles: formData.roles,
+            email_verified_at: formData.email_verified_at,
         };
 
         const url = user ? `/admin/users/${user.id}` : "/admin/users";
@@ -169,6 +173,23 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             </p>
                         )}
                     </div>
+                    <div className="mb-4">
+    <label className="flex items-center gap-2 text-sm font-medium mb-1">
+        <input
+            type="checkbox"
+            checked={!!formData.email_verified_at}
+            onChange={(e) => {
+                setFormData((prev) => ({
+                    ...prev,
+                    email_verified_at: e.target.checked
+                        ? new Date().toISOString()
+                        : null,
+                }));
+            }}
+        />
+        Email Verified
+    </label>
+</div>
 
                     {/* Teléfono */}
                     <div className="mb-4">
