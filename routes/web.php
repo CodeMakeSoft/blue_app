@@ -7,6 +7,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PermissionController;
 
 Route::get('/', function () {
@@ -25,6 +26,7 @@ Route::get('/dashboard', function () {
 Route::get('/account', function () {
     return Inertia::render('Account');
 })->middleware(['auth', 'verified'])->name('account');
+
 
 Route::get('/admin', function () {
     return Inertia::render('Admin/AdminPanel', [
@@ -45,7 +47,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/permissions', PermissionController::class);
 });
 
-
+Route::get('/address/index', [LocationController::class, 'index'])->name('address.index');
 
 
 require __DIR__.'/auth.php';

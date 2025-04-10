@@ -41,7 +41,7 @@ export default function Account() {
 
                     {/* Botón Direcciones */}
                     <Link
-                        href={route("admin.panel")}
+                        href={route("address.index")}
                         className="flex items-start gap-4 p-5 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
                     >
                         <MapPinIcon className="h-6 w-6 text-gray-700 mt-0.5 flex-shrink-0" />
