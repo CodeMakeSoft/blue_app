@@ -22,6 +22,10 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/account', function () {
+    return Inertia::render('Account');
+})->middleware(['auth', 'verified'])->name('account');
+
 Route::get('/admin', function () {
     return Inertia::render('Admin/AdminPanel', [
         'activeRoute' => request()->route()->getName(),
