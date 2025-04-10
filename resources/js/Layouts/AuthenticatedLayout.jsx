@@ -18,6 +18,12 @@ export default function AuthenticatedLayout({ header, children }) {
     const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout');
     const cart = usePage().props.cart || [];
     const activeLink = route().current('checkout.index') ? 'checkout.index' : 'cart.index';
+    const { auth } = usePage().props;
+   
+    //const user = auth.user;
+    const userCanAccessAdminPanel = auth.permissions.includes(
+        "can-access-admin-panel"
+    );
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -37,10 +43,22 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                                    href={route("dashboard")}
+                                    active={route().current("dashboard")}
                                 >
                                     Dashboard
+                                </NavLink>
+                                <NavLink
+                                    href={route("brand.catalog")}
+                                    active={route().current("brand.catalog")}
+                                >
+                                    Marcas
+                                </NavLink>
+                                <NavLink
+                                    href={route("category.catalog")}
+                                    active={route().current("category.catalog")}
+                                >
+                                    Categorias
                                 </NavLink>
                             </div>
                         </div>
@@ -73,11 +91,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>
-                                            Perfil
-                                        </Dropdown.Link>
                                         <Dropdown.Link
-                                            href={route('logout')}
+                                            href={route("profile.edit")}
+                                        >
+                                            Profile
+                                        </Dropdown.Link>
+
+                                        {userCanAccessAdminPanel && (
+                                            <Dropdown.Link
+                                                href={route("admin.panel")}
+                                            >
+                                                Admin
+                                            </Dropdown.Link>
+                                        )}
+
+                                        <Dropdown.Link
+                                            href={route("logout")}
                                             method="post"
                                             as="button"
                                         >
@@ -134,8 +163,8 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className={`${showingNavigationDropdown ? 'block' : 'hidden'} sm:hidden`}>
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            href={route("dashboard")}
+                            active={route().current("dashboard")}
                         >
                             Dashboard
                         </ResponsiveNavLink>
@@ -158,12 +187,19 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Perfil
+                            <ResponsiveNavLink href={route("profile.edit")}>
+                                Profile
                             </ResponsiveNavLink>
+
+                            {userCanAccessAdminPanel && (
+                                <ResponsiveNavLink href={route("admin.panel")}>
+                                    Admin
+                                </ResponsiveNavLink>
+                            )}
+
                             <ResponsiveNavLink
                                 method="post"
-                                href={route('logout')}
+                                href={route("logout")}
                                 as="button"
                             >
                                 Cerrar Sesión

@@ -20,6 +20,8 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                //'permissions' es para que solo se muestre el dropdown.link admin en adminLayout
+                'permissions' => $request->user()?->getAllPermissions()->pluck('name')->toArray(),
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

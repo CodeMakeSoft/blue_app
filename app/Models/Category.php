@@ -10,10 +10,14 @@ class Category extends Model
     /** @use HasFactory<\Database\Factories\CategoryFactory> */
     use HasFactory;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'description', 'url'];
 
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+    public function image()
+    {
+        return $this->morphone (Image::class, 'imageable');
     }
 }
