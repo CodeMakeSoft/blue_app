@@ -38,6 +38,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    //Crud address
+    Route::get('/address/index', [LocationController::class, 'index'])->name('address.index');
+    Route::get('/address/create', [LocationController::class, 'create'])->name('address.create');
 });
 
 Route::group(['middleware' => ['auth']], function() {
@@ -47,7 +50,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/permissions', PermissionController::class);
 });
 
-Route::get('/address/index', [LocationController::class, 'index'])->name('address.index');
+
+
 
 
 require __DIR__.'/auth.php';

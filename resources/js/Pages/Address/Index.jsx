@@ -18,7 +18,7 @@ export default function Index({ locations }) {
             <div className="py-8 px-4 max-w-7xl mx-auto">
                 <div className="mb-4">
                     <Link
-                        href={route("admin.panel")}
+                        href={route("address.create")}
                         className="flex flex-col items-center p-5 bg-white border-4 border-gray-200 border-dashed rounded-lg hover:bg-gray-50 transition-colors"
                     >
                         <PlusIcon className="h-8 w-8 text-gray-700" />
@@ -27,6 +27,7 @@ export default function Index({ locations }) {
                         </h2>
                     </Link>
                 </div>
+                
 
     
             </div>
