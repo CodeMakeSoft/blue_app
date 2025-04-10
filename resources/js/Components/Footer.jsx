@@ -28,7 +28,7 @@ export default function Footer({
         {
             name: "Instagram",
             icon: faInstagram,
-            url: "https://www.instagram.com/codemakesoft/",
+            url: "https://www.instagram.com/codemakesoft_/",
         },
     ],
     linkGroups = [

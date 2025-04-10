@@ -78,7 +78,8 @@ export function Sidebar({ children }) {
             {isMobile && !expanded && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed z-40 bottom-4 left-4 p-3 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-all"
+                    className="fixed z-40 bottom-4 left-4 p-3 rounded-full bg-indigo-600 text-white 
+                    shadow-lg hover:bg-indigo-700 transition-all"
                 >
                     <Bars3BottomLeftIcon className="h-6 w-6" />
                 </button>
@@ -89,7 +90,10 @@ export function Sidebar({ children }) {
                     isMobile && !expanded ? "hidden" : "block"
                 }`}
             >
-                <nav className="h-full flex flex-col bg-white dark:bg-gray-800 border-r dark:border-gray-700 shadow-sm relative">
+                <nav
+                    className="h-full flex flex-col bg-white dark:bg-gray-800 border-r 
+                dark:border-gray-700 shadow-sm relative"
+                >
                     <SidebarContext.Provider value={{ expanded }}>
                         {/* Header Section */}
                         <div className="p-4 pb-2 flex flex-col">
@@ -101,7 +105,8 @@ export function Sidebar({ children }) {
                                 )}
                                 <button
                                     onClick={toggleSidebar}
-                                    className="p-1.5 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                    className="p-1.5 rounded-lg bg-gray-50 dark:bg-gray-700 
+                                    hover:bg-gray-100 dark:hover:bg-gray-600"
                                 >
                                     {expanded ? (
                                         <XMarkIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -120,7 +125,8 @@ export function Sidebar({ children }) {
                         {/* User Footer */}
                         <div className="px-3 pb-4 relative">
                             <div
-                                className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                className="flex items-center p-2 rounded-lg hover:bg-gray-100 
+                                dark:hover:bg-gray-700 cursor-pointer"
                                 onClick={toggleProfileMenu}
                             >
                                 <img
@@ -140,12 +146,15 @@ export function Sidebar({ children }) {
                                 )}
                             </div>
 
-                            {/* Profile Dropdown */}
                             {showProfileMenu && expanded && (
-                                <div className="absolute bottom-16 left-3 right-3 bg-white dark:bg-gray-800 rounded-md shadow-lg border dark:border-gray-700 z-10">
+                                <div
+                                    className="absolute bottom-16 left-3 right-3 bg-white 
+                                dark:bg-gray-800 rounded-md shadow-lg border dark:border-gray-700 z-10"
+                                >
                                     <Link
                                         href={route("profile.edit")}
-                                        className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="flex items-center px-4 py-2 text-sm 
+                                        text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         <UserCircleIcon className="h-5 w-5 mr-2" />
                                         Perfil
@@ -154,7 +163,8 @@ export function Sidebar({ children }) {
                                         href={route("logout")}
                                         method="post"
                                         as="button"
-                                        className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="w-full flex items-center px-4 py-2 text-sm 
+                                        text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         <ArrowLeftOnRectangleIcon className="h-5 w-5 mr-2" />
                                         Cerrar sesión
