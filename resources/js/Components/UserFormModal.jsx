@@ -110,21 +110,10 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
             email_verified_at: formData.email_verified_at,
         };
 
-        const url = user ? `/admin/users/${user.id}` : "/admin/users";
+        const url = address ? `/admin/users/${user.id}` : "/admin/users";
         const method = user ? "put" : "post";
 
-        router[method](url, data, {
-            onSuccess: () => {
-                toast.success(
-                    `User ${user ? "updated" : "created"} successfully`
-                );
-                closeModal();
-            },
-            onError: (errors) => {
-                setErrors(errors);
-                toast.error("Please correct the errors in the form");
-            },
-        });
+          
 
         user ? setShowConfirmEdit(false) : setShowConfirmAdd(false);
     };
@@ -188,22 +177,22 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                         )}
                     </div>
                     <div className="mb-4">
-    <label className="flex items-center gap-2 text-sm font-medium mb-1">
-        <input
-            type="checkbox"
-            checked={!!formData.email_verified_at}
-            onChange={(e) => {
-                setFormData((prev) => ({
-                    ...prev,
-                    email_verified_at: e.target.checked
-                        ? new Date().toISOString()
-                        : null,
-                }));
-            }}
-        />
-        Email Verified
-    </label>
-</div>
+                    <label className="flex items-center gap-2 text-sm font-medium mb-1">
+                        <input
+                            type="checkbox"
+                            checked={!!formData.email_verified_at}
+                            onChange={(e) => {
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    email_verified_at: e.target.checked
+                                        ? new Date().toISOString()
+                                        : null,
+                                }));
+                            }}
+                        />
+                        Email Verified
+                    </label>
+                </div>
 
                     {/* Teléfono */}
                     <div className="mb-4">
@@ -345,11 +334,11 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                             </p>
                         )}
                     </div>
-) : (
-    <p className="text-sm text-red-600 mb-6">
-        You cannot change the role of the last Admin user.
-    </p>
-)}
+                    ) : (
+                        <p className="text-sm text-red-600 mb-6">
+                            You cannot change the role of the last Admin user.
+                        </p>
+                    )}
                     {/* Form Actions */}
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button

@@ -1,17 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import TextInput from "@/Components/TextInput";
 import InputLabel from "@/Components/InputLabel";
+import InputError from "@/Components/InputError";
 
-const Form = ({
+export default function Form({
     data,
     setData,
-    countries = [],
-    districts = [],
-    onSubmit,
+    errors,
+    countries,
+    districts,
     isEditing,
-}) => {
-    const [showPostalData, setShowPostalData] = useState(false);
+    onSubmit,
+}) {
+    const dropdownRef = useRef(null);
     const [postalError, setPostalError] = useState("");
+    const [showPostalData, setShowPostalData] = useState(false);
 
     const verifyPostalCode = () => {
         if (!/^\d{5}$/.test(data.postal_code)) {
@@ -52,9 +55,9 @@ const Form = ({
     };
 
     return (
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-6">
+            {/* País */}
             <div>
-                {/*País*/}
                 <InputLabel htmlFor="country_id" value="País" />
                 <select
                     id="country_id"
@@ -77,62 +80,85 @@ const Form = ({
                         </option>
                     ))}
                 </select>
+                <InputError message={errors.country_id} />
             </div>
-            {/*Alias*/}
+
+            {/* Alias */}
             <div>
-                <InputLabel htmlFor="alias" value="Nombre Completo (Alias)" />
+                <InputLabel htmlFor="alias" value="Nombre (Alias)" />
                 <TextInput
                     id="alias"
                     type="text"
                     className="mt-1 block w-full"
                     value={data.alias}
                     onChange={(e) => setData("alias", e.target.value)}
+                    required
                 />
+                <InputError message={errors.alias} />
             </div>
-            {/*Calle*/}
-            <div>
-                <InputLabel htmlFor="street" value="Calle" />
-                <TextInput
-                    id="street"
-                    type="text"
-                    className="mt-1 block w-full"
-                    value={data.street}
-                    onChange={(e) => setData("street", e.target.value)}
-                />
-            </div>
-            {/*Números*/}
-            <div className="flex items-end space-x-10">
+
+            {/* Dirección */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <InputLabel htmlFor="ext_number" value="Número exterior" />
+                    <InputLabel htmlFor="street" value="Calle" />
                     <TextInput
-                        id="ext_number"
+                        id="street"
                         type="text"
-                        className="mt-1 w-22"
-                        value={data.ext_number}
-                        onChange={(e) => setData("ext_number", e.target.value)}
+                        className="mt-1 block w-full"
+                        value={data.street}
+                        onChange={(e) => setData("street", e.target.value)}
+                        required
                     />
+                    <InputError message={errors.street} />
                 </div>
-                <div>
-                    <InputLabel htmlFor="int_number" value="Número interior" />
-                    <TextInput
-                        id="int_number"
-                        type="text"
-                        className="mt-1 w-22"
-                        value={data.int_number}
-                        onChange={(e) => setData("int_number", e.target.value)}
-                    />
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <InputLabel
+                            htmlFor="ext_number"
+                            value="Núm. Exterior"
+                        />
+                        <TextInput
+                            id="ext_number"
+                            type="text"
+                            className="mt-1 block w-full"
+                            value={data.ext_number}
+                            onChange={(e) =>
+                                setData("ext_number", e.target.value)
+                            }
+                            required
+                        />
+                        <InputError message={errors.ext_number} />
+                    </div>
+                    <div>
+                        <InputLabel
+                            htmlFor="int_number"
+                            value="Núm. Interior"
+                        />
+                        <TextInput
+                            id="int_number"
+                            type="text"
+                            className="mt-1 block w-full"
+                            value={data.int_number}
+                            onChange={(e) =>
+                                setData("int_number", e.target.value)
+                            }
+                        />
+                    </div>
                 </div>
             </div>
-            {/*Código Postal */}
-            <div className="flex items-end space-x-10">
-                <div>
+
+            {/* Código Postal */}
+            <div className="flex items-end gap-4">
+                <div className="mt-1 block w-30">
                     <InputLabel htmlFor="postal_code" value="Código Postal" />
                     <TextInput
                         id="postal_code"
                         type="text"
-                        className="mt-1 block w-30"
+                        className="mt-1 block w-full"
                         value={data.postal_code}
                         onChange={(e) => setData("postal_code", e.target.value)}
+                        required
                     />
                     {postalError && (
                         <p className="text-sm text-red-600 italic mt-1">
@@ -140,28 +166,26 @@ const Form = ({
                         </p>
                     )}
                 </div>
-                <div>
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            verifyPostalCode();
-                        }}
-                        className="bg-gray-300 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-400 transition"
-                    >
-                        Verificar
-                    </button>
-                </div>
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        verifyPostalCode();
+                    }}
+                    className="bg-gray-300 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-400 transition"
+                >
+                    Verificar
+                </button>
             </div>
 
+            {/* Datos derivados del CP */}
             {showPostalData && (
-                <div className="space-y-4 border p-4 rounded-md">
+                <div className="space-y-4 border p-4 rounded-md bg-gray-50">
                     <div>
                         <InputLabel htmlFor="state" value="Estado" />
                         <TextInput
                             id="state"
                             type="text"
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full bg-gray-100"
                             value={data.state}
                             readOnly
                         />
@@ -172,7 +196,7 @@ const Form = ({
                         <TextInput
                             id="municipality"
                             type="text"
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full bg-gray-100"
                             value={data.municipality}
                             readOnly
                         />
@@ -183,14 +207,14 @@ const Form = ({
                         <TextInput
                             id="city"
                             type="text"
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full bg-gray-100"
                             value={data.city}
                             readOnly
                         />
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="district" value="Colonia" />
+                        <InputLabel htmlFor="district_id" value="Colonia" />
                         <select
                             id="district_id"
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -201,34 +225,28 @@ const Form = ({
                             required
                         >
                             <option value="">Seleccione una colonia</option>
-                            {data.districts.length > 0 ? (
-                                data.districts.map((district) => (
-                                    <option
-                                        key={district.id}
-                                        value={district.id}
-                                    >
-                                        {district.name}
-                                    </option>
-                                ))
-                            ) : (
-                                <option disabled>
-                                    No hay colonias disponibles
+                            {data.districts?.map((district) => (
+                                <option key={district.id} value={district.id}>
+                                    {district.name}
                                 </option>
-                            )}
+                            ))}
                         </select>
+                        <InputError message={errors.district_id} />
                     </div>
                 </div>
             )}
 
+            {/* Teléfono e instrucciones */}
             <div>
                 <InputLabel htmlFor="phone" value="Teléfono" />
                 <TextInput
                     id="phone"
-                    type="text"
+                    type="tel"
                     className="mt-1 block w-full"
                     value={data.phone}
                     onChange={(e) => setData("phone", e.target.value)}
                 />
+                <InputError message={errors.phone} />
             </div>
 
             <div>
@@ -244,7 +262,7 @@ const Form = ({
                     onChange={(e) =>
                         setData("delivery_instructions", e.target.value)
                     }
-                    placeholder="Código de acceso, color de la casa, etc."
+                    placeholder="Código de acceso, color de la casa, referencias, etc."
                 />
             </div>
 
@@ -258,6 +276,4 @@ const Form = ({
             </div>
         </form>
     );
-};
-
-export default Form;
+}

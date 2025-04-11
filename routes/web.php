@@ -42,8 +42,10 @@ Route::middleware('auth')->group(function () {
     //Crud address
     Route::get('address', [LocationController::class, 'index'])->name('address.index');
     Route::get('address/create', [LocationController::class, 'create'])->name('address.create');
-    Route::put('address/{address}', [LocationController::class, 'update'])->name('address.update');
+    Route::put('address/{address}', [LocationController::class, 'edit'])->name('address.edit');
     Route::post('/address', [LocationController::class, 'store'])->name('address.store');
+    Route::delete('address/{address}', [LocationController::class, 'destroy'])->name('address.destroy');
+
 });
 
 Route::group(['middleware' => ['auth']], function() {

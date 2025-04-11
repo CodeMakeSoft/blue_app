@@ -22,12 +22,6 @@ return new class extends Migration
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('district_id')->constrained()->onDelete('cascade');
-
-            $table->string('state');
-            $table->string('municipality');
-            $table->string('city');
-            $table->string('country');
-            $table->string('postal_code');
             $table->timestamps();
         });
     }

@@ -11,22 +11,16 @@ use App\Models\District;
 use App\Models\Location;
 use App\Models\Municipality;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class LocationController extends Controller
 {
     public function index()
     {
         return Inertia::render('Address/Index', [
-            'locations' => Location::with([
-                'country',
-                'state',
-                'municipality',
-                'city',
-                'district' => function($query) {
-                $query->with(['city.municipality.state']);
-            }
-            ])
-            ->where('user_id')
+            'locations' => Location::with(['district.city.municipality.state.country'])
+                ->where('user_id', Auth::id()) 
             ->get(),
             'countries' => Country::all(),
             'districts' => District::with([
@@ -54,27 +48,23 @@ class LocationController extends Controller
 
     public function store(Request $request)
 {
-    $validated = $request->validate([
-        'country_name' => 'required|string|max:255', // Ahora validas el nombre del país
+    $request->validate([
         'alias' => 'required|string|max:255',
-        'street' => 'required|string|max:255',
-        'ext_number' => 'required|string|max:50',
-        'int_number' => 'nullable|string|max:50',
-        'postal_code' => 'required|string|max:20',
-        'state' => 'required|string|max:255',
-        'municipality' => 'required|string|max:255',
-        'city' => 'required|string|max:255',
-        'district' => 'required|string|max:255',
-        'district_id' => 'required|exists:districts,id', 
-        'phone' => 'nullable|string|max:20',
-        'delivery_instructions' => 'nullable|string',
+            'street' => 'required|string|max:255',
+            'ext_number' => 'required|string|max:50',
+            'int_number' => 'nullable|string|max:50',
+            'district_id' => 'required|exists:districts,id',
+            'phone' => 'required|string|max:20',
+            'delivery_instructions' => 'nullable|string',
     ]);
 
     $data = $request->only([
         'country_name', 'alias', 'street', 'ext_number', 'int_number', 
-        'postal_code', 'state', 'municipality', 'city', 'district', 
-        'phone', 'delivery_instructions'
+        'postal_code', 'state', 'municipality', 'city', 'district_id',
+        'user_id','phone', 'delivery_instructions'
     ]);
+    
+    $data['user_id'] = Auth::id();
 
     Location::create($data);
 
@@ -105,8 +95,14 @@ class LocationController extends Controller
 }
 
     public function destroy(Location $location)
-    {
-        $location->delete();
-        return redirect()->route('address.index')->with('success', 'Dirección eliminada exitosamente');
+{
+    $location->delete();
+
+    if (request()->wantsJson()) {
+        return response()->json(['success' => true]);
     }
+
+    return redirect()->route('address.index')->with('success', 'Dirección eliminada exitosamente');
+}
+
 }

@@ -29,8 +29,14 @@ export default function Create({ auth, countries, districts }) {
             onSuccess: () => {
                 toast.success("Dirección creada exitosamente");
             },
-            onError: () => {
-                toast.error("Error al crear la dirección");
+            onError: (errors) => {
+                if (Object.keys(errors).length > 0) {
+                    toast.error(
+                        "Por favor corrige los errores en el formulario"
+                    );
+                } else {
+                    toast.error("Error al crear la dirección");
+                }
             },
         });
     };
@@ -39,29 +45,26 @@ export default function Create({ auth, countries, districts }) {
         <AuthenticatedLayout
             user={auth.user}
             header={
-                <div className="flex items-center justify-between">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Crear Nueva Dirección
-                    </h2>
-                </div>
+                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    Crear Nueva Dirección
+                </h2>
             }
         >
             <Head title="Crear Dirección" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 bg-white border-b border-gray-200">
-                            <Form
-                                data={data}
-                                setData={setData}
-                                countries={countries}
-                                districts={districts}
-                                onSubmit={handleSubmit}
-                                isEditing={false}
-                                errors={errors}
-                            />
-                        </div>
+            <div className="py-8 px-4 max-w-7xl mx-auto">
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="p-6">
+                        <Form
+                            data={data}
+                            setData={setData}
+                            countries={countries}
+                            districts={districts}
+                            onSubmit={handleSubmit}
+                            isEditing={false}
+                            errors={errors}
+                            processing={processing}
+                        />
                     </div>
                 </div>
             </div>
