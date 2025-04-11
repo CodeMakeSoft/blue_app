@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PermissionController;
+use App\Models\Location;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -39,8 +40,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     //Crud address
-    Route::get('/address/index', [LocationController::class, 'index'])->name('address.index');
-    Route::get('/address/create', [LocationController::class, 'create'])->name('address.create');
+    Route::get('address', [LocationController::class, 'index'])->name('address.index');
+    Route::get('address/create', [LocationController::class, 'create'])->name('address.create');
+    Route::put('address/{address}', [LocationController::class, 'update'])->name('address.update');
+    Route::post('/address', [LocationController::class, 'store'])->name('address.store');
 });
 
 Route::group(['middleware' => ['auth']], function() {

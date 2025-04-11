@@ -12,8 +12,8 @@ class City extends Model
         return $this->hasMany(District::class);
     }
 
-    public function city()
+    public function municipality()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(Municipality::class);
     }
 }

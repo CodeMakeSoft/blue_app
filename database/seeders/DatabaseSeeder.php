@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
+
 use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Product;
-use App\Models\User;
-use App\Models\Role;
+use App\Models\Category;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
+            AddressSeeder::class,
         ]);
 
         Category::factory(10)->create();

@@ -186,7 +186,7 @@ export default function User({ activeRoute, can }) {
                                         </div>
                                         <div className="break-all overflow-hidden text-ellipsis">
                                             {user.email}
-                                        </div> 
+                                        </div>
 
                                         <div className="font-semibold">
                                             Phone:
@@ -253,6 +253,7 @@ export default function User({ activeRoute, can }) {
                 closeModal={() => setIsModalOpen(false)}
                 user={selectedUser}
                 roles={roles}
+                users={users}
             />
         </AdminLayout>
     );

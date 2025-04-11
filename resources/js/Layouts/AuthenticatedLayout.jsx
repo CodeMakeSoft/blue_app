@@ -147,12 +147,18 @@ export default function AuthenticatedLayout({ header, children }) {
                         " sm:hidden"
                     }
                 >
-                    <div className="space-y-1 pb-3 pt-2">
+                    <div className="space-y-1 pt-2 pb-3">
                         <ResponsiveNavLink
                             href={route("dashboard")}
                             active={route().current("dashboard")}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("account")}
+                            active={route().current("account")}
+                        >
+                            Mi cuenta
                         </ResponsiveNavLink>
                     </div>
 

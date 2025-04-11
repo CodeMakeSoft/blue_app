@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import ConfirmEdit from "@/Components/ConfirmEdit";
 import ConfirmAdd from "@/Components/ConfirmAdd";
 
-export default function UserFormModal({ isOpen, closeModal, user, roles }) {
+export default function UserFormModal({ isOpen, closeModal, user, roles, users }) {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -20,6 +20,20 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
     const [showConfirmEdit, setShowConfirmEdit] = useState(false);
     const [showConfirmAdd, setShowConfirmAdd] = useState(false);
     const dropdownRef = useRef(null);
+        const isLastAdmin = () => {
+            const adminCount = users.data.filter((u) =>
+                u.roles?.some((r) => r.name === "Admin")
+            ).length;
+    
+            return (
+                user &&
+                user.roles?.some((r) => r.name === "Admin") &&
+                adminCount <= 1
+            );
+        };
+    
+        const disableRoleDropdown = isLastAdmin();    
+    
 
     // Inicializar datos del formulario
     useEffect(() => {
@@ -259,6 +273,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                     </div>
 
                     {/* Selector de Rol Único */}
+                    {!isLastAdmin() ? (
                     <div className="mb-6 relative" ref={dropdownRef}>
                         <label className="block text-sm font-medium mb-2">
                             Role *
@@ -330,7 +345,11 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             </p>
                         )}
                     </div>
-
+) : (
+    <p className="text-sm text-red-600 mb-6">
+        You cannot change the role of the last Admin user.
+    </p>
+)}
                     {/* Form Actions */}
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button

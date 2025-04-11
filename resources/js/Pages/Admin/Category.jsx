@@ -7,11 +7,6 @@ import ConfirmAdd from "@/Components/ConfirmAdd";
 import ConfirmEdit from "@/Components/ConfirmEdit";
 import ConfirmDelete from "@/Components/ConfirmDelete";
 import { Toaster, toast } from "sonner";
-import {
-    PlusCircleIcon,
-    PencilSquareIcon,
-    TrashIcon
-} from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
 
 export default function Category({ activeRoute, can}) {
