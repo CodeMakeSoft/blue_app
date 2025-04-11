@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('transaction_id')->nullable();
             $table->decimal('total', 10, 2);
-            $table->string('status')->default('pending'); // pending, completed, cancelled, etc.
+            $table->string('status')->default('pending'); // pending, completed, cancelled
             $table->string('shipping_address')->nullable();
             $table->string('billing_address')->nullable();
             $table->string('contact_email');

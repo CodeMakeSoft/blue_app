@@ -19,7 +19,44 @@ export function Sidebar({ children }) {
     const [expanded, setExpanded] = useState(true);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    
+    const [theme, setTheme] = useState(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("theme") || "system";
+        }
+        return "system";
+    });
+
+    // Aplicar el tema al cargar y cuando cambie
+    useEffect(() => {
+        const root = document.documentElement;
+        root.classList.remove("light", "dark");
+
+        if (theme === "system") {
+            const systemTheme = window.matchMedia(
+                "(prefers-color-scheme: dark)"
+            ).matches
+                ? "dark"
+                : "light";
+            root.classList.add(systemTheme);
+        } else {
+            root.classList.add(theme);
+        }
+
+        localStorage.setItem("theme", theme);
+    }, [theme]);
+
+    // Escuchar cambios en el tema desde el ThemeSwitcher
+    useEffect(() => {
+        const handleThemeChange = (e) => {
+            setTheme(e.detail.theme);
+        };
+
+        window.addEventListener("themeChanged", handleThemeChange);
+        return () => {
+            window.removeEventListener("themeChanged", handleThemeChange);
+        };
+    }, []);
+
     // Detectar cambios en el tamaño de pantalla
     useEffect(() => {
         const handleResize = () => {
@@ -39,8 +76,6 @@ export function Sidebar({ children }) {
     const toggleProfileMenu = () => {
         setShowProfileMenu(!showProfileMenu);
     };
-
-    
 
     return (
         <>
@@ -157,7 +192,7 @@ Sidebar.Item = function SidebarItem({ icon, text, href, active, alert, children 
     return (
         <li
             className={`
-            relative flex flex-col items-start py-2 px-3 my-1
+            relative flex items-center py-2 px-3 my-1
             font-medium rounded-md
             transition-colors group
             ${

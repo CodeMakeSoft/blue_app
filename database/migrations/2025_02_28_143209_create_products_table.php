@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->decimal('price');
+            $table->string('image')->nullable();
+            $table->decimal('price',8,2);// Precio del Producto
             $table->integer('stock');
             $table->string('size')->nullable();
             $table->string('color')->nullable();
@@ -23,13 +24,14 @@ return new class extends Migration
             $table->timestamp('availability')->nullable();
 
             $table->foreignId('category_id')->constrained('categories')
-          ->onDelete('cascade');
+                ->onDelete('cascade');
             $table->foreignId('brand_id')->constrained('brands')
-          ->onDelete('cascade');
+                ->onDelete('cascade');
             
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
