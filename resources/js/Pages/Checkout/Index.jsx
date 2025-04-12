@@ -11,7 +11,7 @@ export default function Index({ cart = [], paymentMethods }) {
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Finalizar Compra</h2>}
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-white">Finalizar Compra</h2>}
         >
             <Head title="Checkout" />
             <Checkout 

@@ -1,5 +1,3 @@
-// src/components/PayPalButton.jsx
-
 import { useEffect } from 'react';
 import { loadScript } from '@paypal/paypal-js';
 
@@ -61,9 +59,9 @@ const PayPalButton = ({ paypalClientId, cart, isReady, onReadyChange }) => {
 
     return (
         <>
-            <div id="paypal-button-container" className={!isReady ? 'invisible' : ''}></div>
+            <div id="paypal-button-container" className={`${!isReady ? 'invisible' : ''} dark:text-white dark:bg-gray-800 dark:border-gray-700`}></div>
             {!isReady && (
-                <div className="text-center py-4">
+                <div className="text-center py-4 dark:text-gray-300">
                     <p>Cargando PayPal...</p>
                 </div>
             )}

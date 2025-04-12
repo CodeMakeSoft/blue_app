@@ -7,20 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'user_id',
-        'transaction_id',
-        'total',
-        'status',
-        'shipping_address',
-        'billing_address',
-        'contact_email',
-        'contact_phone',
-        'notes',
-        'payment_method',
-    ];
+    protected $fillable = ['user_id', 'transaction_id', 'total', 'status', 'payment_method'];
 
     public function user()
     {
@@ -30,8 +17,7 @@ class Order extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class)
-                    ->using(OrderProduct::class)
-                    ->withPivot('quantity', 'price')
-                    ->withTimestamps();
+            ->withPivot('quantity', 'price')
+            ->withTimestamps();
     }
 }

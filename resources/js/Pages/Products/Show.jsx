@@ -1,15 +1,41 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, router } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
+import axios from "axios";
+import Confirm from "@/Components/Confirm";
 
 export default function Show({ product }) {
     const [liked, setLiked] = useState(false);
+    const [confirmProductId, setConfirmProductId] = useState(null);
+    const [inCart, setInCart] = useState(false);
 
     const handleLike = () => {
         if (!liked) {
             setLiked(true);
         }
+    };
+
+    useEffect(() => {
+        axios.get(route("cart.contains", product.id))
+            .then((res) => {
+                setInCart(res.data.inCart);
+            })
+            .catch((err) => {
+                console.error("Error al verificar si el producto está en el carrito:", err);
+            });
+    }, [product.id]);
+
+    const handleAddProduct = (productId) => {
+        setConfirmProductId(null);
+
+        // Como estás usando una ruta GET, eliminamos method: 'post'
+        router.visit(route("cart.add", productId), {
+            method: "get",
+            preserveScroll: true,
+            onSuccess: () => setInCart(true),
+            onError: (err) => console.error("Error al agregar al carrito", err),
+        });
     };
 
     return (
@@ -40,18 +66,19 @@ export default function Show({ product }) {
                             </p>
 
                             <p className="text-sm text-gray-500 mb-2">
-                                Llega entre{" "}
-                                <span className="font-medium">3 y 5 días</span>
+                                Llega entre <span className="font-medium">3 y 5 días</span>
                             </p>
+
                             <p className="text-gray-700 dark:text-gray-300 mt-5 leading-relaxed">
                                 {product.description}
                             </p>
+
                             <p className="text-gray-500 dark:text-gray-400 mt-3 italic">
                                 Stock disponible: {product.stock}
                             </p>
 
                             <div className="mt-8 flex gap-4">
-                                {/* Botón de me gusta */}
+                                {/* Me gusta */}
                                 <button
                                     onClick={handleLike}
                                     disabled={liked}
@@ -67,9 +94,21 @@ export default function Show({ product }) {
                                         color="black"
                                     />
                                 </button>
-                                <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-6 rounded-lg shadow transition">
-                                    Agregar al carrito
+
+                                {/* Agregar al carrito */}
+                                <button
+                                    disabled={inCart}
+                                    onClick={() => setConfirmProductId(product.id)}
+                                    className={`${
+                                        inCart
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-gray-600 hover:bg-gray-700"
+                                    } text-white py-2 px-6 rounded-lg shadow transition`}
+                                >
+                                    {inCart ? "Ya en el carrito" : "Agregar al carrito"}
                                 </button>
+
+                                {/* Comprar */}
                                 <button className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg shadow transition">
                                     Comprar
                                 </button>
@@ -78,6 +117,16 @@ export default function Show({ product }) {
                     </div>
                 </div>
             </div>
+
+            {/* Modal de confirmación */}
+            {confirmProductId && (
+                <Confirm
+                    title="¿Agregar al carrito?"
+                    message="¿Deseas añadir este producto a tu carrito?"
+                    onConfirm={() => handleAddProduct(confirmProductId)}
+                    onCancel={() => setConfirmProductId(null)}
+                />
+            )}
         </AuthenticatedLayout>
     );
 }

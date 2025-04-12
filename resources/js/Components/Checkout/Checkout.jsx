@@ -30,16 +30,16 @@ const Checkout = ({ cart = [], paymentMethods, paypalClientId }) => {
     };
 
     return (
-        <div className="py-12">
+        <div className="py-12 bg-white dark:bg-gray-800">
             <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div className="p-6 bg-white border-b border-gray-200">
-                        <h3 className="text-lg font-medium mb-4">Resumen de tu pedido</h3>
+                <div className="bg-white dark:bg-gray-700 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div className="p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
+                        <h3 className="text-lg font-medium mb-4 text-gray-800 dark:text-white">Resumen de tu pedido</h3>
                         
                         <OrderSummary cart={cart} />
                         
                         <div className="mt-8">
-                            <h3 className="text-lg font-medium mb-4">Método de pago</h3>
+                            <h3 className="text-lg font-medium mb-4 text-gray-800 dark:text-white">Método de pago</h3>
                             
                             <PaymentMethodSelector 
                                 paymentMethods={paymentMethods}

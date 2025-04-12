@@ -15,6 +15,8 @@ use App\Http\Controllers\GoogleApiController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\OrderController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -94,13 +96,19 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::resource('cart', CartController::class)->only(['index', 'update', 'destroy']);
+    Route::get('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::get('cart/contains/{product}', [CartController::class, 'contains'])->name('cart.contains');
+
 
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('checkout.createOrder');
+    Route::post('/checkout/cod', [CheckoutController::class, 'processCod'])->name('checkout.cod');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
-    Route::post('/checkout/cod', [CheckoutController::class, 'processCod'])->name('checkout.cod');
 });
+
+Route::middleware('auth')->get('/purchases', [OrderController::class, 'index'])->name('purchases.index');
+Route::middleware('auth')->post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
 
 Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/categories', CategoryController::class);
@@ -109,15 +117,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/permissions', PermissionController::class);
 });
 
-// Route::get('/google-api-key', [GoogleApiController::class, 'getApiKey'])->middleware('auth');
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('/addresses/create', function () {
-//         return Inertia::render('AddressForm');
-//     })->name('addresses.create');
-
-//     // Ruta para almacenar direcciones
-//     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
-// });
 
 require __DIR__.'/auth.php';

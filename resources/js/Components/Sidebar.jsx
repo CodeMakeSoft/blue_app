@@ -90,7 +90,7 @@ export function Sidebar({ children }) {
             )}
 
             <aside
-                className={`h-screen ${
+                className={`fixed top-0 left-0 h-screen z-30 ${
                     isMobile && !expanded ? "hidden" : "block"
                 }`}
             >

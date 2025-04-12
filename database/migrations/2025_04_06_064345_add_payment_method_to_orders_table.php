@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('payment_method')->default('paypal'); // paypal, cod, etc.
+             // paypal, cod, etc.
         });
     }
 

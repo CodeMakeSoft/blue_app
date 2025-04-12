@@ -4,21 +4,22 @@ import Confirm from '@/Components/Confirm';
 import { calculateCartTotals } from '@/Utils/CartUtils';
 import { Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faCheckCircle, 
-  faTrash, 
-  faChevronLeft, 
-  faChevronRight,
-  faMinus,
-  faPlus,
-  faTshirt,
-  faPalette,
-  faTag,
-  faTruck,
-  faReceipt,
-  faArrowLeft,
-  faCreditCard
+import {
+    faCheckCircle,
+    faTrash,
+    faChevronLeft,
+    faChevronRight,
+    faMinus,
+    faPlus,
+    faTshirt,
+    faPalette,
+    faTag,
+    faTruck,
+    faReceipt,
+    faArrowLeft,
+    faCreditCard
 } from "@fortawesome/free-solid-svg-icons";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductList({ products, onQuantityChange, onConfirmCheckout, isCartEmpty }) {
     const [cartProducts, setCartProducts] = useState(products);
@@ -33,6 +34,7 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
     const [inputQuantity, setInputQuantity] = useState('');
 
     const totals = calculateCartTotals(cartProducts);
+    const { toast } = useToast();
 
     const handleQuantityChangeLocal = (productId, newQuantity) => {
         const product = cartProducts.find((p) => p.id === productId);
@@ -96,20 +98,30 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
     };
 
     const handleRemoveProduct = (productId) => {
-        setConfirmProductId(null);
-        router.visit(
-            route('cart.destroy', productId),
-            {
-                method: 'delete',
-                preserveScroll: true,
-                onSuccess: (response) => {
-                    if (response.props.cart) {
-                        setCartProducts(response.props.cart);
-                    }
-                }
+    setConfirmProductId(null);
+    router.visit(route('cart.destroy', productId), {
+        method: 'delete',
+        preserveScroll: true,
+        onSuccess: (response) => {
+            if (response.props.cart) {
+                setCartProducts(response.props.cart);
             }
-        );
-    };
+
+            toast({
+                title: "Producto eliminado",
+                description: "El producto fue eliminado del carrito.",
+                variant: "default",
+            });
+        },
+        onError: () => {
+            toast({
+                title: "Error",
+                description: "No se pudo eliminar el producto.",
+                variant: "destructive",
+            });
+        },
+    });
+};
 
     const handleCancelRemove = () => {
         setConfirmProductId(null);
@@ -132,18 +144,18 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
     };
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
-            <ul className="divide-y divide-gray-200">
+        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                 {cartProducts.map((product) => (
                     <li key={product.id} className="flex flex-col md:flex-row items-center gap-6 py-6 relative group">
                         <button
                             onClick={() => setConfirmProductId(product.id)}
-                            className="absolute top-3 left-3 text-gray-400 hover:text-red-600 bg-white p-2 rounded-full shadow-md z-10 transition-all duration-200 hover:scale-110"
+                            className="absolute top-3 left-3 text-gray-400 hover:text-red-600 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md z-10 transition-all duration-200 hover:scale-110"
                             aria-label="Eliminar producto"
                         >
                             <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
                         </button>
-        
+
                         {confirmProductId === product.id && (
                             <Confirm
                                 title={`Eliminar "${product.name}"`}
@@ -152,7 +164,7 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
                                 onCancel={handleCancelRemove}
                             />
                         )}
-        
+
                         <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-lg overflow-hidden shadow-sm group-hover:shadow-md transition-shadow duration-200">
                             {product.images.length > 1 && (
                                 <>
@@ -173,26 +185,26 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
                                 </>
                             )}
                             <img
-                                src={product.images.length > 0 ? product.images[imageIndexes[product.id]].url : null}
+                                src={product.images.length > 0 ? product.images[imageIndexes[product.id]].full_url : null}
                                 alt={product.name}
                                 className="w-full h-full object-cover transition-opacity duration-300"
                             />
                         </div>
 
                         <div className="flex-1 text-center md:text-left space-y-2">
-                            <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-                            <p className="text-gray-600 text-sm">{product.description}</p>
-                            
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{product.name}</h3>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">{product.description}</p>
+
                             <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
-                                <span className="bg-gray-800 text-white rounded-full text-xs font-medium px-3 py-1.5 inline-flex items-center">
+                                <span className="bg-gray-800 dark:bg-gray-600 text-white rounded-full text-xs font-medium px-3 py-1.5 inline-flex items-center">
                                     <FontAwesomeIcon icon={faTshirt} className="mr-1.5 w-3 h-3" />
                                     {product.size}
                                 </span>
-                                <span className="bg-gray-800 text-white rounded-full text-xs font-medium px-3 py-1.5 inline-flex items-center">
+                                <span className="bg-gray-800 dark:bg-gray-600 text-white rounded-full text-xs font-medium px-3 py-1.5 inline-flex items-center">
                                     <FontAwesomeIcon icon={faPalette} className="mr-1.5 w-3 h-3" />
                                     {product.color}
                                 </span>
-                                <span className="bg-gray-800 text-white rounded-full text-xs font-medium px-3 py-1.5 inline-flex items-center">
+                                <span className="bg-gray-800 dark:bg-gray-600 text-white rounded-full text-xs font-medium px-3 py-1.5 inline-flex items-center">
                                     <FontAwesomeIcon icon={faTag} className="mr-1.5 w-3 h-3" />
                                     ${product.price}
                                 </span>
@@ -202,22 +214,22 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
                                 </span>
                             </div>
                         </div>
-        
+
                         <div className="flex flex-col items-center md:items-end gap-3">
-                            <p className="text-lg font-semibold text-gray-800">
+                            <p className="text-lg font-semibold text-gray-800 dark:text-white">
                                 ${(product.price * product.pivot.quantity).toFixed(2)}
-                                <span className="text-sm text-gray-500 ml-1">({product.pivot.quantity} un.)</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-300 ml-1">({product.pivot.quantity} un.)</span>
                             </p>
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => handleQuantityChangeLocal(product.id, Math.max(product.pivot.quantity - 1, 1))}
                                     disabled={product.pivot.quantity <= 1}
-                                    className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+                                    className="w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
                                     aria-label="Reducir cantidad"
                                 >
                                     <FontAwesomeIcon icon={faMinus} className="w-3 h-3" />
                                 </button>
-                                
+
                                 {editingProductId === product.id ? (
                                     <input
                                         type="text"
@@ -225,25 +237,25 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
                                         onChange={(e) => handleQuantityInputChange(e, product.id)}
                                         onBlur={() => handleQuantityInputBlur(product.id)}
                                         onKeyDown={(e) => handleQuantityInputKeyDown(e, product.id)}
-                                        className="w-16 text-center border border-gray-300 rounded-md py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-16 text-center border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-md py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         autoFocus
                                     />
                                 ) : (
-                                    <div 
+                                    <div
                                         onClick={() => {
                                             setEditingProductId(product.id);
                                             setInputQuantity(product.pivot.quantity.toString());
                                         }}
-                                        className="w-16 text-center border border-transparent hover:border-gray-300 rounded-md py-1 px-2 cursor-text"
+                                        className="w-16 text-center border border-transparent hover:border-gray-300 dark:hover:border-gray-500 dark:text-white rounded-md py-1 px-2 cursor-text"
                                     >
                                         {product.pivot.quantity}
                                     </div>
                                 )}
-                                
+
                                 <button
                                     onClick={() => handleQuantityChangeLocal(product.id, Math.min(product.pivot.quantity + 1, product.stock))}
                                     disabled={product.pivot.quantity >= product.stock}
-                                    className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+                                    className="w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
                                     aria-label="Aumentar cantidad"
                                 >
                                     <FontAwesomeIcon icon={faPlus} className="w-3 h-3" />
@@ -253,46 +265,45 @@ export default function ProductList({ products, onQuantityChange, onConfirmCheck
                     </li>
                 ))}
             </ul>
-        
+
             {cartProducts.length > 0 && (
-                <div className="mt-8 p-5 bg-gray-50 rounded-lg border border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <FontAwesomeIcon icon={faReceipt} className="mr-2 text-gray-600" />
+                <div className="mt-8 p-5 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                        <FontAwesomeIcon icon={faReceipt} className="mr-2 text-gray-600 dark:text-gray-300" />
                         Resumen del pedido
                     </h3>
-                    
+
                     <div className="space-y-3 mb-5">
                         <div className="flex justify-between">
-                            <span className="text-gray-600">Subtotal</span>
-                            <span className="font-medium">${totals.subtotal.toFixed(2)}</span>
+                            <span className="text-gray-600 dark:text-gray-300">Subtotal</span>
+                            <span className="font-medium text-gray-800 dark:text-white">${totals.subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-gray-600 flex items-center">
+                            <span className="text-gray-600 dark:text-gray-300 flex items-center">
                                 <FontAwesomeIcon icon={faTruck} className="mr-1.5 w-3 h-3" />
                                 Envío
                             </span>
-                            <span className="font-medium">${totals.shipping.toFixed(2)}</span>
+                            <span className="font-medium text-gray-800 dark:text-white">${totals.shipping.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between pt-3 border-t border-gray-200">
-                            <span className="font-semibold">Total</span>
-                            <span className="font-bold text-lg">${totals.total.toFixed(2)}</span>
+                        <div className="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-500">
+                            <span className="font-semibold dark:text-white">Total</span>
+                            <span className="font-bold text-lg text-gray-800 dark:text-white">${totals.total.toFixed(2)}</span>
                         </div>
                     </div>
-        
+
                     <div className="flex flex-col sm:flex-row gap-3">
-                        <Link 
-                            href={route('dashboard')} 
+                        <Link
+                            href={route('dashboard')}
                             className="flex-1 px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 text-center font-medium flex items-center justify-center"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
                             Seguir Comprando
                         </Link>
                         <button
-                            onClick={() => !isCartEmpty && onConfirmCheckout()}
-                            disabled={isCartEmpty}
                             className={`flex-1 px-5 py-2.5 text-white rounded-lg text-center font-medium transition duration-200 flex items-center justify-center ${
                                 isCartEmpty ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
                             }`}
+                            onClick={onConfirmCheckout}
                         >
                             <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
                             Proceder al Pago

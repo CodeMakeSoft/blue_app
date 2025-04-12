@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
-import UserFormModal from "@/components/UserFormModal";
+import UserFormModal from "@/Components/UserFormModal";
 import AdminLayout from "@/Layouts/AdminLayout";
 import ConfirmAdd from "@/Components/ConfirmAdd";
 import ConfirmEdit from "@/Components/ConfirmEdit";

@@ -9,6 +9,7 @@ import Navbar from '@/Components/Navbar';
 import { Sidebar } from "@/Components/Sidebar";
 import Footer from "@/Components/Footer";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import { Toaster } from "@/Components/ui/toaster";
 
 export default function AuthenticatedLayout({ header, children }) {
     const { auth } = usePage().props;
@@ -19,9 +20,15 @@ export default function AuthenticatedLayout({ header, children }) {
     
     // Detecta si estamos en rutas de carrito o checkout
     const { url } = usePage();
-    const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout');
+    const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout') || url.startsWith('/purchases');
     const cart = usePage().props.cart || [];
-    const activeLink = route().current('checkout.index') ? 'checkout.index' : 'cart.index';
+    const activeLink = route().current('checkout.index')
+    ? 'checkout.index'
+    : route().current('cart.index')
+    ? 'cart.index'
+    : route().current('purchases.index')
+    ? 'purchases.index'
+    : '';
     const userCanAccessAdminPanel = auth.permissions.includes("can-access-admin-panel");
 
     // Menú items para Sidebar
@@ -67,14 +74,14 @@ export default function AuthenticatedLayout({ header, children }) {
             active: route().current("category.catalog"),
         },
         // Agregamos perfil al sidebar
-        {
-            href: route("profile.edit"),
-            icon: (
-                <UserIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
-            ),
-            text: "Perfil",
-            active: route().current("profile.edit"),
-        },
+        // {
+        //     href: route("profile.edit"),
+        //     icon: (
+        //         <UserIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
+        //     ),
+        //     text: "Perfil",
+        //     active: route().current("profile.edit"),
+        // },
         // Si el usuario puede acceder al panel de administración, lo agregamos
         ...(userCanAccessAdminPanel ? [{
             href: route("admin.panel"),
@@ -85,15 +92,15 @@ export default function AuthenticatedLayout({ header, children }) {
             active: route().current("admin.panel"),
         }] : []),
         // Agregar botón de cerrar sesión al sidebar
-        {
-            href: route("logout"),
-            method: "post",
-            as: "button",
-            icon: (
-                <ArrowRightOnRectangleIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
-            ),
-            text: "Cerrar Sesión",
-        },
+        // {
+        //     href: route("logout"),
+        //     method: "post",
+        //     as: "button",
+        //     icon: (
+        //         <ArrowRightOnRectangleIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
+        //     ),
+        //     text: "Cerrar Sesión",
+        // },
     ];
 
     // Componente del icono de caja
@@ -138,8 +145,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <div className="flex shrink-0 items-center">
                                         <Link href="/">
                                             {/* Usar ambos logos con condicional para tema oscuro/claro */}
-                                            <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:hidden" />
-                                            <BoxIcon className="hidden dark:block text-gray-200" />
+                                            <BoxIcon className="text-gray-800 dark:text-gray-200" />
                                         </Link>
                                     </div>
                                 </div>
@@ -236,7 +242,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     {/* Contenedor principal */}
                     <main className="flex-1 p-4 bg-white dark:bg-gray-800">
                         <div className="max-w-5xl mx-auto">
-                            {/* Navbar de Carrito/Checkout (solo visible en esas rutas) */}
+                            {/* Navbar de Carrito/Checkout/Purchases (solo visible en esas rutas) */}
                             {showCartNavbar && (
                                 <Navbar 
                                     activeLink={activeLink}
@@ -259,6 +265,7 @@ export default function AuthenticatedLayout({ header, children }) {
             
             {/* Footer de team/white */}
             {user && <Footer />}
+            <Toaster />
         </div>
     );
-}
+}   

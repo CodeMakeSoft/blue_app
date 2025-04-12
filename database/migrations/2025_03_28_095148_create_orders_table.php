@@ -11,16 +11,12 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('transaction_id')->nullable();
+            $table->string('transaction_id')->nullable(); // Para PayPal
             $table->decimal('total', 10, 2);
             $table->string('status')->default('pending'); // pending, completed, cancelled
-            $table->string('shipping_address')->nullable();
-            $table->string('billing_address')->nullable();
-            $table->string('contact_email');
-            $table->string('contact_phone')->nullable();
-            $table->text('notes')->nullable();
+            $table->string('payment_method'); // cod o paypal
             $table->timestamps();
-        });
+        });        
     }
 
     public function down()

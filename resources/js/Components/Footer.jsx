@@ -13,7 +13,7 @@ export default function Footer({
     showSocial = true,
     showLinks = true,
     className = "",
-    logo = "/images/Logo2.jpg",
+    logo = "/images/CMS.svg",
     socialLinks = [
         {
             name: "Facebook",
@@ -37,7 +37,7 @@ export default function Footer({
             links: [
                 {
                     name: "Nosotros",
-                    url: "https://github.com/CodeCraftSoft/blue_app/tree/main",
+                    url: "https://codemakesoft.github.io/",
                 },
                 { name: "Contacto", url: "https://wa.link/n8mxgj" },
             ],
@@ -75,15 +75,13 @@ export default function Footer({
                         >
                             {logo && (
                                 <img
-                                    src={logo}
-                                    alt={`Logo de ${companyName}`}
-                                    className="h-8 md:h-10 object-contain transition-transform duration-300 group-hover:scale-110"
-                                    onError={(e) => {
-                                        e.target.style.display = "none";
-                                    }}
-                                />
+                                src={logo}
+                                alt={`Logo de ${companyName}`}
+                                className="h-12 md:h-20 object-contain transition-transform duration-300 group-hover:scale-110 dark:invert"
+                            />
+                            
                             )}
-                            <span className="text-xl font-bold text-gray-900 dark:text-white transition-all duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                            <span className="ml-[1rem] text-xl font-bold text-gray-900 dark:text-white transition-all duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
                                 {companyName}
                             </span>
                         </Link>
@@ -203,7 +201,7 @@ export default function Footer({
             {/* Línea divisoria */}
 
             <div className="pt-6 text-center md:text-left text-gray-500 dark:text-gray-400 text-sm">
-                <p className="transition-all duration-300 transform hover:scale-102 hover:text-gray-700 dark:hover:text-gray-300">
+                <p className="mx-[2rem] transition-all duration-300 transform hover:scale-102 hover:text-gray-700 dark:hover:text-gray-300">
                     © {new Date().getFullYear()} {companyName}. Todos los
                     derechos reservados.
                 </p>

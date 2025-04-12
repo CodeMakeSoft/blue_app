@@ -47,9 +47,22 @@ class CartController extends Controller
 
         $products = $cart->products()->with('images')->withPivot('quantity')->get();
 
-        return Inertia::render('Cart/Index', [
-            'cart' => $products,
+        // return Inertia::render('Cart/Index', [
+        //     'cart' => $products,
+        // ]);
+    }
+
+    public function contains($productID)
+    {
+        $user = Auth::user();
+        $cart = $user->cart;
+
+        $exist = $cart && $cart->products()->where('product_id', $productID)->exists();
+
+        return response()->json([
+            'inCart' => $exist,
         ]);
+
     }
 
     // Remove from cart

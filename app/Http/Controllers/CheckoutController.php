@@ -99,107 +99,64 @@ class CheckoutController extends Controller
 
     // Nuevo método para procesar COD
     public function processCod(Request $request)
-    {
-        $user = Auth::user();
-        $cart = $user->cart;
+{
+    $user = Auth::user();
+    $cart = $user->cart;
 
-        try {
-            DB::beginTransaction();
+    try {
+        DB::beginTransaction();
 
-            $order = Order::create([
-                'user_id' => $user->id,
-                'payment_method' => 'cod',
-                'total' => $cart->products->sum(function ($product) {
-                    return $product->price * $product->pivot->quantity;
-                }),
-                'status' => 'pending' // Estado inicial para COD
-            ]);
+        $total = $cart->products->sum(fn($p) => $p->price * $p->pivot->quantity);
 
-            foreach ($cart->products as $product) {
-                OrderProduct::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => $product->pivot->quantity,
-                    'price' => $product->price
-                ]);
-            }
+        $order = Order::create([
+            'user_id' => $user->id,
+            'payment_method' => 'cod',
+            'total' => $total,
+            'status' => 'pending'
+        ]);
 
-            $cart->products()->detach();
-
-            // Opcional: Enviar email diferente para COD
-            //Mail::to($user->email)->send(new OrderConfirmation($order, true));
-
-            DB::commit();
-
-            return inertia('Checkout/Success', [
-                'order' => $order,
-                'isCod' => true // Para mostrar mensaje diferente en la vista
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            report($e);
-            return redirect()->route('checkout.cancel')->withErrors([
-                'message' => 'Ocurrió un error al procesar tu orden. Por favor intenta nuevamente.'
+        foreach ($cart->products as $product) {
+            $order->products()->attach($product->id, [
+                'quantity' => $product->pivot->quantity,
+                'price' => $product->price,
             ]);
         }
+
+        $cart->products()->detach();
+
+        DB::commit();
+
+        session()->flash('order_id', $order->id);
+        session()->flash('isCod', true);
+
+        return redirect()->route('checkout.success');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        report($e);
+        return redirect()->route('checkout.cancel')->withErrors([
+            'message' => 'Error procesando el pedido. Intenta nuevamente.'
+        ]);
+    }
+}
+
+public function success(Request $request)
+{
+    $orderId = session('order_id');
+
+    if ($orderId) {
+        $order = Order::with('products')->findOrFail($orderId);
+
+        return inertia('Checkout/Success', [
+            'order' => $order,
+            'isCod' => session('isCod', false)
+        ]);
     }
 
-    // Método success modificado para manejar ambos casos
-    public function success(Request $request)
-    {
-        // Solo procesa PayPal si viene con token
-        if ($request->has('token') || $request->has('paymentId')) {
-            $user = Auth::user();
-            $cart = $user->cart;
-            $orderId = $request->input('token') ?? $request->input('paymentId');
+    return redirect()->route('checkout.index');
+}
 
-            try {
-                DB::beginTransaction();
-
-                $order = Order::create([
-                    'user_id' => $user->id,
-                    'transaction_id' => $orderId,
-                    'payment_method' => 'paypal',
-                    'total' => $cart->products->sum(function ($product) {
-                        return $product->price * $product->pivot->quantity;
-                    }),
-                    'status' => 'completed'
-                ]);
-
-                foreach ($cart->products as $product) {
-                    OrderProduct::create([
-                        'order_id' => $order->id,
-                        'product_id' => $product->id,
-                        'quantity' => $product->pivot->quantity,
-                        'price' => $product->price
-                    ]);
-                }
-
-                $cart->products()->detach();
-                Mail::to($user->email)->send(new OrderConfirmation($order));
-
-                DB::commit();
-
-                return inertia('Checkout/Success', [
-                    'order' => $order,
-                    'isCod' => false
-                ]);
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                report($e);
-                return redirect()->route('checkout.cancel')->withErrors([
-                    'message' => 'Ocurrió un error al procesar tu orden. Por favor intenta nuevamente.'
-                ]);
-            }
-        }
-
-        return redirect()->route('checkout.index');
-    }
-
-    public function cancel()
-    {
-        return inertia('Checkout/Cancel');
-    }
+public function cancel()
+{
+    return inertia('Checkout/Cancel');
+}
 }
