@@ -1,7 +1,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
-import { toast } from "sonner";
+import { Toaster, toast } from "sonner";
 import Form from "@/Components/Address/Form";
+import { router } from "@inertiajs/react";
 
 export default function Create({ auth, countries, districts }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -23,21 +24,12 @@ export default function Create({ auth, countries, districts }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         post(route("address.store"), {
-            preserveScroll: true,
             onSuccess: () => {
-                toast.success("Dirección creada exitosamente");
+                toast.success("Dirección creada");
+                router.visit(route("address.index"));
             },
-            onError: (errors) => {
-                if (Object.keys(errors).length > 0) {
-                    toast.error(
-                        "Por favor corrige los errores en el formulario"
-                    );
-                } else {
-                    toast.error("Error al crear la dirección");
-                }
-            },
+            onError: () => toast.error("Error al crear"),
         });
     };
 
@@ -51,7 +43,7 @@ export default function Create({ auth, countries, districts }) {
             }
         >
             <Head title="Crear Dirección" />
-
+            <Toaster position="top-right" richColors />
             <div className="py-8 px-4 max-w-7xl mx-auto">
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="p-6">

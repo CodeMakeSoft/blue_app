@@ -4,12 +4,13 @@ import { PlusIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 import { Toaster, toast } from "sonner";
 import ConfirmDelete from "@/Components/ConfirmDelete";
 
-
 export default function Index({ locations }) {
     const handleDelete = (id) => {
         router.delete(`/address/${id}`, {
             onSuccess: () => {
-                toast.success("Dirección eliminada exitosamente");
+                console.log("Eliminado correctamente");
+                toast.success("Dirección eliminada correctamente");
+                router.visit();
             },
             onError: () => {
                 toast.error("Error al eliminar la dirección");
@@ -26,9 +27,9 @@ export default function Index({ locations }) {
             }
         >
             <Head title="Direcciones" />
-
+            <Toaster position="top-right" richColors />
             <div className="py-8 px-4 max-w-7xl mx-auto">
-                <div className="mb-4">
+                <div className="mb-6">
                     <Link
                         href={route("address.create")}
                         className="flex flex-col items-center p-5 bg-white border-4 border-gray-200 border-dashed rounded-lg hover:bg-gray-50 transition-colors"
@@ -39,67 +40,48 @@ export default function Index({ locations }) {
                         </h2>
                     </Link>
                 </div>
-                <div className="space-y-4">
+
+                {/* Contenedor grid responsivo */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {locations.length > 0 ? (
                         locations.map((location) => (
                             <div
                                 key={location.id}
-                                className="bg-white p-6 rounded-lg shadow border border-gray-200"
+                                className="bg-white p-6 rounded-lg shadow border border-gray-200 flex flex-col h-full"
                             >
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="font-bold text-lg">
-                                            {location.alias}
-                                        </h3>
+                                <div className="flex-grow">
+                                    <h3 className="font-bold text-lg mb-2">
+                                        {location.alias}
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        {location.street} #{location.ext_number}
+                                        {location.int_number &&
+                                            ` Int. ${location.int_number}`}
+                                    </p>
+                                    <p className="text-gray-600 mt-1">
+                                        {
+                                            location.district?.city
+                                                ?.municipality?.state?.name
+                                        }
+                                        ,{" "}
+                                        {
+                                            location.district?.city
+                                                ?.municipality?.state?.country
+                                                ?.name
+                                        }
+                                    </p>
+                                    <p className="text-gray-600">
+                                        {location.district?.name},{" "}
+                                        {location.district?.city?.name}
+                                    </p>
+                                    <p className="text-gray-600">
+                                        C.P. {location.district?.postal_code}
+                                    </p>
+                                    {location.phone && (
                                         <p className="text-gray-600">
-                                            {location.street} #
-                                            {location.ext_number}
-                                            {location.int_number &&
-                                                ` Int. ${location.int_number}`}
+                                            Tel: {location.phone}
                                         </p>
-                                        <p className="text-gray-600">
-                                            {
-                                                location.district?.city
-                                                    ?.municipality?.state?.name
-                                            }
-                                            ,{" "}
-                                            {
-                                                location.district?.city
-                                                    ?.municipality?.state
-                                                    ?.country?.name
-                                            }
-                                        </p>
-
-                                        <p className="text-gray-600">
-                                            {location.district?.name},{" "}
-                                            {location.district?.city?.name}
-                                        </p>
-                                        <p className="text-gray-600">
-                                            Código Postal:{" "}
-                                            {location.district?.postal_code}
-                                        </p>
-                                        {location.phone && (
-                                            <p className="text-gray-600">
-                                                Tel: {location.phone}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Link
-                                            href={route(
-                                                "address.edit",
-                                                location.id
-                                            )}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                                        >
-                                            <PencilSquareIcon className="h-5 w-5" />
-                                        </Link>
-                                        <ConfirmDelete
-                                            id={location.id}
-                                            onConfirm={handleDelete}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded"
-                                        />
-                                    </div>
+                                    )}
                                 </div>
                                 {location.delivery_instructions && (
                                     <div className="mt-3 pt-3 border-t">
@@ -111,10 +93,27 @@ export default function Index({ locations }) {
                                         </p>
                                     </div>
                                 )}
+                                <div className="flex justify-end gap-2 mt-4">
+                                    <Link
+                                        href={route(
+                                            "address.edit",
+                                            location.id
+                                        )}
+                                        className="flex items-center border border-gray-500 bg-white text-gray-600 px-3 py-1 rounded hover:bg-gray-100 transition"
+                                    >
+                                        <PencilSquareIcon className="h-5 w-5 mr-2" />
+                                        Edit
+                                    </Link>
+                                    <ConfirmDelete
+                                        id={location.id}
+                                        onConfirm={handleDelete}
+                                        className="p-2 text-red-600 hover:bg-red-50 rounded"
+                                    />
+                                </div>
                             </div>
                         ))
                     ) : (
-                        <div className="text-center py-10 bg-white rounded-lg shadow">
+                        <div className="col-span-full text-center py-10 bg-white rounded-lg shadow">
                             <p className="text-gray-500">
                                 No tienes direcciones registradas
                             </p>

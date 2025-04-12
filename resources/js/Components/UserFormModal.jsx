@@ -3,7 +3,6 @@ import { router } from "@inertiajs/react";
 import { toast } from "sonner";
 import ConfirmEdit from "@/Components/ConfirmEdit";
 import ConfirmAdd from "@/Components/ConfirmAdd";
-
 export default function UserFormModal({ isOpen, closeModal, user, roles, users }) {
     const [formData, setFormData] = useState({
         name: "",
@@ -96,8 +95,30 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // Limpiar errores anteriores
+        setErrors({});
+    
+        // Validación de coincidencia de contraseña
+        if (formData.password && formData.password !== formData.password_confirmation) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                password_confirmation: "Passwords do not match",
+            }));
+            return;
+        }
+    
+        // Validación de mínimo 8 caracteres si el usuario escribió una nueva contraseña
+        if (formData.password && formData.password.length < 8) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                password: "Password must be at least 8 characters",
+            }));
+            return;
+        }
+        // Si todo está bien, mostrar modal de confirmación
         user ? setShowConfirmEdit(true) : setShowConfirmAdd(true);
     };
+    
 
     const handleConfirmAction = () => {
         const data = {
@@ -110,10 +131,21 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
             email_verified_at: formData.email_verified_at,
         };
 
-        const url = address ? `/admin/users/${user.id}` : "/admin/users";
+        const url = user ? `/admin/users/${user.id}` : "/admin/users";
         const method = user ? "put" : "post";
 
-          
+        router[method](url, data, {
+            onSuccess: () => {
+                toast.success(
+                    `User ${user ? "updated" : "created"} successfully`
+                );
+                closeModal();
+            },
+            onError: (errors) => {
+                setErrors(errors);
+                toast.error("Please correct the errors in the form");
+            },
+        });
 
         user ? setShowConfirmEdit(false) : setShowConfirmAdd(false);
     };
@@ -177,21 +209,21 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                         )}
                     </div>
                     <div className="mb-4">
-                    <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                        <input
-                            type="checkbox"
-                            checked={!!formData.email_verified_at}
-                            onChange={(e) => {
-                                setFormData((prev) => ({
-                                    ...prev,
-                                    email_verified_at: e.target.checked
-                                        ? new Date().toISOString()
-                                        : null,
-                                }));
-                            }}
-                        />
-                        Email Verified
-                    </label>
+                  <label className="flex items-center gap-2 text-sm font-medium mb-1">
+                   <input
+                    type="checkbox"
+                    checked={!!formData.email_verified_at}
+                    onChange={(e) => {
+                    setFormData((prev) => ({
+                    ...prev,
+                    email_verified_at: e.target.checked
+                        ? new Date().toISOString()
+                        : null,
+                     }));
+                 }}
+                 />
+                   Email Verified
+                </label>
                 </div>
 
                     {/* Teléfono */}
@@ -227,6 +259,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
+                            autoComplete="new-password"
                             className={`w-full border rounded p-2 ${
                                 errors.password
                                     ? "border-red-500"
@@ -257,9 +290,14 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                                     ? "border-red-500"
                                     : "border-gray-300"
                             }`}
-                            required={!user}
-                        />
-                    </div>
+                            required={!user&& !!formData.password}
+                            />
+                            {errors.password_confirmation && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.password_confirmation}
+                                </p>
+                            )}
+                        </div>
 
                     {/* Selector de Rol Único */}
                     {!isLastAdmin() ? (
@@ -334,11 +372,12 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                             </p>
                         )}
                     </div>
-                    ) : (
-                        <p className="text-sm text-red-600 mb-6">
-                            You cannot change the role of the last Admin user.
-                        </p>
+                           ) : (
+                           <p className="text-sm text-red-600 mb-6">
+                         You cannot change the role of the last Admin user.
+                    </p>
                     )}
+                    
                     {/* Form Actions */}
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button

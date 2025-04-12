@@ -125,7 +125,6 @@ class UserController extends Controller implements HasMiddleware
      */
     public function destroy(User $user)
     {
-
         $adminRole = app('adminRole');
         // Verificar si el usuario a eliminar es Admin
         if ($user->hasRole($adminRole->name)) {

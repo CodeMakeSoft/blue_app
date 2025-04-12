@@ -47,62 +47,62 @@ class LocationController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'alias' => 'required|string|max:255',
+    {
+        $request->validate([
+            'alias' => 'required|string|max:255',
             'street' => 'required|string|max:255',
             'ext_number' => 'required|string|max:50',
             'int_number' => 'nullable|string|max:50',
             'district_id' => 'required|exists:districts,id',
             'phone' => 'required|string|max:20',
             'delivery_instructions' => 'nullable|string',
-    ]);
+        ]);
 
-    $data = $request->only([
-        'country_name', 'alias', 'street', 'ext_number', 'int_number', 
-        'postal_code', 'state', 'municipality', 'city', 'district_id',
-        'user_id','phone', 'delivery_instructions'
-    ]);
-    
-    $data['user_id'] = Auth::id();
+        $data = $request->only([
+            'country_name', 'alias', 'street', 'ext_number', 'int_number', 
+            'postal_code', 'state', 'municipality', 'city', 'district_id',
+            'user_id','phone', 'delivery_instructions'
+        ]);
+        
+        $data['user_id'] = Auth::id();
 
-    Location::create($data);
+        Location::create($data);
 
-    return redirect()->route('address.index')->with('success', 'Dirección creada exitosamente');
-}
-
-    public function update(Request $request, Location $location)
-{
-    $validated = $request->validate([
-        'country_name' => 'required|string|max:255', // Ahora validas el nombre del país
-        'alias' => 'required|string|max:255',
-        'street' => 'required|string|max:255',
-        'ext_number' => 'required|string|max:50',
-        'int_number' => 'nullable|string|max:50',
-        'postal_code' => 'required|string|max:20',
-        'state' => 'required|string|max:255',
-        'municipality' => 'required|string|max:255',
-        'city' => 'required|string|max:255',
-        'district' => 'required|string|max:255',
-        'district_id' => 'required|exists:districts,id', 
-        'phone' => 'nullable|string|max:20',
-        'delivery_instructions' => 'nullable|string',
-    ]);
-
-    $location->update($validated);
-
-    return redirect()->route('address.index')->with('success', 'Dirección actualizada exitosamente');
-}
-
-    public function destroy(Location $location)
-{
-    $location->delete();
-
-    if (request()->wantsJson()) {
-        return response()->json(['success' => true]);
+        return redirect()->route('address.index')->with('success', 'Dirección creada exitosamente');
     }
 
-    return redirect()->route('address.index')->with('success', 'Dirección eliminada exitosamente');
-}
+    public function edit(Location $address)
+    {
+        return Inertia::render('Address/Edit', [
+            'location' => $address,
+            'countries' => Country::all(),
+            'districts' => District::with(['city.municipality.state.country'])->get()
+        ]);
+    }
+
+    public function update(Request $request, Location $address)
+    {
+        $validated = $request->validate([
+            'alias' => 'required|string|max:255',
+            'street' => 'required|string|max:255',
+            'ext_number' => 'required|string|max:50',
+            'int_number' => 'nullable|string|max:50',
+            'district_id' => 'required|exists:districts,id',
+            'phone' => 'required|string|max:20',
+            'delivery_instructions' => 'nullable|string',
+        ]);
+
+        $address->update($validated);
+
+        return redirect()->route('address.index')->with('success', 'Dirección actualizada exitosamente');
+    }
+
+    public function destroy(Location $address)
+    {
+        $address->delete();
+        return redirect()->route('address.index')
+            ->with('success', 'Address eliminado correctamente');
+    }
 
 }
+

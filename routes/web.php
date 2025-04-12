@@ -40,12 +40,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     //Crud address
-    Route::get('address', [LocationController::class, 'index'])->name('address.index');
-    Route::get('address/create', [LocationController::class, 'create'])->name('address.create');
-    Route::put('address/{address}', [LocationController::class, 'edit'])->name('address.edit');
+    Route::get('/address', [LocationController::class, 'index'])->name('address.index');
+    Route::get('/address/create', [LocationController::class, 'create'])->name('address.create');
+    Route::get('/address/{address}/edit', [LocationController::class, 'edit'])->name('address.edit'); // Cambiado a GET
     Route::post('/address', [LocationController::class, 'store'])->name('address.store');
-    Route::delete('address/{address}', [LocationController::class, 'destroy'])->name('address.destroy');
-
+    Route::put('/address/{address}', [LocationController::class, 'update'])->name('address.update'); // Ruta para el submit del formulario
+    Route::delete('/address/{address}', [LocationController::class, 'destroy'])->name('address.destroy');
 });
 
 Route::group(['middleware' => ['auth']], function() {

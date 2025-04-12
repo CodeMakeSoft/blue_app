@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState,  useRef } from "react";
+import { router } from "@inertiajs/react";
 import TextInput from "@/Components/TextInput";
 import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
@@ -33,21 +34,23 @@ export default function Form({
             return false;
         }
 
-        setData("districts", matchingDistricts);
-        setData(
-            "state",
-            matchingDistricts[0]?.city?.municipality?.state?.name || ""
-        );
-        setData(
-            "municipality",
-            matchingDistricts[0]?.city?.municipality?.name || ""
-        );
-        setData("city", matchingDistricts[0]?.city?.name || "");
-        setData("district", matchingDistricts[0]?.name || "");
-        setData(
-            "district_id",
-            isEditing ? data.district_id : matchingDistricts[0]?.id || ""
-        );
+        // Actualiza todos los campos relacionados
+        const selectedDistrict =
+            matchingDistricts.find((d) => d.id === data.district_id) ||
+            matchingDistricts[0];
+
+        setData({
+            ...data,
+            districts: matchingDistricts,
+            district_id:
+                isEditing && data.district_id
+                    ? data.district_id
+                    : selectedDistrict.id,
+            state: selectedDistrict?.city?.municipality?.state?.name || "",
+            municipality: selectedDistrict?.city?.municipality?.name || "",
+            city: selectedDistrict?.city?.name || "",
+            district: selectedDistrict?.name || "",
+        });
 
         setPostalError("");
         setShowPostalData(true);

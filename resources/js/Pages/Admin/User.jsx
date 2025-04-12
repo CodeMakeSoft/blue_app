@@ -164,7 +164,7 @@ export default function User({ activeRoute, can }) {
                             </tbody>
                         </table>
                     </div>
-
+                    {/* Vista móvil */}
                     <div className="md:hidden">
                         {users.data.length ? (
                             users.data.map((user) => (
