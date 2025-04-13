@@ -70,7 +70,7 @@
         };
 
         if (!Array.isArray(orders) || orders.length === 0) {
-            return <div className="text-center text-gray-600 dark:text-gray-300">Cargando órdenes...</div>;
+            return <div className="text-center text-gray-600 dark:text-gray-300">Cargando ordenes de compra...</div>;
         }
 
         return (
@@ -83,7 +83,6 @@
                 }
             >
                 <Head title="Mis Compras" />
-
                 <div className="p-6 max-w-5xl mx-auto">
                     {orders.length === 0 ? (
                         <div className="text-center text-gray-600 dark:text-gray-300">
