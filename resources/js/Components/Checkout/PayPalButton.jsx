@@ -1,61 +1,73 @@
 import { useEffect } from 'react';
 import { loadScript } from '@paypal/paypal-js';
+import { router } from '@inertiajs/react';
 
-const PayPalButton = ({ paypalClientId, cart, isReady, onReadyChange }) => {
+const PayPalButton = ({ paypalClientId, isReady, onReadyChange, cart }) => {
     useEffect(() => {
         let paypalButtons;
-        
+
         const initializePaypal = async () => {
             try {
-                await loadScript({ 
+                await loadScript({
                     'client-id': paypalClientId,
                     currency: 'MXN',
-                    'disable-funding': 'credit,card'
+                    'disable-funding': 'credit,card',
                 });
-                
+
                 paypalButtons = window.paypal.Buttons({
-                    createOrder: (data, actions) => {
-                        return fetch(route('checkout.createOrder'), {
+                    createOrder: async () => {
+                        const res = await fetch(route('checkout.paypal.create'), {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            },
+                        });
+
+                        const data = await res.json();
+                        return data.id;
+                    },
+
+                    onApprove: async (data) => {
+                        const res = await fetch(route('checkout.paypal.capture'), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             },
                             body: JSON.stringify({
-                                total: cart.reduce((sum, product) => 
-                                    sum + (product.price * product.pivot.quantity), 0
-                                )
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(order => order.id);
-                    },
-                    onApprove: (data, actions) => {
-                        return actions.order.capture().then(details => {
-                            router.visit(route('checkout.success'));
+                                orderID: data.orderID,
+                            }),
                         });
+
+                        const result = await res.json();
+
+                        if (result.success) {
+                            router.visit(route('checkout.success'));
+                        } else {
+                            alert('Error al capturar el pago.');
+                        }
                     },
+
                     onError: (err) => {
                         console.error('PayPal error:', err);
                         alert('Ocurrió un error con PayPal. Intenta de nuevo.');
                     }
                 });
-                
+
                 paypalButtons.render('#paypal-button-container');
                 onReadyChange(true);
             } catch (error) {
-                console.error('Failed to load PayPal JS:', error);
+                console.error('Error inicializando PayPal:', error);
             }
         };
 
         initializePaypal();
 
         return () => {
-            if (paypalButtons) {
-                paypalButtons.close();
-            }
+            if (paypalButtons) paypalButtons.close();
         };
-    }, [paypalClientId, cart, onReadyChange]);
+    }, [paypalClientId, onReadyChange]);
 
     return (
         <>

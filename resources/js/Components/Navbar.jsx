@@ -67,24 +67,31 @@ export default function Navbar({
                 <li className="navbar-item">
                     {activeLink === 'cart.index' ? (
                         <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                isCartEmpty ? setIsConfirmVisible(false) : setIsConfirmVisible(true);
-                            }}
-                            className={`navbar-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 dark:hover:bg-green-400 transition duration-200 ${isCartEmpty ? 'disabled opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={isCartEmpty}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            isCartEmpty ? setIsConfirmVisible(false) : setIsConfirmVisible(true);
+                        }}
+                        className={`navbar-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 dark:hover:bg-green-400 transition duration-200 ${isCartEmpty ? 'disabled opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isCartEmpty}
                         >
-                            <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
-                            Proceder al Pago
+                        <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
+                        Proceder al Pago
                         </button>
                     ) : (
-                        <Link
-                            href={route('checkout.index')}
-                            className={`navbar-link flex items-center text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 ${getActiveClass('checkout.index')}`}
+                        <button
+                        onClick={() => {
+                            if (!isCartEmpty) {
+                            router.visit(route('checkout.index'));
+                            }
+                        }}
+                        className={`navbar-button flex items-center px-4 py-2 rounded-lg transition duration-200 ${isCartEmpty 
+                            ? 'bg-gray-300 text-gray-600 cursor-not-allowed dark:bg-gray-600 dark:text-gray-300' 
+                            : 'bg-blue-500 text-white hover:bg-blue-600 dark:hover:bg-blue-400'}`}
+                        disabled={isCartEmpty}
                         >
-                            <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
-                            Finalizar Compra
-                        </Link>
+                        <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
+                        Finalizar Compra
+                        </button>
                     )}
                 </li>
                 <li className="navbar-item">

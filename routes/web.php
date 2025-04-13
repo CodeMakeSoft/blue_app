@@ -1,5 +1,4 @@
 <?php
-
 use Inertia\Inertia;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
@@ -16,7 +15,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\OrderController;
-
+use App\Http\Controllers\PayPalController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -30,7 +29,6 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
 
 Route::middleware('auth')->group(function () {
     Route::get('categories',[CategoryController::class,'index'])->name('category.index');
@@ -50,8 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('brands/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
     Route::get('/brands/catalog', [BrandController::class, 'catalog'])->name('brand.catalog');
     Route::get('/brands/{brand}', [BrandController::class, 'show'])->name('brand.show');
-
 });
+
 Route::get('/admin', function () {
     return Inertia::render('Admin/AdminPanel', [
         'activeRoute' => request()->route()->getName(),
@@ -99,11 +97,13 @@ Route::middleware('auth')->group(function () {
     Route::get('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::get('cart/contains/{product}', [CartController::class, 'contains'])->name('cart.contains');
 
-
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/cod', [CheckoutController::class, 'processCod'])->name('checkout.cod');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
+    
+    Route::post('/checkout/paypal/order', [CheckoutController::class, 'createPaypalOrder'])->name('checkout.paypal.create');
+    Route::post('/checkout/paypal/capture', [CheckoutController::class, 'capturePaypalOrder'])->name('checkout.paypal.capture');
 });
 
 Route::middleware('auth')->get('/purchases', [OrderController::class, 'index'])->name('purchases.index');
