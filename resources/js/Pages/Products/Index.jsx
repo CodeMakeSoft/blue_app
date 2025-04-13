@@ -10,9 +10,12 @@ import {
 import { useState, useRef, useEffect } from "react";
 import ConfirmDelete from "@/Components/Product/ConfirmDelete";
 import Pagination from "@/Components/Product/Pagination";
+import { usePage } from "@inertiajs/react";
+
 
 export default function Index({ products }) {
     const { delete: destroy } = useForm();
+    const { auth } = usePage().props;
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -127,215 +130,85 @@ export default function Index({ products }) {
                                 focus:ring-gray-500 dark:focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                             >
                                 <PlusCircleIcon className="h-5 w-5 text-gray-800 dark:text-gray-200 mr-1 sm:mr-2" />
-                                <span className="text-sm sm:text-base">
-                                    Agregar Producto
-                                </span>
+                                <span className="text-sm sm:text-base">Agregar Producto</span>
                             </Link>
                         </div>
-
-                        <div className="overflow-x-auto">
-                            <div className="min-w-full overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                                <table className="w-full text-left text-gray-700 dark:text-gray-300">
-                                    <thead className="bg-gray-100 dark:bg-gray-700">
-                                        <tr className="text-xs sm:text-sm uppercase">
-                                            <th className="px-3 py-2 sm:px-4 sm:py-3">
-                                                Imágenes
-                                            </th>
-                                            <th className="px-3 py-2 sm:px-4 sm:py-3">
-                                                Nombre
-                                            </th>
-                                            <th className="hidden sm:table-cell px-4 py-3">
-                                                Descripción
-                                            </th>
-                                            <th className="px-3 py-2 sm:px-4 sm:py-3">
-                                                Precio
-                                            </th>
-                                            <th className="hidden xs:table-cell px-4 py-3">
-                                                Stock
-                                            </th>
-                                            <th className="hidden sm:table-cell px-4 py-3">
-                                                Estado
-                                            </th>
-                                            <th className="px-3 py-2 sm:px-4 sm:py-3">
-                                                Acciones
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {currentProducts.length > 0 ? (
-                                            currentProducts.map((product) => {
-                                                const imageCount =
-                                                    product.images?.length || 0;
-                                                const showNavigation =
-                                                    imageCount > 2;
-                                                const currentScroll =
-                                                    scrollStates[product.id]
-                                                        ?.position || 0;
-                                                const maxScroll =
-                                                    scrollStates[product.id]
-                                                        ?.maxScroll || 0;
-
-                                                return (
-                                                    <tr
-                                                        key={product.id}
-                                                        className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
-                                                    >
-                                                        <td className="px-3 py-2 sm:px-4 sm:py-4">
-                                                            <div className="relative">
-                                                                <div
-                                                                    ref={(el) =>
-                                                                        (carouselRefs.current[
-                                                                            product.id
-                                                                        ] = el)
-                                                                    }
-                                                                    className="flex gap-2 overflow-x-auto py-1 sm:py-2 w-[180px] sm:w-[216px] scrollbar-hide"
-                                                                    onScroll={() =>
-                                                                        handleScroll(
-                                                                            product.id
-                                                                        )
-                                                                    }
-                                                                    style={{
-                                                                        scrollbarWidth:
-                                                                            "none",
-                                                                    }}
-                                                                >
-                                                                    {imageCount >
-                                                                    0 ? (
-                                                                        product.images.map(
-                                                                            (
-                                                                                image
-                                                                            ) => (
-                                                                                <div
-                                                                                    key={
-                                                                                        image.id
-                                                                                    }
-                                                                                    className="flex-shrink-0"
-                                                                                >
-                                                                                    <img
-                                                                                        src={
-                                                                                            image.url.startsWith(
-                                                                                                "http"
-                                                                                            )
-                                                                                                ? image.url
-                                                                                                : `/storage/${image.url}`
-                                                                                        }
-                                                                                        alt={`Imagen de ${product.name}`}
-                                                                                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-md object-cover shadow-sm border dark:border-gray-600"
-                                                                                    />
-                                                                                </div>
-                                                                            )
-                                                                        )
-                                                                    ) : (
-                                                                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 dark:bg-gray-600 rounded-md flex items-center justify-center text-gray-500 dark:text-gray-300">
-                                                                            Sin
-                                                                            imagen
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-
-                                                                {showNavigation && (
-                                                                    <>
-                                                                        {currentScroll >
-                                                                            0 && (
-                                                                            <button
-                                                                                onClick={() =>
-                                                                                    scrollCarousel(
-                                                                                        product.id,
-                                                                                        "left"
-                                                                                    )
-                                                                                }
-                                                                                className="absolute left-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-70 transition focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
-                                                                            >
-                                                                                <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                                            </button>
-                                                                        )}
-                                                                        {currentScroll <
-                                                                            maxScroll && (
-                                                                            <button
-                                                                                onClick={() =>
-                                                                                    scrollCarousel(
-                                                                                        product.id,
-                                                                                        "right"
-                                                                                    )
-                                                                                }
-                                                                                className="absolute right-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-70 transition focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
-                                                                            >
-                                                                                <ChevronRightIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                                            </button>
-                                                                        )}
-                                                                        <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-black bg-opacity-50 text-white text-xxs sm:text-xs px-1 py-0.5 sm:px-2 sm:py-1 rounded-full">
-                                                                            {Math.min(
-                                                                                imageCount,
-                                                                                Math.ceil(
-                                                                                    currentScroll /
-                                                                                        116
-                                                                                ) +
-                                                                                    2
-                                                                            )}
-                                                                            /
-                                                                            {
-                                                                                imageCount
-                                                                            }
-                                                                        </div>
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-3 py-2 sm:px-4 sm:py-4 font-semibold dark:text-gray-200 whitespace-nowrap">
-                                                            {product.name}
-                                                        </td>
-                                                        <td className="hidden sm:table-cell px-4 py-4 text-gray-500 dark:text-gray-400 truncate max-w-xs">
-                                                            {
-                                                                product.description
-                                                            }
-                                                        </td>
-                                                        <td className="px-3 py-2 sm:px-4 sm:py-4 font-medium dark:text-gray-200 whitespace-nowrap">
-                                                            ${product.price}
-                                                        </td>
-                                                        <td className="hidden xs:table-cell px-4 py-4 dark:text-gray-200">
-                                                            {product.stock}
-                                                        </td>
-                                                        <td className="hidden sm:table-cell px-4 py-4 dark:text-gray-200">
-                                                            {product.status
-                                                                ? "Activo"
-                                                                : "Inactivo"}
-                                                        </td>
-                                                        <td className="px-3 py-2 sm:px-4 sm:py-4 flex space-x-1 sm:space-x-2">
-                                                            <Link
-                                                                href={`/products/${product.id}/edit`}
-                                                                className="p-1 sm:p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm hover:bg-green-100 dark:hover:bg-green-900 hover:shadow-lg transition focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                                                            >
-                                                                <PencilSquareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                                                            </Link>
-                                                            <button
-                                                                onClick={() =>
-                                                                    openDeleteModal(
-                                                                        product
-                                                                    )
-                                                                }
-                                                                className="p-1 sm:p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm hover:bg-red-100 dark:hover:bg-red-900 hover:shadow-lg transition focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                                                            >
-                                                                <TrashIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
-                                        ) : (
-                                            <tr>
-                                                <td
-                                                    colSpan="7"
-                                                    className="text-center py-6 text-gray-500 dark:text-gray-400"
+    
+                        {/* Contenedor scroll responsivo */}
+                        <div className="w-full overflow-x-auto">
+                            <div className="min-w-[700px] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                            <table className="w-full text-left text-gray-700 dark:text-gray-300">
+                                <thead className="bg-gray-100 dark:bg-gray-700">
+                                    <tr>
+                                        <th className="px-4 py-2">Nombre</th>
+                                        <th className="px-4 py-2">Precio</th>
+                                        <th className="px-4 py-2">Imágenes</th>
+                                        <th className="px-4 py-2 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentProducts.map((product) => (
+                                        <tr
+                                            key={product.id}
+                                            className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200"
+                                        >
+                                            <td className="px-4 py-2">{product.name}</td>
+                                            <td className="px-4 py-2">${product.price}</td>
+                                            <td className="px-4 py-4">
+                                                {product.images?.length > 0 ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => scrollCarousel(product.id, "left")}
+                                                            className="p-1 rounded-full bg-gray-700 text-white hover:bg-gray-600"
+                                                        >
+                                                            <ChevronLeftIcon className="w-5 h-5" />
+                                                        </button>
+                                                        <div
+                                                            ref={(el) => (carouselRefs.current[product.id] = el)}
+                                                            onScroll={() => handleScroll(product.id)}
+                                                            className="flex gap-2 overflow-hidden max-w-[250px]"
+                                                        >
+                                                            {product.images.map((img, index) => (
+                                                                <img
+                                                                    key={index}
+                                                                    src={`/storage/${img.url}`}  // Asumiendo que la propiedad que contiene la URL es 'url'
+                                                                    alt={`Producto ${product.id} - ${index}`}
+                                                                    className="h-20 w-20 object-cover rounded-md border border-gray-300 dark:border-gray-600 flex-shrink-0"
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        <button
+                                                            onClick={() => scrollCarousel(product.id, "right")}
+                                                            className="p-1 rounded-full bg-gray-700 text-white hover:bg-gray-600"
+                                                        >
+                                                            <ChevronRightIcon className="w-5 h-5" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-sm text-gray-400">Sin imágenes</span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-2 text-center space-x-2">
+                                                <Link
+                                                    href={`/products/${product.id}/edit`}
+                                                    className="inline-flex items-center text-blue-500 hover:text-blue-700"
                                                 >
-                                                    No hay productos
-                                                    disponibles.
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                                    <PencilSquareIcon className="w-5 h-5" />
+                                                </Link>
+                                                <button
+                                                    onClick={() => openDeleteModal(product)}
+                                                    className="inline-flex items-center text-red-500 hover:text-red-700"
+                                                >
+                                                    <TrashIcon className="w-5 h-5" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                             </div>
                         </div>
+    
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
@@ -353,4 +226,5 @@ export default function Index({ products }) {
             )}
         </AuthenticatedLayout>
     );
+    
 }

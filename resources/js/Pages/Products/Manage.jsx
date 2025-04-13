@@ -2,7 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useState } from "react";
 import { Head, router } from "@inertiajs/react";
 
-export default function Dashboard({ products = [] }) {
+export default function Manage({ products = [] }) {
     console.log(products);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [likes, setLikes] = useState({});
