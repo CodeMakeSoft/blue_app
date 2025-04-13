@@ -3,6 +3,7 @@ import { Head, useForm } from "@inertiajs/react";
 import {useEffect} from "react";
 import { Toaster, toast } from "sonner";
 import Form from "@/Components/Address/Form";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Edit({ auth, location, countries, districts }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -53,9 +54,12 @@ export default function Edit({ auth, location, countries, districts }) {
         <AuthenticatedLayout
             user={auth.user}
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Editar Dirección
-                </h2>
+                <div className="space-y-4">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Editar Dirección
+                    </h1>
+                    <Breadcrumb currentPage="Editar" />
+                </div>
             }
         >
             <Head title="Editar Dirección" />

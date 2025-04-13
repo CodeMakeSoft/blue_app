@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from "@inertiajs/react";
 import { PlusIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 import { Toaster, toast } from "sonner";
 import ConfirmDelete from "@/Components/ConfirmDelete";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Index({ locations }) {
     const handleDelete = (id) => {
@@ -21,9 +22,12 @@ export default function Index({ locations }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Mis direcciones
-                </h2>
+                <div className="space-y-2">
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Mis direcciones
+                    </h2>
+                    <Breadcrumb />
+                </div>
             }
         >
             <Head title="Direcciones" />

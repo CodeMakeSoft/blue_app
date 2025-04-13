@@ -3,6 +3,7 @@ import { Head, useForm } from "@inertiajs/react";
 import { Toaster, toast } from "sonner";
 import Form from "@/Components/Address/Form";
 import { router } from "@inertiajs/react";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Create({ auth, countries, districts }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -37,9 +38,12 @@ export default function Create({ auth, countries, districts }) {
         <AuthenticatedLayout
             user={auth.user}
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Nueva Dirección
-                </h2>
+                <div className="space-y-4">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Nueva Dirección
+                    </h1>
+                    <Breadcrumb currentPage="Crear" />
+                </div>
             }
         >
             <Head title="Crear Dirección" />
