@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Cart from "@/Components/Cart/Cart";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
-import { router } from "@inertiajs/react"; // Importa router
+import { router } from "@inertiajs/react";
 import { calculateCartTotals } from "@/Utils/CartUtils";
 import { Link } from '@inertiajs/react';
 import { useToast } from "@/hooks/use-toast";
@@ -35,7 +35,6 @@ export default function Index({ cart = [] }) {
 
                     setCurrentTotal(calculateCartTotals(updatedCart));
 
-                    // Mostrar el toast en el éxito
                     toast({
                         title: "Cantidad actualizada",
                         description: `La cantidad del producto ha sido actualizada correctamente.`,
@@ -47,7 +46,6 @@ export default function Index({ cart = [] }) {
             }
         );
     };
-
 
     return (
         <AuthenticatedLayout
@@ -65,11 +63,11 @@ export default function Index({ cart = [] }) {
                         onQuantityChange={handleQuantityChange}
                     />
                 ) : (
-                    <div className="text-center text-gray-600 dark:text-gray-400 mt-6">
+                    <div className="text-center text-gray-600 dark:text-gray-400 mt-6 space-y-4">
                         <p>Tu carrito está vacío.</p>
                         <Link
                             href={route('dashboard')}
-                            className="underline text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
                         >
                             Continúa comprando
                         </Link>

@@ -23,12 +23,12 @@ export default function AuthenticatedLayout({ header, children }) {
     const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout') || url.startsWith('/purchases');
     const cart = usePage().props.cart || [];
     const activeLink = route().current('checkout.index')
-    ? 'checkout.index'
-    : route().current('cart.index')
-    ? 'cart.index'
-    : route().current('purchases.index')
-    ? 'purchases.index'
-    : '';
+        ? 'checkout.index'
+        : route().current('cart.index')
+        ? 'cart.index'
+        : route().current('purchases.index')
+        ? 'purchases.index'
+        : '';
     const userCanAccessAdminPanel = auth.permissions.includes("can-access-admin-panel");
 
     // Menú items para Sidebar
