@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import axios from "axios";
 import Confirm from "@/Components/Confirm";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart, faCartPlus, faCreditCard } from '@fortawesome/free-solid-svg-icons';
 
 export default function Show({ product }) {
     const [liked, setLiked] = useState(false);
     const [confirmProductId, setConfirmProductId] = useState(null);
     const [inCart, setInCart] = useState(false);
+    const [confirmBuy, setConfirmBuy] = useState(false);  // Estado para el modal de confirmación de compra
 
     const handleLike = () => {
         if (!liked) {
@@ -29,13 +32,25 @@ export default function Show({ product }) {
     const handleAddProduct = (productId) => {
         setConfirmProductId(null);
 
-        // Como estás usando una ruta GET, eliminamos method: 'post'
         router.visit(route("cart.add", productId), {
             method: "get",
             preserveScroll: true,
             onSuccess: () => setInCart(true),
             onError: (err) => console.error("Error al agregar al carrito", err),
         });
+    };
+
+    const handleBuyNow = (productId) => {
+        setConfirmBuy(true);  // Mostrar el modal de confirmación para comprar
+    };
+
+    const handleConfirmBuy = (productId) => {
+        // Redirigir directamente al checkout con este producto
+        router.visit(route("checkout.buy-now", productId), {
+            method: "get",
+            preserveScroll: true,
+        });
+        setConfirmBuy(false); // Cerrar el modal después de la compra
     };
 
     return (
@@ -88,10 +103,10 @@ export default function Show({ product }) {
                                             : "hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                                 >
-                                    <Heart
-                                        size={24}
-                                        fill={liked ? "black" : "none"}
-                                        color="black"
+                                    <FontAwesomeIcon
+                                        icon={faHeart}
+                                        size="lg"
+                                        color={liked ? "red" : "gray"}
                                     />
                                 </button>
 
@@ -103,13 +118,18 @@ export default function Show({ product }) {
                                         inCart
                                             ? "bg-gray-400 cursor-not-allowed"
                                             : "bg-gray-600 hover:bg-gray-700"
-                                    } text-white py-2 px-6 rounded-lg shadow transition`}
+                                    } text-white py-2 px-6 rounded-lg shadow transition flex items-center gap-2`}
                                 >
+                                    <FontAwesomeIcon icon={faCartPlus} />
                                     {inCart ? "Ya en el carrito" : "Agregar al carrito"}
                                 </button>
 
-                                {/* Comprar */}
-                                <button className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg shadow transition">
+                                {/* Comprar Ahora */}
+                                <button
+                                    onClick={() => handleBuyNow(product.id)}
+                                    className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg shadow transition flex items-center gap-2"
+                                >
+                                    <FontAwesomeIcon icon={faCreditCard} />
                                     Comprar
                                 </button>
                             </div>
@@ -118,7 +138,17 @@ export default function Show({ product }) {
                 </div>
             </div>
 
-            {/* Modal de confirmación */}
+            {/* Modal de confirmación para compra */}
+            {confirmBuy && (
+                <Confirm
+                    title="¿Confirmar compra?"
+                    message="¿Estás seguro de que deseas proceder con la compra de este producto?"
+                    onConfirm={() => handleConfirmBuy(product.id)}
+                    onCancel={() => setConfirmBuy(false)}
+                />
+            )}
+
+            {/* Modal de confirmación de agregar al carrito */}
             {confirmProductId && (
                 <Confirm
                     title="¿Agregar al carrito?"

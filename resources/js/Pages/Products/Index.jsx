@@ -118,6 +118,7 @@ export default function Index({ products }) {
             }
         >
             <Head title="Productos" />
+            
             <div className="py-4 sm:py-8 lg:py-12">
                 <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6">

@@ -148,7 +148,7 @@ public function show($id)
 }
 
 
-public function manage()
+public function view()
 {
     $products = Product::all(); // Puedes paginar si quieres
 
@@ -163,7 +163,7 @@ public function manage()
         }
     }
 
-    return Inertia::render('Products/Manage', [
+    return Inertia::render('Products/Products', [
         'products' => $products,
     ]);
 }

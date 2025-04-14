@@ -70,14 +70,14 @@ const PayPalButton = ({ paypalClientId, isReady, onReadyChange, cart }) => {
     }, [paypalClientId, onReadyChange]);
 
     return (
-        <>
+        <div className="flex justify-center w-full"> {/* Aquí centramos el contenedor */}
             <div id="paypal-button-container" className={`${!isReady ? 'invisible' : ''} dark:text-white dark:bg-gray-800 dark:border-gray-700`}></div>
             {!isReady && (
                 <div className="text-center py-4 dark:text-gray-300">
                     <p>Cargando PayPal...</p>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 

@@ -20,7 +20,6 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
     const [showConfirmAdd, setShowConfirmAdd] = useState(false);
     const dropdownRef = useRef(null);
 
-    // Inicializar datos del formulario
     useEffect(() => {
         if (user) {
             setFormData({
@@ -44,7 +43,6 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
         setErrors({});
     }, [user, isOpen]);
 
-    // Cerrar dropdown al hacer clic fuera
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -89,7 +87,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
             phone: formData.phone,
             password: formData.password,
             password_confirmation: formData.password_confirmation,
-            roles: formData.roles,  
+            roles: formData.roles,
         };
 
         const url = user ? `/admin/users/${user.id}` : "/admin/users";
@@ -115,16 +113,14 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            {/* Formulario principal */}
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
-                <h2 className="text-lg font-semibold mb-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
+                <h2 className="text-lg font-semibold mb-4 dark:text-white">
                     {user ? "Edit User" : "Create User"}
                 </h2>
 
                 <form onSubmit={handleSubmit}>
-                    {/* Nombre */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                             Full Name *
                         </label>
                         <input
@@ -132,10 +128,10 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className={`w-full border rounded p-2 ${
+                            className={`w-full border rounded p-2 bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
                                 errors.name
                                     ? "border-red-500"
-                                    : "border-gray-300"
+                                    : "border-gray-300 dark:border-gray-600"
                             }`}
                             required
                         />
@@ -146,9 +142,8 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                         )}
                     </div>
 
-                    {/* Email */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                             Email *
                         </label>
                         <input
@@ -156,10 +151,10 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className={`w-full border rounded p-2 ${
+                            className={`w-full border rounded p-2 bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
                                 errors.email
                                     ? "border-red-500"
-                                    : "border-gray-300"
+                                    : "border-gray-300 dark:border-gray-600"
                             }`}
                             required
                         />
@@ -170,9 +165,8 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                         )}
                     </div>
 
-                    {/* Teléfono */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                             Phone Number
                         </label>
                         <input
@@ -180,10 +174,10 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            className={`w-full border rounded p-2 ${
+                            className={`w-full border rounded p-2 bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
                                 errors.phone
                                     ? "border-red-500"
-                                    : "border-gray-300"
+                                    : "border-gray-300 dark:border-gray-600"
                             }`}
                         />
                         {errors.phone && (
@@ -193,9 +187,8 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                         )}
                     </div>
 
-                    {/* Contraseña */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                             {user ? "New Password" : "Password *"}
                         </label>
                         <input
@@ -203,10 +196,10 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className={`w-full border rounded p-2 ${
+                            className={`w-full border rounded p-2 bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
                                 errors.password
                                     ? "border-red-500"
-                                    : "border-gray-300"
+                                    : "border-gray-300 dark:border-gray-600"
                             }`}
                             required={!user}
                             minLength={8}
@@ -218,9 +211,8 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                         )}
                     </div>
 
-                    {/* Confirmar contraseña*/}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                             Confirm {user ? "New " : ""}Password *
                         </label>
                         <input
@@ -228,24 +220,23 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             name="password_confirmation"
                             value={formData.password_confirmation}
                             onChange={handleChange}
-                            className={`w-full border rounded p-2 ${
+                            className={`w-full border rounded p-2 bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
                                 errors.password_confirmation
                                     ? "border-red-500"
-                                    : "border-gray-300"
+                                    : "border-gray-300 dark:border-gray-600"
                             }`}
                             required={!user}
                         />
                     </div>
 
-                    {/* Selector de Rol Único */}
                     <div className="mb-6 relative" ref={dropdownRef}>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="block text-sm font-medium mb-2 dark:text-gray-200">
                             Role *
                         </label>
                         <button
                             type="button"
                             onClick={() => setIsRolesOpen(!isRolesOpen)}
-                            className="w-full flex justify-between items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full flex justify-between items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-left text-gray-700 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <span className="truncate">
                                 {formData.roles[0]
@@ -257,7 +248,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                                     : "Select a role"}
                             </span>
                             <svg
-                                className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
+                                className={`h-5 w-5 text-gray-400 dark:text-gray-300 transition-transform duration-200 ${
                                     isRolesOpen ? "transform rotate-180" : ""
                                 }`}
                                 xmlns="http://www.w3.org/2000/svg"
@@ -273,12 +264,12 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                         </button>
 
                         {isRolesOpen && (
-                            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 border border-gray-200 max-h-60 overflow-y-auto">
+                            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-md py-1 border border-gray-200 dark:border-gray-600 max-h-60 overflow-y-auto">
                                 <div
                                     onClick={() => handleRoleSelect(null)}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-blue-50 ${
+                                    className={`px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-600 ${
                                         formData.roles.length === 0
-                                            ? "bg-blue-50"
+                                            ? "bg-blue-50 dark:bg-gray-600"
                                             : ""
                                     }`}
                                 >
@@ -291,9 +282,9 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                                         onClick={() =>
                                             handleRoleSelect(role.id)
                                         }
-                                        className={`px-3 py-2 cursor-pointer hover:bg-blue-50 ${
+                                        className={`px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-600 ${
                                             formData.roles.includes(role.id)
-                                                ? "bg-blue-50"
+                                                ? "bg-blue-50 dark:bg-gray-600"
                                                 : ""
                                         }`}
                                     >
@@ -310,12 +301,11 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                         )}
                     </div>
 
-                    {/* Form Actions */}
-                    <div className="flex justify-end gap-3 pt-4 border-t">
+                    <div className="flex justify-end gap-3 pt-4 border-t dark:border-gray-600">
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition"
                         >
                             Cancel
                         </button>
@@ -329,7 +319,6 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                 </form>
             </div>
 
-            {/* Componentes de confirmación */}
             <ConfirmEdit
                 isOpen={showConfirmEdit}
                 onConfirm={handleConfirmAction}

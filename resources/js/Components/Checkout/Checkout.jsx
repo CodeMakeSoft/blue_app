@@ -9,24 +9,29 @@ const Checkout = ({ cart = [], paymentMethods, paypalClientId }) => {
     const [selectedMethod, setSelectedMethod] = useState('paypal');
     const [paypalReady, setPaypalReady] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isCheckoutComplete, setIsCheckoutComplete] = useState(false);
 
     const handleCodSubmit = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
-        
-        try {
-            await router.post(route('checkout.cod'), {
-                cart: cart.map(product => ({
-                    id: product.id,
-                    quantity: product.pivot.quantity
-                })),
-                total: cart.reduce((sum, product) => 
-                    sum + (product.price * product.pivot.quantity), 0)
-            });
-        } catch (error) {
-            console.error('COD error:', error);
-            setIsProcessing(false);
-        }
+
+        // Simular el proceso de la compra
+        setTimeout(async () => {
+            try {
+                await router.post(route('checkout.cod'), {
+                    cart: cart.map(product => ({
+                        id: product.id,
+                        quantity: product.pivot.quantity
+                    })),
+                    total: cart.reduce((sum, product) => 
+                        sum + (product.price * product.pivot.quantity), 0)
+                });
+                setIsCheckoutComplete(true);  // Completar la compra
+            } catch (error) {
+                console.error('COD error:', error);
+                setIsProcessing(false);
+            }
+        }, 2000); // Simula un tiempo de procesamiento
     };
 
     return (
@@ -37,7 +42,7 @@ const Checkout = ({ cart = [], paymentMethods, paypalClientId }) => {
                         <h3 className="text-lg font-medium mb-4 text-gray-800 dark:text-white">Resumen de tu pedido</h3>
                         
                         <OrderSummary cart={cart} />
-                        
+
                         <div className="mt-8">
                             <h3 className="text-lg font-medium mb-4 text-gray-800 dark:text-white">Método de pago</h3>
                             
@@ -56,11 +61,18 @@ const Checkout = ({ cart = [], paymentMethods, paypalClientId }) => {
                                 />
                             )}
 
-                            {selectedMethod === 'cod' && (
+                            {selectedMethod === 'cod' && !isCheckoutComplete && (
                                 <CODButton 
                                     isProcessing={isProcessing}
                                     onSubmit={handleCodSubmit}
                                 />
+                            )}
+
+                            {isCheckoutComplete && (
+                                <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-lg">
+                                    <p className="font-semibold">¡Compra completada con éxito!</p>
+                                    <p>Gracias por tu compra, te notificaremos cuando tu pedido esté listo para ser enviado.</p>
+                                </div>
                             )}
                         </div>
                     </div>

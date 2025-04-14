@@ -71,10 +71,10 @@ Route::middleware('auth')->group(function () {
 
     // Product Routes - Fixed routes first
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::get('/products/mange', [ProductController::class, 'manage'])->name('products.manage');
+    Route::get('/products', [ProductController::class, 'view'])->name('products.view');
     
     // Product resource routes
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/index', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
     
@@ -100,9 +100,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout/cod', [CheckoutController::class, 'processCod'])->name('checkout.cod');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
-    
     Route::post('/checkout/paypal/order', [CheckoutController::class, 'createPaypalOrder'])->name('checkout.paypal.create');
     Route::post('/checkout/paypal/capture', [CheckoutController::class, 'capturePaypalOrder'])->name('checkout.paypal.capture');
+
+    Route::get('/checkout/buy-now/{product}', [CheckoutController::class, 'buyNow'])->name('checkout.buy-now');
+
 });
 
 Route::middleware('auth')->get('/purchases', [OrderController::class, 'index'])->name('purchases.index');

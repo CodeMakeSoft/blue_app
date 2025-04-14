@@ -42,12 +42,12 @@ export default function AuthenticatedLayout({ header, children }) {
             active: route().current("dashboard"),
         },
         {
-            href: route("products.manage"),
+            href: route("products.view"),
             icon: (
                 <SwatchIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
             ),
             text: "Productos",
-            active: route().current("products.manage"),
+            active: route().current("products.view"),
         },
         {
             href: route("products.index"),

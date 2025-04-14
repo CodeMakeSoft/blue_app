@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\OrderProduct;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmation;
 use Illuminate\Support\Facades\Log;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use App\Models\Cart;
 
 class CheckoutController extends Controller
 {
@@ -171,4 +173,32 @@ public function success(Request $request)
     {
         return inertia('Checkout/Cancel');
     }
+
+    public function buyNow($productId)
+    {
+        $product = Product::findOrFail($productId);
+        $user = Auth::user();
+    
+        // Verificar si el usuario ya tiene un carrito
+        $cart = $user->cart ?? Cart::create(['user_id' => $user->id]);
+    
+        // Verificar si el producto ya está en el carrito, si no está, agregarlo
+        $cartProduct = $cart->products()->where('product_id', $productId)->first();
+    
+        if ($cartProduct) {
+            // Si ya existe, actualizar la cantidad si es necesario
+            $cart->products()->updateExistingPivot($productId, [
+                'quantity' => $cartProduct->pivot->quantity + 1,
+            ]);
+        } else {
+            // Si no está en el carrito, agregarlo
+            $cart->products()->attach($productId, [
+                'quantity' => 1,
+            ]);
+        }
+    
+        // Redirigir al checkout para proceder con la compra
+        return redirect()->route('checkout.index');
+    }    
+
 }
