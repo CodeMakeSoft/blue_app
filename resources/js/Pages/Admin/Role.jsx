@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
-import RoleFormModal from "@/components/RoleFormModal";
+import RoleFormModal from "@/Components/RoleFormModal";
 import ConfirmAdd from "@/Components/ConfirmAdd";
 import ConfirmDelete from "@/Components/ConfirmDelete";
 import ConfirmEdit from "@/Components/ConfirmEdit";
@@ -50,16 +50,16 @@ export default function Role({ activeRoute, can }) {
         <AdminLayout activeRoute={activeRoute}>
             <Head title="Roles" />
             <Toaster position="top-right" richColors />
-            <div className="card">
+            <div className="card dark:bg-gray-800 dark:text-gray-100">
                 <div className="card-header">
-                    <h2 className="text-xl font-semibold">Roles</h2>
+                    <h2 className="text-xl font-semibold dark:text-gray-200">Roles</h2>
                 </div>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.role_create && (
                             <button
                                 onClick={() => openModal()}
-                                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                className="flex items-center border border-gray-500 dark:border-gray-600 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-200 hover:dark:bg-gray-600 transition"
                             >
                                 <PlusCircleIcon className="h-6 w-6 mr-2" />
                                 Add Role
@@ -69,9 +69,9 @@ export default function Role({ activeRoute, can }) {
 
                     {/* Vista de tabla para desktop */}
                     <div className="hidden md:block overflow-x-auto">
-                        <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse bg-white text-black dark:bg-gray-800 dark:text-gray-100 shadow-sm rounded-lg overflow-hidden">
                             <thead>
-                                <tr className="bg-gray-100 text-gray-800 border-b">
+                                <tr className="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 border-b">
                                     {[
                                         "ID",
                                         "Name",
@@ -96,15 +96,15 @@ export default function Role({ activeRoute, can }) {
                                     roles.data.map((role) => (
                                         <tr
                                             key={role.id}
-                                            className="border-b hover:bg-gray-50"
+                                            className="border-b hover:bg-gray-50 dark:hover:bg-gray-600"
                                         >
-                                            <td className="p-3 font-mono text-sm text-gray-500">
+                                            <td className="p-3 font-mono text-sm text-gray-500 dark:text-gray-300">
                                                 {role.id}
                                             </td>
-                                            <td className="p-3 font-medium">
+                                            <td className="p-3 font-medium dark:text-gray-100">
                                                 {role.name}
                                             </td>
-                                            <td className="p-3">
+                                            <td className="p-3 dark:text-gray-200">
                                                 {role.permissions
                                                     ?.map((p) => p.name)
                                                     .join(", ") ||
@@ -117,7 +117,7 @@ export default function Role({ activeRoute, can }) {
                                                             onClick={() =>
                                                                 openModal(role)
                                                             }
-                                                            className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                                            className="flex items-center border border-gray-500 dark:border-gray-600 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-200 hover:dark:bg-gray-600 transition"
                                                         >
                                                             <PencilSquareIcon className="h-4 sm:h-5 w-4 sm:w-5 mr-1" />
                                                             Edit
@@ -139,7 +139,7 @@ export default function Role({ activeRoute, can }) {
                                     <tr>
                                         <td
                                             colSpan={4}
-                                            className="text-center p-4 text-gray-600"
+                                            className="text-center p-4 text-gray-600 dark:text-gray-400"
                                         >
                                             No roles found.
                                         </td>
@@ -155,11 +155,11 @@ export default function Role({ activeRoute, can }) {
                             roles.data.map((role) => (
                                 <div
                                     key={role.id}
-                                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
+                                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
                                 >
                                     <div className="grid grid-cols-2 gap-4 mb-3">
                                         <div>
-                                            <div className="text-xs text-gray-500 font-medium">
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                                                 ID
                                             </div>
                                             <div className="font-mono text-sm">
@@ -167,7 +167,7 @@ export default function Role({ activeRoute, can }) {
                                             </div>
                                         </div>
                                         <div>
-                                            <div className="text-xs text-gray-500 font-medium">
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                                                 Name
                                             </div>
                                             <div className="font-medium">
@@ -175,7 +175,7 @@ export default function Role({ activeRoute, can }) {
                                             </div>
                                         </div>
                                         <div className="col-span-2">
-                                            <div className="text-xs text-gray-500 font-medium">
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                                                 Permissions
                                             </div>
                                             <div className="text-sm">
@@ -190,7 +190,7 @@ export default function Role({ activeRoute, can }) {
                                         {can.role_edit && (
                                             <button
                                                 onClick={() => openModal(role)}
-                                                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                                className="flex items-center border border-gray-500 dark:border-gray-600 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-200 hover:dark:bg-gray-600 transition"
                                             >
                                                 <PencilSquareIcon className="h-4 w-4 mr-1" />
                                                 Edit
@@ -207,7 +207,7 @@ export default function Role({ activeRoute, can }) {
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center p-4 text-gray-600 bg-white rounded-lg shadow-sm">
+                            <div className="text-center p-4 text-gray-600 bg-white rounded-lg shadow-sm dark:bg-gray-700 dark:text-gray-400">
                                 No roles found.
                             </div>
                         )}

@@ -1,20 +1,15 @@
 // resources/js/Pages/Admin/Category.jsx
 import { useState } from "react";
 import { Head, router, usePage } from "@inertiajs/react";
-import CategoryFormModal from "@/components/CategoryFormModal";
+import CategoryFormModal from "@/Components/CategoryFormModal";
 import AdminLayout from "@/Layouts/AdminLayout";
 import ConfirmAdd from "@/Components/ConfirmAdd";
 import ConfirmEdit from "@/Components/ConfirmEdit";
 import ConfirmDelete from "@/Components/ConfirmDelete";
 import { Toaster, toast } from "sonner";
-import {
-    PlusCircleIcon,
-    PencilSquareIcon,
-    TrashIcon
-} from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
 
-export default function Category({ activeRoute, can}) {
+export default function Category({ activeRoute, can }) {
     const { categories } = usePage().props; // categories ahora es un objeto paginado
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -36,7 +31,6 @@ export default function Category({ activeRoute, can}) {
             },
         });
     };
-    
 
     const handlePageChange = (url) => {
         router.visit(url); // Navegar a la página seleccionada
@@ -46,9 +40,9 @@ export default function Category({ activeRoute, can}) {
         <AdminLayout activeRoute={activeRoute}>
             <Head title="Category" />
             <Toaster position="top-right" richColors />
-            <div className="card">
+            <div className="card bg-white dark:bg-gray-800">
                 <div className="card-header">
-                    <h2 className="text-xl font-semibold">Categories</h2>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Categories</h2>
                 </div>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
@@ -56,9 +50,9 @@ export default function Category({ activeRoute, can}) {
                             <ConfirmAdd onConfirm={openModal} label="Agregar Categoría" />
                         )}
                     </div>
-                    <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
+                    <table className="w-full border-collapse bg-white text-black dark:bg-gray-700 dark:text-gray-200 shadow-sm rounded-lg overflow-hidden">
                         <thead>
-                            <tr className="bg-gray-100 text-gray-800">
+                            <tr className="bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300">
                                 {[
                                     "Picture",
                                     "Category",
@@ -87,7 +81,7 @@ export default function Category({ activeRoute, can}) {
                                             index === categories.data.length - 1
                                                 ? "last:rounded-b-lg"
                                                 : ""
-                                        }`}
+                                        } dark:bg-gray-800`}
                                     >
                                         <td className="p-3">
                                             {category.picture ? (
@@ -105,14 +99,14 @@ export default function Category({ activeRoute, can}) {
                                             {category.description}
                                         </td>
                                         <td className="p-3">
-                                        <div className="flex justify-end gap-2">
-                                            {can.category_edit && (
-                                                 <ConfirmEdit item={category} onConfirm={openModal} />
-                                            )}
-                                               {can.category_delete && (
-                                                <ConfirmDelete key={category.id} id={category.id} onConfirm={handleDelete} />
-                                               )}
-                                               </div>
+                                            <div className="flex justify-end gap-2">
+                                                {can.category_edit && (
+                                                    <ConfirmEdit item={category} onConfirm={openModal} />
+                                                )}
+                                                {can.category_delete && (
+                                                    <ConfirmDelete key={category.id} id={category.id} onConfirm={handleDelete} />
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -120,7 +114,7 @@ export default function Category({ activeRoute, can}) {
                                 <tr>
                                     <td
                                         colSpan={4}
-                                        className="text-center p-4 text-gray-600 rounded-b-lg"
+                                        className="text-center p-4 text-gray-600 dark:text-gray-400 rounded-b-lg"
                                     >
                                         No categories found.
                                     </td>

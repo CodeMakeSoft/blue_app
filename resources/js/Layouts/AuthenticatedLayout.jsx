@@ -118,9 +118,9 @@ export default function AuthenticatedLayout({ header, children }) {
     return (
         <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
             <meta name="csrf-token" content={window.csrfToken} />
-            
+    
             <div className="flex flex-1">
-                {/* Sidebar de team/white */}
+                {/* Sidebar */}
                 <Sidebar>
                     {menuItems.map((item, index) => (
                         <Sidebar.Item
@@ -134,42 +134,46 @@ export default function AuthenticatedLayout({ header, children }) {
                         />
                     ))}
                 </Sidebar>
-
+    
                 <div className="flex-1 flex flex-col">
-                    {/* Navbar Principal (simplificado) */}
+                    {/* Navbar */}
                     <nav className="border-b border-gray-100 bg-white dark:bg-gray-800">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="flex h-16 justify-between">
-                                {/* Logo y navegación izquierda */}
+                                {/* Logo */}
                                 <div className="flex">
                                     <div className="flex shrink-0 items-center">
-                                        <Link href="/">
-                                            {/* Usar ambos logos con condicional para tema oscuro/claro */}
+                                        <Link href="/dashboard">
                                             <BoxIcon className="text-gray-800 dark:text-gray-200" />
+                                        </Link>
+                                        <Link
+                                            href={route("account")}
+                                        >
+                                            <UserIcon className="h-8 w-8 text-gray-500 dark:text-gray-300 ml-[2rem]" />
                                         </Link>
                                     </div>
                                 </div>
-
-                                {/* Parte derecha - Carrito y theme switcher (sin dropdown de usuario) */}
+    
+                                {/* Right side: Theme switcher + Cart */}
                                 <div className="hidden sm:ms-6 sm:flex sm:items-center">
                                     <ThemeSwitcher />
-                                    <div className="flex shrink-0 items-center ml-4">
+                                    <div className="flex shrink-0 items-center ml-4 relative">
                                         <Link href={route('cart.index')}>
                                             <ShoppingCartIcon className="h-6 w-6 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200" />
                                             {cart.length > 0 && (
-                                                <span className="absolute -mt-2 ml-3 rounded-full bg-red-500 text-white text-xs h-5 w-5 flex items-center justify-center">
+                                                <span className="absolute -top-2 -right-2 rounded-full bg-red-500 text-white text-xs h-5 w-5 flex items-center justify-center">
                                                     {cart.length}
                                                 </span>
                                             )}
                                         </Link>
                                     </div>
                                 </div>
-
-                                {/* Menú móvil */}
+    
+                                {/* Mobile menu button */}
                                 <div className="-me-2 flex items-center sm:hidden">
                                     <button
                                         onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
-                                        className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-500 focus:outline-none"
+                                        className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 focus:outline-none"
                                     >
                                         <svg
                                             className="h-6 w-6"
@@ -196,11 +200,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Contenido del menú móvil */}
+    
+                        {/* Mobile nav dropdown */}
                         <div className={`${showingNavigationDropdown ? 'block' : 'hidden'} sm:hidden`}>
                             <div className="space-y-1 pb-3 pt-2">
-                                {menuItems.map((item, index) => (
+                                {menuItems.map((item, index) =>
                                     item.method ? (
                                         <ResponsiveNavLink
                                             key={index}
@@ -219,17 +223,56 @@ export default function AuthenticatedLayout({ header, children }) {
                                             {item.text}
                                         </ResponsiveNavLink>
                                     )
-                                ))}
+                                )}
+    
                                 <ResponsiveNavLink
                                     href={route('cart.index')}
                                     active={route().current('cart.index')}
                                 >
                                     Carrito {cart.length > 0 && `(${cart.length})`}
                                 </ResponsiveNavLink>
+    
+                                <ResponsiveNavLink
+                                    href={route("dashboard")}
+                                    active={route().current("dashboard")}
+                                >
+                                    Dashboard
+                                </ResponsiveNavLink>
+    
+                                <ResponsiveNavLink
+                                    href={route("account")}
+                                    active={route().current("account")}
+                                >
+                                    Mi cuenta
+                                </ResponsiveNavLink>
+                            </div>
+    
+                            {/* User info */}
+                            <div className="border-t border-gray-200 pb-1 pt-4">
+                                <div className="px-4">
+                                    <div className="text-base font-medium text-gray-800">
+                                        {user.name}
+                                    </div>
+                                    <div className="text-sm font-medium text-gray-500">
+                                        {user.email}
+                                    </div>
+                                </div>
+    
+                                <div className="mt-3 space-y-1">
+                                    <ResponsiveNavLink href={route("profile.edit")}>
+                                        Perfil
+                                    </ResponsiveNavLink>
+    
+                                    {userCanAccessAdminPanel && (
+                                        <ResponsiveNavLink href={route("admin.panel")}>
+                                            Admin
+                                        </ResponsiveNavLink>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </nav>
-
+    
                     {/* Header opcional */}
                     {header && (
                         <header className="bg-white dark:bg-gray-800 shadow">
@@ -238,11 +281,11 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
                         </header>
                     )}
-
-                    {/* Contenedor principal */}
+    
+                    {/* Main */}
                     <main className="flex-1 ml-16 p-4 bg-white dark:bg-gray-800">
                         <div className="max-w-5xl mx-auto">
-                            {/* Navbar de Carrito/Checkout/Purchases (solo visible en esas rutas) */}
+                            {/* Navbar de carrito, checkout, etc. */}
                             {showCartNavbar && (
                                 <Navbar 
                                     activeLink={activeLink}
@@ -253,8 +296,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     isCartEmpty={cart.length === 0}
                                 />
                             )}
-
-                            {/* Contenido principal */}
+    
+                            {/* Children */}
                             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
                                 {children}
                             </div>
@@ -262,12 +305,13 @@ export default function AuthenticatedLayout({ header, children }) {
                     </main>
                 </div>
             </div>
-            
+    
             {/* Footer */}
-            <div className="ml-16 ">
+            <div className="ml-16">
                 {user && <Footer />}
             </div>
+    
             <Toaster />
         </div>
     );
-}   
+}    

@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
             ]
         );
 
+
         // Asignar rol 'Admin' (usando el nombre exacto del rol creado en RoleSeeder)
         $adminRole = Role::where('name', 'Admin')->first();
         $admin->assignRole($adminRole);

@@ -1,9 +1,11 @@
+import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useState, useEffect } from "react";
 import { Head, router } from "@inertiajs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function View({ products = [] }) {
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -62,11 +64,22 @@ export default function View({ products = [] }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Menú de Productos
-                </h2>
+                <div>
+                    <Breadcrumb
+                    routes={[
+                        { name: "Dashboard", link: route("dashboard") },
+                        { name: "Productos", link: route("products.view") },
+                    ]}
+                    currentPage="Lista de Productos"
+                    />
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
+                        Menú de Productos
+                    </h2>
+                </div>
+                
             }
         >
+
             <Head title="Menú de Productos" />
 
             <div className="py-12">

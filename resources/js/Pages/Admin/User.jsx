@@ -23,26 +23,19 @@ export default function User({ activeRoute, can }) {
         setIsModalOpen(true);
     };
 
-
     const handleDelete = (id) => {
-        // Encuentra al usuario que se quiere eliminar
         const userToDelete = users.data.find((user) => user.id === id);
-
-        // Contamos cuántos administradores hay
         const adminCount = users.data.filter((user) =>
             user.roles?.some((role) => role.name === "Admin")
         ).length;
 
-        // Si el usuario a eliminar es un admin, verificamos si hay más de 1 admin
         if (userToDelete?.roles?.some((role) => role.name === "Admin")) {
             if (adminCount <= 1) {
-                // Si solo queda un admin, no se permite eliminarlo
                 toast.error("Cannot delete the last Admin user");
                 return;
             }
         }
 
-        // Si no es el último admin, procedemos con la eliminación
         router.delete(`/admin/users/${id}`, {
             onSuccess: () => {
                 toast.success("User Deleted Successfully");
@@ -54,6 +47,7 @@ export default function User({ activeRoute, can }) {
             },
         });
     };
+
     const handlePageChange = (url) => {
         router.visit(url);
     };
@@ -62,7 +56,7 @@ export default function User({ activeRoute, can }) {
         <AdminLayout activeRoute={activeRoute}>
             <Head title="Users" />
             <Toaster position="top-right" richColors />
-            <div className="card">
+            <div className="card dark:bg-gray-800 dark:text-white">
                 <div className="card-header">
                     <h2 className="text-xl font-semibold">Users</h2>
                 </div>
@@ -71,7 +65,7 @@ export default function User({ activeRoute, can }) {
                         {can.user_create && (
                             <button
                                 onClick={() => openModal()}
-                                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                className="flex items-center border border-gray-500 bg-white text-gray-600 dark:bg-gray-700 dark:text-white text-sm px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                             >
                                 <PlusCircleIcon className="h-6 w-6 mr-2" />
                                 Add User
@@ -79,9 +73,9 @@ export default function User({ activeRoute, can }) {
                         )}
                     </div>
                     <div className="hidden md:block">
-                        <table className="w-full border-collapse bg-white text-black shadow-sm rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse bg-white text-black dark:bg-gray-700 dark:text-white shadow-sm rounded-lg overflow-hidden">
                             <thead>
-                                <tr className="bg-gray-100 text-gray-800 border-b">
+                                <tr className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white border-b">
                                     {[
                                         "Name",
                                         "Email",
@@ -106,7 +100,10 @@ export default function User({ activeRoute, can }) {
                             <tbody>
                                 {users.data.length ? (
                                     users.data.map((user) => (
-                                        <tr key={user.id} className="border-b">
+                                        <tr
+                                            key={user.id}
+                                            className="border-b dark:border-gray-600"
+                                        >
                                             <td className="p-3">{user.name}</td>
                                             <td className="p-3">
                                                 {user.email}
@@ -121,11 +118,11 @@ export default function User({ activeRoute, can }) {
                                             </td>
                                             <td className="p-3">
                                                 {user.email_verified_at ? (
-                                                    <span className="text-green-600">
+                                                    <span className="text-green-600 dark:text-green-400">
                                                         Verified
                                                     </span>
                                                 ) : (
-                                                    <span className="text-red-600">
+                                                    <span className="text-red-600 dark:text-red-400">
                                                         Not Verified
                                                     </span>
                                                 )}
@@ -136,7 +133,7 @@ export default function User({ activeRoute, can }) {
                                                         onClick={() =>
                                                             openModal(user)
                                                         }
-                                                        className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                                        className="flex items-center border border-gray-500 bg-white text-gray-600 dark:bg-gray-700 dark:text-white text-sm px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                                                     >
                                                         <PencilSquareIcon className="h-4 sm:h-5 w-4 sm:w-5 mr-1" />
                                                         Edit
@@ -155,7 +152,7 @@ export default function User({ activeRoute, can }) {
                                     <tr>
                                         <td
                                             colSpan={6}
-                                            className="text-center p-4 text-gray-600"
+                                            className="text-center p-4 text-gray-600 dark:text-gray-300"
                                         >
                                             No users found.
                                         </td>
@@ -164,13 +161,12 @@ export default function User({ activeRoute, can }) {
                             </tbody>
                         </table>
                     </div>
-
                     <div className="md:hidden">
                         {users.data.length ? (
                             users.data.map((user) => (
                                 <div
                                     key={user.id}
-                                    className="bg-white rounded-lg shadow-sm mb-4 p-4"
+                                    className="bg-white rounded-lg shadow-sm mb-4 p-4 dark:bg-gray-700 dark:text-white"
                                 >
                                     <div className="grid grid-cols-2 gap-2 mb-3">
                                         <div className="font-semibold">ID:</div>
@@ -186,7 +182,7 @@ export default function User({ activeRoute, can }) {
                                         </div>
                                         <div className="break-all overflow-hidden text-ellipsis">
                                             {user.email}
-                                        </div> 
+                                        </div>
 
                                         <div className="font-semibold">
                                             Phone:
@@ -208,21 +204,21 @@ export default function User({ activeRoute, can }) {
                                         </div>
                                         <div>
                                             {user.email_verified_at ? (
-                                                <span className="text-green-600">
+                                                <span className="text-green-600 dark:text-green-400">
                                                     Verified
                                                 </span>
                                             ) : (
-                                                <span className="text-red-600">
+                                                <span className="text-red-600 dark:text-red-400">
                                                     Not Verified
                                                 </span>
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex justify-end gap-2 pt-2 border-t">
+                                    <div className="flex justify-end gap-2 pt-2 border-t dark:border-gray-600">
                                         {can.user_edit && (
                                             <button
                                                 onClick={() => openModal(user)}
-                                                className="flex items-center border border-gray-500 bg-white text-gray-600 text-sm px-3 py-1 rounded hover:bg-gray-100 transition"
+                                                className="flex items-center border border-gray-500 bg-white text-gray-600 dark:bg-gray-700 dark:text-white text-sm px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                                             >
                                                 <PencilSquareIcon className="h-4 w-4 mr-1" />
                                                 Edit
@@ -239,7 +235,7 @@ export default function User({ activeRoute, can }) {
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center p-4 text-gray-600 bg-white rounded-lg">
+                            <div className="text-center p-4 text-gray-600 dark:text-gray-300 bg-white rounded-lg">
                                 No users found
                             </div>
                         )}
@@ -253,6 +249,7 @@ export default function User({ activeRoute, can }) {
                 closeModal={() => setIsModalOpen(false)}
                 user={selectedUser}
                 roles={roles}
+                users={users}
             />
         </AdminLayout>
     );

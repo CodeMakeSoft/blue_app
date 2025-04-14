@@ -3,6 +3,7 @@ import { Sidebar } from "@/Components/Sidebar";
 import { Head, Link } from "@inertiajs/react";
 import { route } from "ziggy-js";
 
+
 import {
     UsersIcon,
     TagIcon,
@@ -18,7 +19,7 @@ import AuthenticatedLayout from "./AuthenticatedLayout";
 export default function AdminLayout({ children, activeRoute }) {
     return (
         <AuthenticatedLayout>
-            <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+            <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 mt-[6rem]">
                 {/* Sidebar */}
                 <Sidebar>
                     <Sidebar.Item

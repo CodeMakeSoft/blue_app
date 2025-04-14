@@ -1,10 +1,27 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Show({ auth, brand }) {
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <div>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Marcas", link: route("brand.index") },
+                        ]}
+                        currentPage={`Detalle: ${brand.name}`}
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Detalle de Marca
+                    </h2>
+                </div>
+            }
+        >
             <Head title={`Detalle de ${brand.name}`} />
 
             <div className="py-6 px-3 sm:px-6 lg:px-8">

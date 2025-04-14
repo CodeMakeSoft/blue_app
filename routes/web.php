@@ -10,12 +10,13 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\GoogleApiController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\LocationController;
+use App\Models\Location;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -49,6 +50,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/brands/catalog', [BrandController::class, 'catalog'])->name('brand.catalog');
     Route::get('/brands/{brand}', [BrandController::class, 'show'])->name('brand.show');
 });
+Route::get('/account', function () {
+    return Inertia::render('Account');
+})->middleware(['auth', 'verified'])->name('account');
+
 
 Route::get('/admin', function () {
     return Inertia::render('Admin/AdminPanel', [
@@ -89,6 +94,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    //Crud address
+    Route::get('/address', [LocationController::class, 'index'])->name('address.index');
+    Route::get('/address/create', [LocationController::class, 'create'])->name('address.create');
+    Route::get('/address/{address}/edit', [LocationController::class, 'edit'])->name('address.edit'); // Cambiado a GET
+    Route::post('/address', [LocationController::class, 'store'])->name('address.store');
+    Route::put('/address/{address}', [LocationController::class, 'update'])->name('address.update'); // Ruta para el submit del formulario
+    Route::delete('/address/{address}', [LocationController::class, 'destroy'])->name('address.destroy');
 });
 
 Route::middleware('auth')->group(function () {
@@ -105,10 +117,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/checkout/buy-now/{product}', [CheckoutController::class, 'buyNow'])->name('checkout.buy-now');
 
+    Route::middleware('auth')->get('/purchases', [OrderController::class, 'index'])->name('purchases.index');
+    Route::middleware('auth')->post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
 });
 
-Route::middleware('auth')->get('/purchases', [OrderController::class, 'index'])->name('purchases.index');
-Route::middleware('auth')->post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
 
 
 Route::group(['middleware' => ['auth']], function() {
@@ -117,7 +131,5 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/roles', RoleController::class);
     Route::resource('admin/permissions', PermissionController::class);
 });
-
-
 
 require __DIR__.'/auth.php';

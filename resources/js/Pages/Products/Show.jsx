@@ -6,6 +6,7 @@ import axios from "axios";
 import Confirm from "@/Components/Confirm";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faCartPlus, faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Show({ product }) {
     const [liked, setLiked] = useState(false);
@@ -56,9 +57,19 @@ export default function Show({ product }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    {product.name}
-                </h2>
+                <div>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Dashboard", link: route("dashboard") },
+                            { name: "Productos", link: route("products.index") },
+                        ]}
+                        currentPage={product.name}
+                    />
+
+                    <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
+                        {product.name}
+                    </h2>
+                </div>
             }
         >
             <Head title={`Detalle - ${product.name}`} />

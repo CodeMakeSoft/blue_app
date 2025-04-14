@@ -3,6 +3,7 @@ import { Head, router } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@react-hook/window-size";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Success({ order, isCod }) {
     const [showConfetti, setShowConfetti] = useState(true);
@@ -24,9 +25,18 @@ export default function Success({ order, isCod }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-white">
-                    Finalizar Compra
-                </h2>
+                <>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Compras", link: route("purchases.index") },
+                        ]}
+                        currentPage="Compra Exitosa"
+                    />
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-white mt-2">
+                        Compra Exitosa
+                    </h2>
+                </>
             }
         >
             <Head title="Compra Exitosa" />

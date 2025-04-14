@@ -4,6 +4,7 @@ import { Head, Link } from "@inertiajs/react";
 import BrandCard from "@/Components/Brand/BrandCard";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import Pagination from "@/Components/Category/Pagination";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Catalog({ auth, brands = [] }) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -52,7 +53,23 @@ export default function Catalog({ auth, brands = [] }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <div>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Catálogo de Marcas", link: route("brand.catalog") },
+                        ]}
+                        currentPage="Catálogo de Marcas"
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Catálogo de Marcas
+                    </h2>
+                </div>
+            }
+        >
             <Head title="Catálogo de Marcas" />
 
             <div className="py-6">

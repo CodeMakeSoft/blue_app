@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Form from "@/Components/Product/Form";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 const Edit = ({ product, categories, brands }) => {
     // Verifica si 'product' tiene los datos correctamente
@@ -58,7 +59,20 @@ const Edit = ({ product, categories, brands }) => {
     };
 
     return (
-        <AuthenticatedLayout header={<Head title="Editar Producto" />}>
+        <AuthenticatedLayout
+        header={
+            <>
+                <Breadcrumb
+                    routes={[
+                        { name: "Productos", link: route("products.index") },
+                        { name: "Editar Producto", link: route("products.edit", product.id) },
+                    ]}
+                    currentPage="Editar Producto"
+                />
+                <Head title="Editar Producto" />
+            </>
+        }
+    >
             <div className="max-w-5xl mx-auto mt-10 bg-white shadow-md rounded-lg">
                 <div className="overflow-hidden rounded-lg border border-gray-200">
                     <div className="bg-gray-200 text-gray-600  uppercase text-sm font-semibold px-6 py-3 rounded-t-lg">

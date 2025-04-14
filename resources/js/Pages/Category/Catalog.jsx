@@ -4,6 +4,7 @@ import { Head, Link } from "@inertiajs/react";
 import CategoryCard from "@/Components/Category/CategoryCard";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import Pagination from "@/Components/Category/Pagination";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Catalog({ auth, categories = [] }) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -54,7 +55,20 @@ export default function Catalog({ auth, categories = [] }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <>
+                    <Breadcrumb
+                        routes={[{ name: "Inicio", link: route("dashboard") }]}
+                        currentPage="Catálogo de Categorías"
+                    />
+                    <h1 className="text-2xl font-bold text-gray-800 mt-2">
+                        Catálogo de Categorías
+                    </h1>
+                </>
+            }
+        >
             <Head title="Catálogo de Categorías" />
 
             <div className="py-6">

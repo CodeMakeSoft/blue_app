@@ -11,6 +11,7 @@ import { useState, useRef, useEffect } from "react";
 import ConfirmDelete from "@/Components/Product/ConfirmDelete";
 import Pagination from "@/Components/Product/Pagination";
 import { usePage } from "@inertiajs/react";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 
 export default function Index({ products }) {
@@ -112,9 +113,18 @@ export default function Index({ products }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-lg sm:text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Lista de Productos
-                </h2>
+                <div>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Dashboard", link: route("dashboard") },
+                            { name: "Productos", link: route("products.index") },
+                        ]}
+                        currentPage="Lista de Productos"
+                    />
+                    <h2 className="text-lg sm:text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
+                        Lista de Productos
+                    </h2>
+                </div>
             }
         >
             <Head title="Productos" />

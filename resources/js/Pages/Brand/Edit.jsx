@@ -4,6 +4,7 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import Form from "@/Components/Category/Form"; // Asegúrate de tener este componente
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Edit({ auth, brand }) {
     const { data, setData, errors, post } = useForm({
@@ -37,7 +38,23 @@ export default function Edit({ auth, brand }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <div>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Marcas", link: route("brand.index") },
+                        ]}
+                        currentPage={`Editar: ${brand.name}`}
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Editar Marca
+                    </h2>
+                </div>
+            }
+        >
             <Head title="Editar Marca" />
 
             <div className="py-6 px-3">

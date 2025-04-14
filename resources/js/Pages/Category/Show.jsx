@@ -1,10 +1,24 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Show({ auth, category }) {
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout user={auth.user} header={
+            <>
+                <Breadcrumb
+                    routes={[
+                        { name: "Inicio", link: route("dashboard") },
+                        { name: "Categorías", link: route("category.index") },
+                    ]}
+                    currentPage={`Detalle de ${category.name}`}
+                />
+                <h1 className="text-2xl font-semibold text-gray-800 mt-2">
+                    Detalle de Categoría
+                </h1>
+            </>
+        }>
             <Head title={`Detalle de ${category.name}`} />
 
             <div className="py-6 px-3 sm:px-6 lg:px-8">

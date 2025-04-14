@@ -4,6 +4,7 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import Form from "@/Components/Category/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Edit({ auth, category }) {
     const { data, setData, errors, post } = useForm({
@@ -37,7 +38,23 @@ export default function Edit({ auth, category }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Categorías", link: route("category.index") },
+                        ]}
+                        currentPage="Actualizar Categoría"
+                    />
+                    <h1 className="text-2xl font-bold text-gray-800 mt-2">
+                        Actualizar Categoría
+                    </h1>
+                </>
+            }
+        >
             <Head title="Crear Categoría" />
 
             {/* Contenedor principal con márgenes de 3cm (3rem) */}

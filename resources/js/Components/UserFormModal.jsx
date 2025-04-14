@@ -3,8 +3,7 @@ import { router } from "@inertiajs/react";
 import { toast } from "sonner";
 import ConfirmEdit from "@/Components/ConfirmEdit";
 import ConfirmAdd from "@/Components/ConfirmAdd";
-
-export default function UserFormModal({ isOpen, closeModal, user, roles }) {
+export default function UserFormModal({ isOpen, closeModal, user, roles, users }) {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -12,6 +11,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
         password: "",
         roles: [],
         password_confirmation: "",
+        email_verified_at: null, // <- nuevo campo
     });
 
     const [errors, setErrors] = useState({});
@@ -19,6 +19,20 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
     const [showConfirmEdit, setShowConfirmEdit] = useState(false);
     const [showConfirmAdd, setShowConfirmAdd] = useState(false);
     const dropdownRef = useRef(null);
+        const isLastAdmin = () => {
+            const adminCount = users.data.filter((u) =>
+                u.roles?.some((r) => r.name === "Admin")
+            ).length;
+    
+            return (
+                user &&
+                user.roles?.some((r) => r.name === "Admin") &&
+                adminCount <= 1
+            );
+        };
+    
+        const disableRoleDropdown = isLastAdmin();    
+    
 
     useEffect(() => {
         if (user) {
@@ -29,6 +43,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                 password: "",
                 password_confirmation: "",
                 roles: user.roles?.map((r) => r.id) || [],
+                email_verified_at: user.email_verified_at,
             });
         } else {
             setFormData({
@@ -38,6 +53,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                 password: "",
                 password_confirmation: "",
                 roles: [],
+                email_verified_at: null,
             });
         }
         setErrors({});
@@ -77,8 +93,30 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // Limpiar errores anteriores
+        setErrors({});
+    
+        // Validación de coincidencia de contraseña
+        if (formData.password && formData.password !== formData.password_confirmation) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                password_confirmation: "Passwords do not match",
+            }));
+            return;
+        }
+    
+        // Validación de mínimo 8 caracteres si el usuario escribió una nueva contraseña
+        if (formData.password && formData.password.length < 8) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                password: "Password must be at least 8 characters",
+            }));
+            return;
+        }
+        // Si todo está bien, mostrar modal de confirmación
         user ? setShowConfirmEdit(true) : setShowConfirmAdd(true);
     };
+    
 
     const handleConfirmAction = () => {
         const data = {
@@ -88,6 +126,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
             password: formData.password,
             password_confirmation: formData.password_confirmation,
             roles: formData.roles,
+            email_verified_at: formData.email_verified_at,
         };
 
         const url = user ? `/admin/users/${user.id}` : "/admin/users";
@@ -164,6 +203,23 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             </p>
                         )}
                     </div>
+                    <div className="mb-4">
+                  <label className="flex items-center gap-2 text-sm font-medium mb-1">
+                   <input
+                    type="checkbox"
+                    checked={!!formData.email_verified_at}
+                    onChange={(e) => {
+                    setFormData((prev) => ({
+                    ...prev,
+                    email_verified_at: e.target.checked
+                        ? new Date().toISOString()
+                        : null,
+                     }));
+                 }}
+                 />
+                   Email Verified
+                </label>
+                </div>
 
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1 dark:text-gray-200">
@@ -196,6 +252,7 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
+                            autoComplete="new-password"
                             className={`w-full border rounded p-2 bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
                                 errors.password
                                     ? "border-red-500"
@@ -225,10 +282,17 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                                     ? "border-red-500"
                                     : "border-gray-300 dark:border-gray-600"
                             }`}
-                            required={!user}
-                        />
-                    </div>
+                            required={!user&& !!formData.password}
+                            />
+                            {errors.password_confirmation && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.password_confirmation}
+                                </p>
+                            )}
+                        </div>
 
+                    {/* Selector de Rol Único */}
+                    {!isLastAdmin() ? (
                     <div className="mb-6 relative" ref={dropdownRef}>
                         <label className="block text-sm font-medium mb-2 dark:text-gray-200">
                             Role *
@@ -300,7 +364,13 @@ export default function UserFormModal({ isOpen, closeModal, user, roles }) {
                             </p>
                         )}
                     </div>
-
+                        ) : (
+                        <p className="text-sm text-red-600 mb-6">
+                            You cannot change the role of the last Admin user.
+                        </p>
+                    )}
+                    
+                    {/* Form Actions */}
                     <div className="flex justify-end gap-3 pt-4 border-t dark:border-gray-600">
                         <button
                             type="button"

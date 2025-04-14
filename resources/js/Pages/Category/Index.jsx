@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Pagination from "@/Components/category/Pagination";
 import ConfirmDeleteModal from "@/Components/category/ConfirmDeleteModal";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Index({ auth, categories }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +64,23 @@ export default function Index({ auth, categories }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Categorías", link: route("category.index") },
+                        ]}
+                        currentPage="Gestión de Categorías"
+                    />
+                    <h1 className="text-2xl font-semibold text-gray-800 mt-2">
+                        Gestión de Categorías
+                    </h1>
+                </>
+            }
+        >
             <Head title="Categorías" />
 
             <div className="py-10">

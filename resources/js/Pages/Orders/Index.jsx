@@ -19,6 +19,7 @@ import {
 import Confirm from '@/Components/Confirm';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
+import Breadcrumb from '@/Components/Breadcrumb';
 
 export default function Index({ orders }) {
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -164,10 +165,19 @@ export default function Index({ orders }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    <FontAwesomeIcon icon={faReceipt} className="mr-2" />
-                    Mis Compras
-                </h2>
+                <>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Finalizar Compra", link: route("purchases.index") },
+                        ]}
+                        currentPage="Mis Compras"
+                    />
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
+                        <FontAwesomeIcon icon={faReceipt} className="mr-2" />
+                        Mis Compras
+                    </h2>
+                </>
             }
         >
             <Head title="Mis Compras" />

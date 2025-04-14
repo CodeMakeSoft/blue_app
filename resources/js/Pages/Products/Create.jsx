@@ -2,6 +2,7 @@ import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Form from "@/Components/Product/Form";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 const Create = ({ categories, brands }) => {
     const { data, errors, setData, post } = useForm({
@@ -42,7 +43,20 @@ const Create = ({ categories, brands }) => {
     };
 
     return (
-        <AuthenticatedLayout header={<Head title="Crear Producto" />}>
+        <AuthenticatedLayout
+            header={
+                <>
+                    <Breadcrumb
+                        routes={[
+                            { name: "Productos", link: route("products.index") },
+                            { name: "Crear Producto", link: route("products.create") },
+                        ]}
+                        currentPage="Crear Producto"
+                    />
+                    <Head title="Crear Producto" />
+                </>
+            }
+        >
             <div className="max-w-5xl mx-auto mt-10 bg-white dark:bg-gray-800 shadow-md rounded-lg">
                 <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                     <div className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-sm font-semibold px-6 py-3 rounded-t-lg">

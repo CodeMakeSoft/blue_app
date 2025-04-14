@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Pagination from "@/Components/Category/Pagination";
 import ConfirmDeleteModal from "@/Components/Brand/ConfirmDeleteModal";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Index({ auth, brands }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +64,20 @@ export default function Index({ auth, brands }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={null}>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <div>
+                    <Breadcrumb
+                        routes={[{ name: "Inicio", link: route("dashboard") }]}
+                        currentPage="Catálogo de Marcas"
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Catálogo de Marcas
+                    </h2>
+                </div>
+            }
+        >
             <Head title="Marcas" />
 
             <div className="py-10">
