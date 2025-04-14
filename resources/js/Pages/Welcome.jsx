@@ -2,7 +2,8 @@ import { Head, Link } from '@inertiajs/react';
 import Footer from '@/Components/Footer';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
+export default function Welcome({ auth, products, brands, categories }) {
+
     const handleImageError = () => {
         document
             .getElementById('screenshot-container')
@@ -60,9 +61,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 )}
                             </div>
                         </header>
-
+                        
                         {/* Aquí puedes agregar más contenido si deseas */}
-
+                        
                     </div>
                 </div>
 

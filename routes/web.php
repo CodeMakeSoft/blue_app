@@ -16,6 +16,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -130,5 +131,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | Auth
 |--------------------------------------------------------------------------
 */
+// Ruta para vista home
+Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 
 require __DIR__.'/auth.php';
