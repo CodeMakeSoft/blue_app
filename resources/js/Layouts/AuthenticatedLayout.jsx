@@ -1,5 +1,5 @@
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid';
 import Navbar from '@/Components/Navbar';
@@ -111,6 +111,15 @@ export default function AuthenticatedLayout({ header, children }) {
             <path d="m168.1,241.82c.37-6.54-.34-5.62,10.81-12.25l18.21-11.02c6.17-3.74,13.14-6.12,13.06,5.09-.05,7.64.11,15.17,0,22.21-.17,4.69.39,4.89-3.72,7.49-9.65,6.15-18.19,10.56-28.2,16.12-6.84,3.44-9.82,2.08-10.16-5.41m30.7-28.25c0-4.21,0-5.33-5.68-1.72-4.06,2.57-7.88,5.21-11.99,7.69-2.69,1.79-1.73,2.38-1.54,12.16.38,3.57.12,3.07,13.02-5.04,5.94-3.86,6.19-3.45,6.19-6.41v-6.67Z" />
         </svg>
     );
+
+    const { data, setData, get } = useForm({
+        search: ''
+    });
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        get(route('dashboard'), { preserveState: true });
+    };
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
@@ -281,7 +290,7 @@ export default function AuthenticatedLayout({ header, children }) {
     
                     {/* Main */}
                     <main className="flex-1 ml-16 p-4 bg-white dark:bg-gray-800">
-                        <div className="max-w-5xl mx-auto">
+                        <div className="max-w-full mx-auto">
                             {/* Navbar de carrito, checkout, etc. */}
                             {showCartNavbar && (
                                 <Navbar 
@@ -295,7 +304,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             )}
     
                             {/* Children */}
-                            <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                            <div className="flex-1 w-full bg-white dark:bg-gray-800 shadow-sm px-4 py-6">
                                 {children}
                             </div>
                         </div>
