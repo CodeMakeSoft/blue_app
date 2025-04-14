@@ -63,9 +63,9 @@ export default function Catalog({ auth, categories = [] }) {
                         routes={[{ name: "Inicio", link: route("dashboard") }]}
                         currentPage="Catálogo de Categorías"
                     />
-                    <h1 className="text-2xl font-bold text-gray-800 mt-2">
+                    <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
                         Catálogo de Categorías
-                    </h1>
+                    </h2>
                 </>
             }
         >
@@ -74,7 +74,7 @@ export default function Catalog({ auth, categories = [] }) {
             <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Título */}
-                    <h1 className="text-2xl font-bold text-gray-800 mb-6">
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">
                         Catálogo de Categorías
                     </h1>
 
@@ -82,12 +82,12 @@ export default function Catalog({ auth, categories = [] }) {
                     <div className="mb-8">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-300" />
                             </div>
                             <input
                                 type="text"
                                 placeholder="Buscar categorías por nombre o descripción..."
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
@@ -108,9 +108,9 @@ export default function Catalog({ auth, categories = [] }) {
                                             ...category,
                                             image: category.image
                                                 ? {
-                                                      url: category.image.url,
-                                                      id: category.image.id,
-                                                  }
+                                                    url: category.image.url,
+                                                    id: category.image.id,
+                                                }
                                                 : null,
                                         }}
                                         showLink={true}
@@ -122,11 +122,11 @@ export default function Catalog({ auth, categories = [] }) {
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
                                 {/* Select de items por página (izquierda) */}
                                 <div className="flex items-center space-x-2 w-full sm:w-auto">
-                                    <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                         Mostrar:
                                     </label>
                                     <select
-                                        className="border border-gray-300 rounded px-3 py-1.5 text-center w-40 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 text-center w-40 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         value={itemsPerPage}
                                         onChange={handleItemsPerPageChange}
                                     >
@@ -141,7 +141,7 @@ export default function Catalog({ auth, categories = [] }) {
                                     </select>
                                 </div>
 
-                                {/* Paginación (centrada en móvil, derecha en desktop) */}
+                                {/* Paginación */}
                                 <div className="w-full sm:w-auto">
                                     <Pagination
                                         currentPage={currentPage}
@@ -158,8 +158,8 @@ export default function Catalog({ auth, categories = [] }) {
                             </div>
                         </>
                     ) : (
-                        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-                            <p className="text-gray-500 text-lg">
+                        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                            <p className="text-gray-500 dark:text-gray-400 text-lg">
                                 {searchTerm
                                     ? "No se encontraron categorías con ese criterio"
                                     : "No hay categorías disponibles"}

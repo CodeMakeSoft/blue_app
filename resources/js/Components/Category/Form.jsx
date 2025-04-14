@@ -140,21 +140,21 @@ const Form = ({
     return (
         <form onSubmit={submit} className="space-y-6">
             {successMessage && (
-                <div className="p-4 mb-6 text-green-800 bg-green-100 border border-green-400 rounded-md">
+                <div className="p-4 mb-6 text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-900 border border-green-400 rounded-md">
                     {successMessage}
                 </div>
             )}
-
+    
             {/* Contenedores alineados horizontalmente */}
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Contenedor de datos (65%) */}
-                <div className="w-full md:w-[65%] bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                <div className="w-full md:w-[65%] bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                     {/* Campo Nombre */}
                     <div className="mb-6">
                         <InputLabel
                             htmlFor="name"
                             value="Nombre"
-                            className="text-gray-700 font-semibold mb-2"
+                            className="text-gray-700 dark:text-gray-200 font-semibold mb-2"
                         />
                         <TextInput
                             id="name"
@@ -164,8 +164,8 @@ const Form = ({
                             className={`w-full p-3 border ${
                                 nameTouched && formErrors.name
                                     ? "border-red-500"
-                                    : "border-gray-300"
-                            } rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50`}
+                                    : "border-gray-300 dark:border-gray-600"
+                            } rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
                             onChange={handleNameChange}
                             onBlur={() => setNameTouched(true)}
                             disabled={isSubmitting}
@@ -174,30 +174,30 @@ const Form = ({
                         {nameTouched && formErrors.name ? (
                             <InputError
                                 message={formErrors.name}
-                                className="mt-2 text-red-600 text-sm"
+                                className="mt-2 text-red-600 dark:text-red-400 text-sm"
                             />
                         ) : (
                             errors.name && (
                                 <InputError
                                     message={errors.name}
-                                    className="mt-2 text-red-600 text-sm"
+                                    className="mt-2 text-red-600 dark:text-red-400 text-sm"
                                 />
                             )
                         )}
                     </div>
-
+    
                     {/* Campo Descripción */}
                     <div>
                         <InputLabel
                             htmlFor="description"
                             value="Descripción"
-                            className="text-gray-700 font-semibold mb-2"
+                            className="text-gray-700 dark:text-gray-200 font-semibold mb-2"
                         />
                         <textarea
                             id="description"
                             name="description"
                             value={data.description || ""}
-                            className="w-full mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 h-40"
+                            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 h-40 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                             onChange={(e) =>
                                 setData("description", e.target.value)
                             }
@@ -205,39 +205,38 @@ const Form = ({
                         {errors.description && (
                             <InputError
                                 message={errors.description}
-                                className="mt-2 text-red-600 text-sm"
+                                className="mt-2 text-red-600 dark:text-red-400 text-sm"
                             />
                         )}
                     </div>
                 </div>
-
+    
                 {/* Contenedor de imagen (35%) */}
-                <div className="w-full md:w-[35%] bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                <div className="w-full md:w-[35%] bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                     {/* Encabezado con título y botón Editar */}
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-lg font-semibold text-gray-800">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                             Imagen
                         </h2>
-
+    
                         {/* Menú desplegable Editar */}
                         {imagePreview && (
                             <div className="relative">
                                 <button
                                     type="button"
-                                    className="text-blue-600 hover:text-blue-800 font-medium"
+                                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                                     onClick={() =>
                                         setIsEditMenuOpen(!isEditMenuOpen)
                                     }
                                 >
                                     Editar
                                 </button>
-
-                                {/* Menú desplegable */}
+    
                                 {isEditMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-10 border dark:border-gray-600">
                                         <button
                                             type="button"
-                                            className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                                            className="block w-full px-4 py-2 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
                                             onClick={handleChangeImage}
                                             disabled={isSubmitting}
                                         >
@@ -245,7 +244,7 @@ const Form = ({
                                         </button>
                                         <button
                                             type="button"
-                                            className="block w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100"
+                                            className="block w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600"
                                             onClick={() => {
                                                 removeImage();
                                                 setIsEditMenuOpen(false);
@@ -259,15 +258,15 @@ const Form = ({
                             </div>
                         )}
                     </div>
-
+    
                     {/* Contenedor de imagen */}
                     <div
                         className={`border-2 rounded-lg flex flex-col items-center justify-center p-4 h-64 ${
                             isDragging
-                                ? "border-blue-400 bg-blue-50"
+                                ? "border-blue-400 bg-blue-50 dark:bg-blue-900"
                                 : imagePreview
                                 ? "border-transparent"
-                                : "border-dashed border-gray-300"
+                                : "border-dashed border-gray-300 dark:border-gray-600"
                         }`}
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
@@ -311,7 +310,7 @@ const Form = ({
                                     }
                                     disabled={isSubmitting}
                                 />
-                                <p className="text-gray-500 text-sm">
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">
                                     {isDragging
                                         ? "Suelta la imagen aquí"
                                         : "Arrastrar una imagen aquí"}
@@ -319,7 +318,7 @@ const Form = ({
                                 {formErrors.image && (
                                     <InputError
                                         message={formErrors.image}
-                                        className="mt-2 text-red-600 text-sm"
+                                        className="mt-2 text-red-600 dark:text-red-400 text-sm"
                                     />
                                 )}
                             </div>
@@ -327,19 +326,18 @@ const Form = ({
                     </div>
                 </div>
             </div>
-
+    
             {/* Barra inferior con botones */}
-            <div className="flex justify-between items-center border-t border-gray-200 pt-4 mt-6">
+            <div className="flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4 mt-6">
                 {React.cloneElement(children, {
-                    disabled:
-                        isSubmitting || Object.keys(formErrors).length > 0,
+                    disabled: isSubmitting || Object.keys(formErrors).length > 0,
                     className: `${children.props.className || ""} ${
                         isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                     }`,
                 })}
             </div>
         </form>
-    );
+    );    
 };
 
 export default Form;

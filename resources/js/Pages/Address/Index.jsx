@@ -21,13 +21,12 @@ export default function Index({ locations }) {
 
     return (
         <AuthenticatedLayout
-            user={auth.user}
             header={
                 <div>
                     <Breadcrumb
                         routes={[
-                            { name: "Inicio", link: route("home") },
-                            { name: "Catálogo de Marcas", link: route("catalog") },
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Catálogo de Marcas", link: route("address.index") },
                         ]}
                         currentPage="Catálogo de Marcas"
                     />
