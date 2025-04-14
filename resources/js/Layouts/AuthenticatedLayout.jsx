@@ -240,7 +240,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     )}
 
                     {/* Contenedor principal */}
-                    <main className="flex-1 p-4 bg-white dark:bg-gray-800">
+                    <main className="flex-1 ml-16 p-4 bg-white dark:bg-gray-800">
                         <div className="max-w-5xl mx-auto">
                             {/* Navbar de Carrito/Checkout/Purchases (solo visible en esas rutas) */}
                             {showCartNavbar && (
@@ -263,8 +263,10 @@ export default function AuthenticatedLayout({ header, children }) {
                 </div>
             </div>
             
-            {/* Footer de team/white */}
-            {user && <Footer />}
+            {/* Footer */}
+            <div className="ml-16 ">
+                {user && <Footer />}
+            </div>
             <Toaster />
         </div>
     );
