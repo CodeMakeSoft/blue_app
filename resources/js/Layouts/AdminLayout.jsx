@@ -49,7 +49,7 @@ export default function AdminLayout({ children, activeRoute }) {
                         <Link href={route("roles.index")}>
                             <TagIcon className="h-5 w-5 mr-2" /> Brands
                         </Link>
-                        <Link href={route("permissions.index")}>
+                        <Link href={route("products.index")}>
                             <CubeIcon className="h-5 w-5 mr-2" /> Products
                         </Link>
                     </Sidebar.Item>

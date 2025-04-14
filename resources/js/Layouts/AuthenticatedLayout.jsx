@@ -1,15 +1,20 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { ShoppingCartIcon, HomeIcon, SwatchIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import { ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid';
 import Navbar from '@/Components/Navbar';
 import { Sidebar } from "@/Components/Sidebar";
 import Footer from "@/Components/Footer";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
 import { Toaster } from "@/Components/ui/toaster";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faHouse,
+    faBoxOpen,
+    faTags,
+    faLayerGroup,
+    faUserShield,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function AuthenticatedLayout({ header, children }) {
     const { auth } = usePage().props;
@@ -36,7 +41,10 @@ export default function AuthenticatedLayout({ header, children }) {
         {
             href: route("dashboard"),
             icon: (
-                <HomeIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
+                <FontAwesomeIcon
+                    icon={faHouse}
+                    className="h-5 w-5 text-gray-800 dark:text-gray-200"
+                />
             ),
             text: "Inicio",
             active: route().current("dashboard"),
@@ -44,23 +52,21 @@ export default function AuthenticatedLayout({ header, children }) {
         {
             href: route("products.view"),
             icon: (
-                <SwatchIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
+                <FontAwesomeIcon
+                    icon={faBoxOpen}
+                    className="h-5 w-5 text-gray-800 dark:text-gray-200"
+                />
             ),
             text: "Productos",
             active: route().current("products.view"),
         },
         {
-            href: route("products.index"),
-            icon: (
-                <SwatchIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
-            ),
-            text: "Crear Productos",
-            active: route().current("products.index"),
-        },
-        {
             href: route("brand.catalog"),
             icon: (
-                <SwatchIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
+                <FontAwesomeIcon
+                    icon={faTags}
+                    className="h-5 w-5 text-gray-800 dark:text-gray-200"
+                />
             ),
             text: "Marcas",
             active: route().current("brand.catalog"),
@@ -68,40 +74,31 @@ export default function AuthenticatedLayout({ header, children }) {
         {
             href: route("category.catalog"),
             icon: (
-                <SwatchIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
+                <FontAwesomeIcon
+                    icon={faLayerGroup}
+                    className="h-5 w-5 text-gray-800 dark:text-gray-200"
+                />
             ),
             text: "Categorías",
             active: route().current("category.catalog"),
         },
-        // Agregamos perfil al sidebar
-        // {
-        //     href: route("profile.edit"),
-        //     icon: (
-        //         <UserIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
-        //     ),
-        //     text: "Perfil",
-        //     active: route().current("profile.edit"),
-        // },
-        // Si el usuario puede acceder al panel de administración, lo agregamos
-        ...(userCanAccessAdminPanel ? [{
-            href: route("admin.panel"),
-            icon: (
-                <SwatchIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
-            ),
-            text: "Admin",
-            active: route().current("admin.panel"),
-        }] : []),
-        // Agregar botón de cerrar sesión al sidebar
-        // {
-        //     href: route("logout"),
-        //     method: "post",
-        //     as: "button",
-        //     icon: (
-        //         <ArrowRightOnRectangleIcon className="h-5 w-5 text-gray-800 dark:text-gray-200" />
-        //     ),
-        //     text: "Cerrar Sesión",
-        // },
+        ...(userCanAccessAdminPanel
+            ? [
+                {
+                    href: route("admin.panel"),
+                    icon: (
+                        <FontAwesomeIcon
+                            icon={faUserShield}
+                            className="h-5 w-5 text-gray-800 dark:text-gray-200"
+                        />
+                    ),
+                    text: "Admin",
+                    active: route().current("admin.panel"),
+                },
+            ]
+        : []),
     ];
+    
 
     // Componente del icono de caja
     const BoxIcon = ({ className }) => (
