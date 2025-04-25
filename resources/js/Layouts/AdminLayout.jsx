@@ -16,10 +16,10 @@ import {
 } from "@heroicons/react/24/solid";
 import AuthenticatedLayout from "./AuthenticatedLayout";
 
-export default function AdminLayout({ children, activeRoute }) {
+export default function AdminLayout({ children, header, activeRoute }) {
     return (
         <AuthenticatedLayout>
-            <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 mt-[6rem]">
+            <div className="flex min-h-screen bg-gray-50 dark:bg-gray-800 mt-[6rem]">
                 {/* Sidebar */}
                 <Sidebar>
                     <Sidebar.Item
@@ -56,7 +56,12 @@ export default function AdminLayout({ children, activeRoute }) {
                 </Sidebar>
 
                 {/* Contenido principal */}
-                <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+                <main className="flex-1 overflow-y-auto">
+                    <div className="mx-auto max-w-6xl">
+                        {header && <div className="px-6 pt-4">{header}</div>}
+                        <div className="px-6 pb-6">{children}</div>
+                    </div>
+                </main>
             </div>
         </AuthenticatedLayout>
     );

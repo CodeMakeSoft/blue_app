@@ -68,20 +68,21 @@ export default function Index({ auth, brands }) {
         <AdminLayout
             user={auth.user}
             header={
-                <div>
-                    <Breadcrumb
-                        routes={[{ name: "Inicio", link: route("dashboard") }]}
-                        currentPage="Catálogo de Marcas"
-                    />
-                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
-                        Catálogo de Marcas
-                    </h2>
-                </div>
+                <Breadcrumb
+                    routes={[
+                        { name: "Inicio", link: route("dashboard") },
+                        {
+                            name: "Marcas",
+                            link: route("brand.index"),
+                        },
+                    ]}
+                    currentPage="Gestión de Marcas"
+                />
             }
         >
             <Head title="Marcas" />
 
-            <div className="py-10">
+            <div className="py-5">
                 <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
                     {/* Header con título y botón */}
                     <div className="flex justify-between items-center mb-6">
@@ -114,11 +115,11 @@ export default function Index({ auth, brands }) {
                     </div>
 
                     {/* Contenedor de la tabla */}
-                    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm">
-                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg mx-6 my-2 pt-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+                                    <tr className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                                         <th className="px-4 py-3 text-left text-sm font-medium w-1/5 rounded-tl-lg">
                                             Nombre
                                         </th>
@@ -143,9 +144,9 @@ export default function Index({ auth, brands }) {
                                                     paginatedBrands.length - 1
                                                         ? "border-b border-gray-200 dark:border-gray-700"
                                                         : ""
-                                                } hover:bg-gray-50 dark:hover:bg-gray-800`}
+                                                } hover:bg-gray-50 dark:hover:bg-gray-700/50`}
                                             >
-                                                <td className="px-4 py-3 align-middle text-gray-700 dark:text-gray-200">
+                                                <td className="px-4 py-3 align-middle text-gray-900 dark:text-gray-100">
                                                     {brand.name}
                                                 </td>
                                                 <td className="px-4 py-3 align-middle">
@@ -177,7 +178,7 @@ export default function Index({ auth, brands }) {
                                                                     brand: brand.id,
                                                                 }
                                                             )}
-                                                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                             title="Ver detalle"
                                                         >
                                                             <EyeIcon className="w-6 h-6" />
@@ -189,13 +190,13 @@ export default function Index({ auth, brands }) {
                                                                     brand: brand.id,
                                                                 }
                                                             )}
-                                                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900"
+                                                            className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30"
                                                             title="Editar"
                                                         >
                                                             <PencilSquareIcon className="w-6 h-6" />
                                                         </Link>
                                                         <button
-                                                            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900"
+                                                            className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30"
                                                             onClick={() =>
                                                                 handleDelete(
                                                                     brand
@@ -226,7 +227,7 @@ export default function Index({ auth, brands }) {
                         </div>
 
                         {/* Paginación */}
-                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                        <div className="px-3 py-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={Math.ceil(
