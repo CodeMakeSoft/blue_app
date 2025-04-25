@@ -42,11 +42,11 @@ export default function AdminLayout({ children, activeRoute }) {
                         text="Manage E-commerce"
                         active={activeRoute === "ecommerce"}
                     >
-                        <Link href={route("categories.index")}>
+                        <Link href={route("category.index")}>
                             <Squares2X2Icon className="h-5 w-5 mr-2" />{" "}
                             Categories
                         </Link>
-                        <Link href={route("roles.index")}>
+                        <Link href={route("brand.index")}>
                             <TagIcon className="h-5 w-5 mr-2" /> Brands
                         </Link>
                         <Link href={route("products.index")}>

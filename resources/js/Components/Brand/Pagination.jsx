@@ -41,9 +41,11 @@ export default function Pagination({
         <div className="flex justify-between items-center mt-4 w-full">
             {/* Select de "Mostrar" a la izquierda */}
             <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium">Mostrar:</label>
+                <label className="text-sm font-medium dark:text-gray-200">
+                    Mostrar:
+                </label>
                 <select
-                    className="border rounded px-3 py-1 text-center w-20"
+                    className="border rounded px-3 py-1 text-center w-20 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                     value={itemsPerPage === totalItems ? "all" : itemsPerPage}
                     onChange={handleSelectChange}
                 >
@@ -58,10 +60,10 @@ export default function Pagination({
             {itemsPerPage !== totalItems && computedTotalPages > 1 && (
                 <div className="flex space-x-3 ml-auto">
                     <button
-                        className={`px-4 py-2 border rounded ${
+                        className={`px-4 py-2 border rounded transition ${
                             currentPage === 1
-                                ? "opacity-50 cursor-not-allowed"
-                                : "hover:bg-gray-200"
+                                ? "opacity-50 cursor-not-allowed dark:opacity-50"
+                                : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:border-gray-600 dark:text-white"
                         }`}
                         onClick={() => handlePageClick(currentPage - 1)}
                         disabled={currentPage === 1}
@@ -79,10 +81,10 @@ export default function Pagination({
                                 key={index}
                                 className={`px-4 py-2 border rounded transition ${
                                     isSelected
-                                        ? "bg-gray-800 text-white border-gray-800" // Botón activo (al cargar la página)
+                                        ? "bg-gray-800 text-white border-gray-800 dark:bg-blue-600 dark:border-blue-600"
                                         : isClicked
-                                        ? "border-blue-800" // Bordes azules al hacer clic
-                                        : "hover:bg-gray-200" // Efecto hover
+                                        ? "border-blue-800 dark:border-blue-400"
+                                        : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 }`}
                                 onClick={() => handlePageClick(pageNumber)}
                             >
@@ -92,10 +94,10 @@ export default function Pagination({
                     })}
 
                     <button
-                        className={`px-4 py-2 border rounded ${
+                        className={`px-4 py-2 border rounded transition ${
                             currentPage === computedTotalPages
-                                ? "opacity-50 cursor-not-allowed"
-                                : "hover:bg-gray-200"
+                                ? "opacity-50 cursor-not-allowed dark:opacity-50"
+                                : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:border-gray-600 dark:text-white"
                         }`}
                         onClick={() => handlePageClick(currentPage + 1)}
                         disabled={currentPage === computedTotalPages}

@@ -1,4 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import {
     PencilSquareIcon,
@@ -111,7 +112,7 @@ export default function Index({ products }) {
     };
 
     return (
-        <AuthenticatedLayout
+        <AdminLayout
             header={
                 <div>
                     <Breadcrumb
@@ -235,7 +236,7 @@ export default function Index({ products }) {
                     onConfirm={handleConfirmDelete}
                 />
             )}
-        </AuthenticatedLayout>
+        </AdminLayout>
     );
     
 }

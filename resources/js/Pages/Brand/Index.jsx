@@ -1,4 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 import {
@@ -64,7 +65,7 @@ export default function Index({ auth, brands }) {
     };
 
     return (
-        <AuthenticatedLayout
+        <AdminLayout
             user={auth.user}
             header={
                 <div>
@@ -84,14 +85,14 @@ export default function Index({ auth, brands }) {
                 <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
                     {/* Header con título y botón */}
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-2xl font-semibold text-gray-800">
+                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                             Gestión de Marcas
                         </h1>
                         <button
                             onClick={() =>
                                 (window.location.href = route("brand.create"))
                             }
-                            className="flex items-center bg-gray-100 text-gray-900 px-5 py-2.5 rounded-md hover:bg-gray-200 transition duration-300 shadow-sm"
+                            className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
                         >
                             <PlusCircleIcon className="w-5 h-5 mr-2" />
                             Nueva Marca
@@ -105,7 +106,7 @@ export default function Index({ auth, brands }) {
                         </div>
                         <input
                             type="text"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             placeholder="Buscar marcas por nombre..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -113,12 +114,11 @@ export default function Index({ auth, brands }) {
                     </div>
 
                     {/* Contenedor de la tabla */}
-                    <div className="bg-white rounded-lg shadow-sm">
-                        {/* Tabla con bordes redondeados */}
-                        <div className="overflow-x-auto border-t border-gray-200 rounded-b-lg mx-6 my-2 pt-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm">
+                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg mx-6 my-2 pt-4">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="bg-gray-100 text-gray-800">
+                                    <tr className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
                                         <th className="px-4 py-3 text-left text-sm font-medium w-1/5 rounded-tl-lg">
                                             Nombre
                                         </th>
@@ -141,15 +141,15 @@ export default function Index({ auth, brands }) {
                                                 className={`${
                                                     index !==
                                                     paginatedBrands.length - 1
-                                                        ? "border-b border-gray-200"
+                                                        ? "border-b border-gray-200 dark:border-gray-700"
                                                         : ""
-                                                } hover:bg-gray-50`}
+                                                } hover:bg-gray-50 dark:hover:bg-gray-800`}
                                             >
-                                                <td className="px-4 py-3 align-middle">
+                                                <td className="px-4 py-3 align-middle text-gray-700 dark:text-gray-200">
                                                     {brand.name}
                                                 </td>
                                                 <td className="px-4 py-3 align-middle">
-                                                    <p className="line-clamp-2 text-gray-600">
+                                                    <p className="line-clamp-2 text-gray-600 dark:text-gray-300">
                                                         {brand.description}
                                                     </p>
                                                 </td>
@@ -162,7 +162,7 @@ export default function Index({ auth, brands }) {
                                                                 className="w-12 h-12 object-cover rounded"
                                                             />
                                                         ) : (
-                                                            <span className="text-gray-400 text-sm">
+                                                            <span className="text-gray-400 dark:text-gray-500 text-sm">
                                                                 Sin imagen
                                                             </span>
                                                         )}
@@ -177,7 +177,7 @@ export default function Index({ auth, brands }) {
                                                                     brand: brand.id,
                                                                 }
                                                             )}
-                                                            className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+                                                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
                                                             title="Ver detalle"
                                                         >
                                                             <EyeIcon className="w-6 h-6" />
@@ -189,13 +189,13 @@ export default function Index({ auth, brands }) {
                                                                     brand: brand.id,
                                                                 }
                                                             )}
-                                                            className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                                                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900"
                                                             title="Editar"
                                                         >
                                                             <PencilSquareIcon className="w-6 h-6" />
                                                         </Link>
                                                         <button
-                                                            className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
+                                                            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900"
                                                             onClick={() =>
                                                                 handleDelete(
                                                                     brand
@@ -213,7 +213,7 @@ export default function Index({ auth, brands }) {
                                         <tr>
                                             <td
                                                 colSpan="4"
-                                                className="px-6 py-6 text-center text-gray-500 rounded-b-lg"
+                                                className="px-6 py-6 text-center text-gray-500 dark:text-gray-400 rounded-b-lg"
                                             >
                                                 {searchTerm
                                                     ? "No se encontraron marcas con ese nombre"
@@ -226,7 +226,7 @@ export default function Index({ auth, brands }) {
                         </div>
 
                         {/* Paginación */}
-                        <div className="px-6 py-4 border-t border-gray-200">
+                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={Math.ceil(
@@ -247,6 +247,6 @@ export default function Index({ auth, brands }) {
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
             />
-        </AuthenticatedLayout>
+        </AdminLayout>
     );
 }

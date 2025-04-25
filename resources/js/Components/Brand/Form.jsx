@@ -24,14 +24,13 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
 
     const handleImageChange = (files) => {
         const fileArray = Array.from(files);
-        setData("new_images", [...(data.images || []), ...fileArray]); // Cambiar a "images"
+        setData("new_images", [...(data.images || []), ...fileArray]);
 
         const previews = fileArray.map((file) => URL.createObjectURL(file));
         setImagePreviews([...imagePreviews, ...previews]);
     };
 
     const removeImage = (index) => {
-        // Si es una imagen existente, agregar a deleted_images
         if (index < imagePreviews.length - (data.new_images?.length || 0)) {
             const deletedId = data.existing_images[index].id;
             setData("deleted_images", [
@@ -40,12 +39,10 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
             ]);
         }
 
-        // Actualizar previews
         const updatedPreviews = [...imagePreviews];
         updatedPreviews.splice(index, 1);
         setImagePreviews(updatedPreviews);
 
-        // Actualizar new_images si corresponde
         if (index >= imagePreviews.length - (data.new_images?.length || 0)) {
             const newImages = [...(data.new_images || [])];
             newImages.splice(
@@ -72,10 +69,10 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
     return (
         <form
             onSubmit={handleSubmit}
-            className="space-y-6 bg-white p-6 rounded-lg shadow-md border border-gray-200"
+            className="space-y-6 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700"
         >
             {successMessage && (
-                <div className="p-4 mb-4 text-green-800 bg-green-100 border border-green-400 rounded-md">
+                <div className="p-4 mb-4 text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-900 border border-green-400 rounded-md">
                     {successMessage}
                 </div>
             )}
@@ -85,19 +82,19 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                         <InputLabel
                             htmlFor="name"
                             value="Nombre"
-                            className="text-gray-700 font-semibold"
+                            className="text-gray-700 dark:text-gray-300 font-semibold"
                         />
                         <TextInput
                             id="name"
                             type="text"
                             name="name"
                             value={data.name || ""}
-                            className="mt-2 block w-1/2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            className="mt-2 block w-1/2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                             onChange={(e) => setData("name", e.target.value)}
                         />
                         <InputError
                             message={errors.name}
-                            className="mt-2 text-red-600 text-sm"
+                            className="mt-2 text-red-600 dark:text-red-400 text-sm"
                         />
                     </div>
 
@@ -105,13 +102,13 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                         <InputLabel
                             htmlFor="description"
                             value="Descripción"
-                            className="text-gray-700 font-semibold"
+                            className="text-gray-700 dark:text-gray-300 font-semibold"
                         />
                         <textarea
                             id="description"
                             name="description"
                             value={data.description || ""}
-                            className="w-full h-64 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2 resize-none whitespace-pre-wrap overflow-auto"
+                            className="w-full h-64 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2 resize-none whitespace-pre-wrap overflow-auto"
                             onChange={(e) =>
                                 setData("description", e.target.value)
                             }
@@ -119,7 +116,7 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                         />
                         <InputError
                             message={errors.description}
-                            className="mt-2 text-red-600 text-sm"
+                            className="mt-2 text-red-600 dark:text-red-400 text-sm"
                         />
                     </div>
                 </div>
@@ -127,10 +124,10 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                     <InputLabel
                         htmlFor="images"
                         value="Imágenes"
-                        className="text-gray-700 font-semibold"
+                        className="text-gray-700 dark:text-gray-300 font-semibold"
                     />
                     <div
-                        className="mt-2 border-2 border-dashed border-gray-300 p-4 w-full h-80 rounded-lg text-center cursor-pointer"
+                        className="mt-2 border-2 border-dashed border-gray-300 dark:border-gray-600 p-4 w-full h-80 rounded-lg text-center cursor-pointer"
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                     >
@@ -144,7 +141,7 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                         />
                         <label
                             htmlFor="images"
-                            className="block text-gray-600 cursor-pointer"
+                            className="block text-gray-600 dark:text-gray-400 cursor-pointer"
                         >
                             Haz clic para cargar imágenes o arrástralas aquí
                         </label>
@@ -154,11 +151,11 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
             </div>
             {imagePreviews.length > 0 && (
                 <div className="mt-4">
-                    <h3 className="text-gray-700 font-semibold mb-2">
+                    <h3 className="text-gray-700 dark:text-gray-300 font-semibold mb-2">
                         Vista previa:
                     </h3>
                     <div className="flex flex-wrap gap-4">
-                        <div className="w-full h-80 border border-gray-300 rounded-lg flex items-center justify-center">
+                        <div className="w-full h-80 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
                             {imagePreviews.length > 0 && (
                                 <img
                                     src={imagePreviews[0]}
@@ -173,7 +170,7 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                                     <img
                                         src={preview}
                                         alt="Vista previa"
-                                        className="w-full h-24 object-cover rounded-md border cursor-pointer hover:opacity-75"
+                                        className="w-full h-24 object-cover rounded-md border dark:border-gray-500 cursor-pointer hover:opacity-75"
                                         onClick={() =>
                                             setImagePreviews([
                                                 preview,
@@ -187,7 +184,9 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                                         type="button"
                                         className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
                                         onClick={() => removeImage(index)}
-                                    ></button>
+                                    >
+                                        ×
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -198,7 +197,7 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
             <div className="flex justify-between items-center mt-4">
                 <Link
                     href={route("brand.index")}
-                    className="px-5 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-900 transition duration-300"
+                    className="px-5 py-2 bg-gray-700 dark:bg-gray-800 text-white rounded-md hover:bg-gray-900 transition duration-300"
                 >
                     Volver
                 </Link>

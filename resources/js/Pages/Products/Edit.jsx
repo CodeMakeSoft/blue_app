@@ -8,7 +8,7 @@ const Edit = ({ product, categories, brands }) => {
     // Verifica si 'product' tiene los datos correctamente
     console.log(product);
 
-    const { data, errors, setData, put } = useForm({
+    const { data, errors, setData, post } = useForm({
         name: product.name || "",
         description: product.description || "",
         stock: product.stock || 0,
@@ -55,7 +55,7 @@ const Edit = ({ product, categories, brands }) => {
         formData.append("color", data.color); // Asegúrate de que 'color' se agregue correctamente
 
         // Realiza la petición PUT para editar el producto
-        put(route("products.update", product.id), formData);
+        post(route("products.update", product.id), formData);
     };
 
     return (

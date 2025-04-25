@@ -1,4 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 import {
@@ -64,7 +65,7 @@ export default function Index({ auth, categories }) {
     };
 
     return (
-        <AuthenticatedLayout
+        <AdminLayout
             user={auth.user}
             header={
                 <>
@@ -258,6 +259,6 @@ export default function Index({ auth, categories }) {
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
             />
-        </AuthenticatedLayout>
+        </AdminLayout>
     );
 }

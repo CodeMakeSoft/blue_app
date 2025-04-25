@@ -22,9 +22,9 @@ export default function BrandCard({ brand, showLink = true }) {
     const imageUrl = getImageUrl();
 
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
-            {/* Imagen de la marca - Mismo estilo que CategoryCard */}
-            <div className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
+            {/* Imagen de la marca */}
+            <div className="h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                 {imageUrl ? (
                     <img
                         src={imageUrl}
@@ -38,23 +38,25 @@ export default function BrandCard({ brand, showLink = true }) {
                         }}
                     />
                 ) : (
-                    <span className="text-gray-500">Sin imagen</span>
+                    <span className="text-gray-500 dark:text-gray-300">
+                        Sin imagen
+                    </span>
                 )}
             </div>
 
-            {/* Contenido de la tarjeta - Mismo estilo que CategoryCard */}
+            {/* Contenido de la tarjeta */}
             <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
                     {brand.name}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
                     {brand.description || "Descripción no disponible"}
                 </p>
 
                 {showLink && (
                     <Link
                         href={route("brand.show", brand.id)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                     >
                         Ver productos →
                     </Link>

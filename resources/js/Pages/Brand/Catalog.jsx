@@ -60,11 +60,14 @@ export default function Catalog({ auth, brands = [] }) {
                     <Breadcrumb
                         routes={[
                             { name: "Inicio", link: route("dashboard") },
-                            { name: "Catálogo de Marcas", link: route("brand.catalog") },
+                            {
+                                name: "Catálogo de Marcas",
+                                link: route("brand.catalog"),
+                            },
                         ]}
                         currentPage="Catálogo de Marcas"
                     />
-                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                    <h2 className="text-lg sm:text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
                         Catálogo de Marcas
                     </h2>
                 </div>
@@ -72,9 +75,9 @@ export default function Catalog({ auth, brands = [] }) {
         >
             <Head title="Catálogo de Marcas" />
 
-            <div className="py-6">
+            <div className="py-6 sm:py-8 lg:py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
                         Catálogo de Marcas
                     </h1>
 
@@ -173,4 +176,3 @@ export default function Catalog({ auth, brands = [] }) {
         </AuthenticatedLayout>
     );
 }
-// Compare this snippet from resources/js/Components/Category/Pagination.jsx:
