@@ -135,12 +135,12 @@ export default function Footer({
                             <address className="text-gray-600 dark:text-gray-400 not-italic text-sm">
                                 <p className="mb-2 transition-all duration-300 transform hover:scale-105">
                                     <a
-                                        href="mailto:emmanuelislas@micorreo.upp.edu.mx"
+                                        href="mailto:codemakesoft@gmail.com"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="hover:text-blue-600 dark:hover:text-blue-400"
                                     >
-                                        cod3cr4fts0ft@gmail.com
+                                        codemakesoft@gmail.com
                                     </a>
                                 </p>
                                 <p className="transition-all duration-300 transform hover:scale-105 hover:text-blue-600 dark:hover:text-blue-400">
