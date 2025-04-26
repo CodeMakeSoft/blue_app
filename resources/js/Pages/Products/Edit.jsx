@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, useForm } from "@inertiajs/react";
 import Form from "@/Components/Product/Form";
 import Breadcrumb from "@/Components/Breadcrumb";
@@ -59,7 +59,7 @@ const Edit = ({ product, categories, brands }) => {
     };
 
     return (
-        <AuthenticatedLayout
+        <AdminLayout
         header={
             <>
                 <Breadcrumb
@@ -91,7 +91,7 @@ const Edit = ({ product, categories, brands }) => {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AdminLayout>
     );
 };
 

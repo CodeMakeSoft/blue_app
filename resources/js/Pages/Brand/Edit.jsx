@@ -1,5 +1,5 @@
 import React from "react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import Form from "@/Components/Category/Form"; // Asegúrate de tener este componente
 import PrimaryButton from "@/Components/PrimaryButton";
@@ -38,7 +38,7 @@ export default function Edit({ auth, brand }) {
     };
 
     return (
-        <AuthenticatedLayout
+        <AdminLayout
             user={auth.user}
             header={
                 <div>
@@ -85,6 +85,6 @@ export default function Edit({ auth, brand }) {
                     </div>
                 </Form>
             </div>
-        </AuthenticatedLayout>
+        </AdminLayout>
     );
 }

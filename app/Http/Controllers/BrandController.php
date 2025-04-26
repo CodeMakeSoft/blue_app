@@ -9,14 +9,31 @@ use App\Http\Requests\Brand\StoreRequest;
 use App\Http\Requests\Brand\UpdateRequest;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class BrandController extends Controller
+class BrandController extends Controller implements HasMiddleware
 {
-    public function index(): Response 
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:brand-view', only: ['index']),
+            new Middleware('permission:brand-create', only: ['store']),
+            new Middleware('permission:brand-edit', only: ['update']),
+            new Middleware('permission:brand-delete', only: ['destroy']),
+        ];
+    }
+    public function index(Request $request): Response 
     {
         $brands = Brand::with('image')->get();
         return Inertia::render('Brand/Index', [
             'brands' => $brands,
+            'can' => [
+                'brand_edit' => $request->user() ? $request->user()->can('brand-edit') : false,
+                'brand_delete' => $request->user() ? $request->user()->can('brand-delete') : false,
+                'brand_create' => $request->user() ? $request->user()->can('brand-create') : false,
+                
+            ],
         ]);
     }
 

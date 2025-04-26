@@ -13,7 +13,7 @@ import Pagination from "@/Components/category/Pagination";
 import ConfirmDeleteModal from "@/Components/category/ConfirmDeleteModal";
 import Breadcrumb from "@/Components/Breadcrumb";
 
-export default function Index({ auth, categories }) {
+export default function Index({ auth, categories, can }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -91,16 +91,18 @@ export default function Index({ auth, categories }) {
                         <h1 className="text-2xl font-semibold text-gray-800">
                             Gestión de Categorías
                         </h1>
-                        <button
-                            onClick={() =>
+                        {can.category_create && (
+                            <button
+                                onClick={() =>
                                 (window.location.href =
                                     route("category.create"))
-                            }
-                            className="flex items-center bg-gray-100 text-gray-900 px-5 py-2.5 rounded-md hover:bg-gray-200 transition duration-300 shadow-sm"
-                        >
-                            <PlusCircleIcon className="w-5 h-5 mr-2" />
-                            Nueva Categoría
-                        </button>
+                                }
+                                className="flex items-center bg-gray-100 text-gray-900 px-5 py-2.5 rounded-md hover:bg-gray-200 transition duration-300 shadow-sm"
+                            >
+                                <PlusCircleIcon className="w-5 h-5 mr-2" />
+                                Nueva Categoría
+                            </button>
+                        )}
                     </div>
 
                     {/* Barra de búsqueda */}
@@ -192,30 +194,34 @@ export default function Index({ auth, categories }) {
                                                             >
                                                                 <EyeIcon className="w-6 h-6" />
                                                             </Link>
-                                                            <Link
-                                                                href={route(
-                                                                    "category.edit",
-                                                                    {
-                                                                        category:
-                                                                            category.id,
+                                                            {can.category_edit && (
+                                                                <Link
+                                                                    href={route(
+                                                                        "category.edit",
+                                                                        {
+                                                                            category:
+                                                                                category.id,
+                                                                        }
+                                                                    )}
+                                                                    className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                                                                    title="Editar"
+                                                                >
+                                                                    <PencilSquareIcon className="w-6 h-6" />
+                                                                </Link>
+                                                            )}
+                                                            {can.category_delete && (
+                                                                <button
+                                                                    className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
+                                                                    onClick={() =>
+                                                                        handleDelete(
+                                                                            category
+                                                                        )
                                                                     }
-                                                                )}
-                                                                className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
-                                                                title="Editar"
-                                                            >
-                                                                <PencilSquareIcon className="w-6 h-6" />
-                                                            </Link>
-                                                            <button
-                                                                className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        category
-                                                                    )
-                                                                }
-                                                                title="Eliminar"
-                                                            >
-                                                                <TrashIcon className="w-6 h-6" />
-                                                            </button>
+                                                                    title="Eliminar"
+                                                                >
+                                                                    <TrashIcon className="w-6 h-6" />
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>

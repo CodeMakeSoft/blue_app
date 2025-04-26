@@ -13,7 +13,7 @@ import Pagination from "@/Components/Category/Pagination";
 import ConfirmDeleteModal from "@/Components/Brand/ConfirmDeleteModal";
 import Breadcrumb from "@/Components/Breadcrumb";
 
-export default function Index({ auth, brands }) {
+export default function Index({ auth, brands, can }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -88,15 +88,17 @@ export default function Index({ auth, brands }) {
                         <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                             Gestión de Marcas
                         </h1>
-                        <button
-                            onClick={() =>
-                                (window.location.href = route("brand.create"))
-                            }
-                            className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
-                        >
-                            <PlusCircleIcon className="w-5 h-5 mr-2" />
-                            Nueva Marca
-                        </button>
+                        {can.brand_create && (
+                            <button
+                                onClick={() =>
+                                    (window.location.href = route("brand.create"))
+                                }
+                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
+                            >
+                                <PlusCircleIcon className="w-5 h-5 mr-2" />
+                                Nueva Marca
+                            </button>
+                        )}
                     </div>
 
                     {/* Barra de búsqueda */}
@@ -182,29 +184,33 @@ export default function Index({ auth, brands }) {
                                                         >
                                                             <EyeIcon className="w-6 h-6" />
                                                         </Link>
-                                                        <Link
-                                                            href={route(
-                                                                "brand.edit",
-                                                                {
-                                                                    brand: brand.id,
+                                                        {can.brand_edit && (
+                                                            <Link
+                                                                href={route(
+                                                                    "brand.edit",
+                                                                    {
+                                                                        brand: brand.id,
+                                                                    }
+                                                                )}
+                                                                className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900"
+                                                                title="Editar"
+                                                            >
+                                                                <PencilSquareIcon className="w-6 h-6" />
+                                                            </Link>
+                                                        )}
+                                                        {can.brand_delete && (
+                                                            <button
+                                                                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900"
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        brand
+                                                                    )
                                                                 }
-                                                            )}
-                                                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900"
-                                                            title="Editar"
-                                                        >
-                                                            <PencilSquareIcon className="w-6 h-6" />
-                                                        </Link>
-                                                        <button
-                                                            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    brand
-                                                                )
-                                                            }
-                                                            title="Eliminar"
-                                                        >
-                                                            <TrashIcon className="w-6 h-6" />
-                                                        </button>
+                                                                title="Eliminar"
+                                                            >
+                                                                <TrashIcon className="w-6 h-6" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>
