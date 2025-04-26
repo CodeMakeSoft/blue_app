@@ -130,7 +130,14 @@ export function Sidebar({ children }) {
     );
 }
 
-Sidebar.Item = function SidebarItem({ icon, text, href, active, alert, children }) {
+Sidebar.Item = function SidebarItem({
+    icon,
+    text,
+    href,
+    active,
+    alert,
+    children,
+}) {
     const { expanded } = useContext(SidebarContext);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -142,65 +149,69 @@ Sidebar.Item = function SidebarItem({ icon, text, href, active, alert, children 
     };
 
     return (
-        <li
-            className={`
-                relative flex items-center py-2 px-3 my-1
-                font-medium rounded-md
-                transition-colors group
-                ${
-                    active
-                        ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800 dark:from-indigo-900 dark:to-indigo-800 dark:text-indigo-100"
-                        : "hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
-                }
-            `}
-        >
-            <Link
-                href={href || "#"}
-                className="w-full flex items-center"
-                onClick={handleClick}
+        <li className="relative">
+            <div
+                className={`
+                    relative flex items-center py-2 px-3 my-1
+                    font-medium rounded-md
+                    transition-colors group
+                    ${
+                        active
+                            ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800 dark:from-indigo-900 dark:to-indigo-800 dark:text-indigo-100"
+                            : "hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
+                    }
+                `}
             >
-                <span className="flex-shrink-0">{icon}</span>
-                <span
-                    className={`overflow-hidden transition-all ${
-                        expanded ? "w-52 ml-3" : "w-0"
-                    }`}
+                <Link
+                    href={href || "#"}
+                    className="w-full flex items-center"
+                    onClick={handleClick}
                 >
-                    {text}
-                </span>
-                {children && expanded && (
-                    <ChevronDownIcon
-                        className={`h-5 w-5 text-gray-600 dark:text-gray-300 ml-auto transition-transform ${
-                            isExpanded ? "rotate-180" : ""
+                    <span className="flex-shrink-0">{icon}</span>
+                    <span
+                        className={`overflow-hidden transition-all ${
+                            expanded ? "w-52 ml-3" : "w-0"
                         }`}
-                    />
-                )}
-                {alert && (
-                    <div
-                        className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
-                            expanded ? "" : "top-2"
-                        }`}
-                    />
-                )}
-            </Link>
+                    >
+                        {text}
+                    </span>
+                    {children && expanded && (
+                        <ChevronDownIcon
+                            className={`h-5 w-5 text-gray-600 dark:text-gray-300 ml-auto transition-transform ${
+                                isExpanded ? "rotate-180" : ""
+                            }`}
+                        />
+                    )}
+                    {alert && (
+                        <div
+                            className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+                                expanded ? "" : "top-2"
+                            }`}
+                        />
+                    )}
+                </Link>
+            </div>
 
             {children && expanded && isExpanded && (
-                <div className="w-full pl-6 dark:text-gray-300">
-                    {React.Children.map(children, child =>
+                <div className="ml-6 pl-2 mt-1 space-y-1 border-l-2 border-indigo-200 dark:border-gray-600">
+                    {React.Children.map(children, (child) =>
                         React.cloneElement(child, {
-                            className: "w-full flex items-center text-left p-2 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-md"
+                            className:
+                                "w-full flex items-center text-left p-2 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-md text-sm",
                         })
                     )}
                 </div>
             )}
 
+            {/* Tooltip para cuando está colapsado */}
             {!expanded && (
                 <div
                     className={`
-                    absolute left-full rounded-md px-2 py-1 ml-6
-                    bg-indigo-100 dark:bg-gray-700 text-indigo-800 dark:text-gray-200 text-sm
-                    invisible opacity-20 -translate-x-3 transition-all
-                    group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
-                `}
+                        absolute left-full rounded-md px-2 py-1 ml-6
+                        bg-indigo-100 dark:bg-gray-700 text-indigo-800 dark:text-gray-200 text-sm
+                        invisible opacity-20 -translate-x-3 transition-all
+                        group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+                    `}
                 >
                     {text}
                 </div>
