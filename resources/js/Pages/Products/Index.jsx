@@ -1,67 +1,70 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import React, { useState, useRef, useEffect } from "react";
 import {
     PencilSquareIcon,
-    PlusCircleIcon,
     TrashIcon,
+    PlusCircleIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-} from "@heroicons/react/24/solid";
-import { useState, useRef, useEffect } from "react";
-import ConfirmDelete from "@/Components/Product/ConfirmDelete";
-import Pagination from "@/Components/Product/Pagination";
-import { usePage } from "@inertiajs/react";
+    MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
+import Pagination from "@/Components/category/Pagination";
+import ConfirmDeleteModal from "@/Components/Product/ConfirmDelete";
 import Breadcrumb from "@/Components/Breadcrumb";
-
+import { usePage } from "@inertiajs/react";
 
 export default function Index({ products, can }) {
     const { delete: destroy } = useForm();
     const { auth } = usePage().props;
-    const [modalOpen, setModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [searchTerm, setSearchTerm] = useState("");
     const carouselRefs = useRef({});
     const [scrollStates, setScrollStates] = useState({});
 
-    const totalPages = Math.ceil(products.length / itemsPerPage);
+    const filteredProducts = products.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentProducts = products.slice(startIndex, endIndex);
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
 
     useEffect(() => {
         const initialStates = {};
-        currentProducts.forEach((product) => {
-            initialStates[product.id] = {
-                position: 0,
-                maxScroll: Math.max(
-                    0,
-                    ((product.images?.length || 0) - 2) * 116
-                ),
-            };
+        paginatedProducts.forEach((product) => {
+            if (product.images?.length > 0) {
+                initialStates[product.id] = {
+                    position: 0,
+                    maxScroll: (product.images.length - 1) * 116,
+                    canScrollLeft: false,
+                    canScrollRight: product.images.length > 2,
+                };
+            }
         });
         setScrollStates(initialStates);
-    }, [currentProducts]);
+    }, [paginatedProducts]);
 
-    const openDeleteModal = (product) => {
+    const handleDelete = (product) => {
         setSelectedProduct(product);
-        setModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setModalOpen(false);
-        setSelectedProduct(null);
     };
 
     const handleConfirmDelete = () => {
         if (selectedProduct) {
             destroy(route("products.destroy", selectedProduct.id), {
                 onSuccess: () => {
-                    closeModal();
+                    setSelectedProduct(null);
                 },
             });
         }
+    };
+
+    const handleCloseModal = () => {
+        setSelectedProduct(null);
     };
 
     const scrollCarousel = (productId, direction) => {
@@ -94,6 +97,8 @@ export default function Index({ products, can }) {
             [productId]: {
                 ...prev[productId],
                 position: newPosition,
+                canScrollLeft: newPosition > 0,
+                canScrollRight: newPosition < currentState.maxScroll,
             },
         }));
     };
@@ -101,11 +106,16 @@ export default function Index({ products, can }) {
     const handleScroll = (productId) => {
         const carousel = carouselRefs.current[productId];
         if (carousel) {
+            const newPosition = carousel.scrollLeft;
+            const currentState = scrollStates[productId] || { maxScroll: 0 };
+
             setScrollStates((prev) => ({
                 ...prev,
                 [productId]: {
                     ...prev[productId],
-                    position: carousel.scrollLeft,
+                    position: newPosition,
+                    canScrollLeft: newPosition > 0,
+                    canScrollRight: newPosition < currentState.maxScroll,
                 },
             }));
         }
@@ -113,6 +123,7 @@ export default function Index({ products, can }) {
 
     return (
         <AdminLayout
+            user={auth.user}
             header={
                 <div>
                     <Breadcrumb
@@ -284,13 +295,12 @@ export default function Index({ products, can }) {
                     </div>
                 </div>
             </div>
-            {modalOpen && (
-                <ConfirmDelete
-                    product={selectedProduct}
-                    onClose={closeModal}
-                    onConfirm={handleConfirmDelete}
-                />
-            )}
+
+            <ConfirmDeleteModal
+                product={selectedProduct}
+                onClose={handleCloseModal}
+                onConfirm={handleConfirmDelete}
+            />
         </AdminLayout>
     );
 }

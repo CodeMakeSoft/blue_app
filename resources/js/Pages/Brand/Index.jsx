@@ -179,7 +179,7 @@ export default function Index({ auth, brands, can }) {
                                                                     brand: brand.id,
                                                                 }
                                                             )}
-                                                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                             title="Ver detalle"
                                                         >
                                                             <EyeIcon className="w-6 h-6" />
@@ -211,6 +211,29 @@ export default function Index({ auth, brands, can }) {
                                                                 <TrashIcon className="w-6 h-6" />
                                                             </button>
                                                         )}
+                                                        <Link
+                                                            href={route(
+                                                                "brand.edit",
+                                                                {
+                                                                    brand: brand.id,
+                                                                }
+                                                            )}
+                                                            className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                                            title="Editar"
+                                                        >
+                                                            <PencilSquareIcon className="w-6 h-6" />
+                                                        </Link>
+                                                        <button
+                                                            className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    brand
+                                                                )
+                                                            }
+                                                            title="Eliminar"
+                                                        >
+                                                            <TrashIcon className="w-6 h-6" />
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
