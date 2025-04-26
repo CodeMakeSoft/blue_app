@@ -19,7 +19,6 @@ export default function AdminLayout({ children, header, activeRoute }) {
     return (
         <AuthenticatedLayout>
             <div className="flex min-h-screen bg-gray-50 dark:bg-gray-800 mt-[6rem]">
-            <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
                 {/* Sidebar */}
                 <Sidebar>
                     <Sidebar.Item
