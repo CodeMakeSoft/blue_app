@@ -1,5 +1,4 @@
 import { Head, Link } from '@inertiajs/react';
-import Footer from '@/Components/Footer';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Confirm from '@/Components/Confirm';
 import { useState } from 'react';
@@ -169,8 +168,6 @@ export default function Dashboard({ auth, products, brands, categories, filters 
                         </div>
                     </section>
                 </main>
-
-                <Footer />
             </div>
 
             {/* Modal */}
