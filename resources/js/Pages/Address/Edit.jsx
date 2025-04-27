@@ -56,7 +56,7 @@ export default function Edit({ auth, location, countries, districts }) {
                     <Breadcrumb
                         routes={[
                             { name: "Dashboard", link: route("dashboard") },
-                            { name: "Mi cuenta", link: route("address.index") },
+                            { name: "Mis Direcciones", link: route("address.index") },
                         ]}
                         currentPage="Editar Dirección"
                     />
