@@ -112,7 +112,7 @@ export default function Welcome({ auth, products, brands, categories }) {
                                     >
                                         <div className="relative flex flex-col items-center">
                                             <div className="relative group w-24 h-24">
-                                                <img src={brand.image} alt={brand.name} className="w-full h-full object-contain" />
+                                                <img src={brand.image_url} alt={brand.name} className="w-full h-full object-contain" />
                                                 <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-full">
                                                     <button 
                                                         onClick={(e) => handleItemClick('marca', e)}
@@ -143,7 +143,7 @@ export default function Welcome({ auth, products, brands, categories }) {
                                     >
                                         <div className="relative flex flex-col items-center">
                                             <div className="relative group w-24 h-24">
-                                                <img src={category.image} alt={category.name} className="w-full h-full object-contain" />
+                                                <img src={category.image_url} alt={category.name} className="w-full h-full object-contain" />
                                                 <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-full">
                                                     <button 
                                                         onClick={(e) => handleItemClick('categoría', e)}

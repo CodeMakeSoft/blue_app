@@ -40,6 +40,7 @@ export default function Dashboard({ auth, products, brands, categories, filters 
         <AuthenticatedLayout
             header={
                 <div>
+                    <Head title="Dashboard" />
                     <Breadcrumb
                         routes={[
                             { name: "Dashboard", link: route("dashboard") },
@@ -86,13 +87,6 @@ export default function Dashboard({ auth, products, brands, categories, filters 
                                         <div className="relative">
                                             <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />
                                             <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                <button
-                                                    onClick={(e) => handleItemClick('producto', e)}
-                                                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition-all duration-300 transform hover:scale-110"
-                                                    title="Ver producto"
-                                                >
-                                                    <FontAwesomeIcon icon={faEye} className="text-lg" />
-                                                </button>
                                             </div>
                                         </div>
                                         <div className="p-4">
@@ -118,7 +112,7 @@ export default function Dashboard({ auth, products, brands, categories, filters 
                                     >
                                         <div className="relative flex flex-col items-center">
                                             <div className="relative group w-24 h-24">
-                                                <img src={brand.image} alt={brand.name} className="w-full h-full object-contain" />
+                                                <img src={brand.image_url} alt={brand.name} className="w-full h-full object-contain" />
                                                 <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-full">
                                                     <button 
                                                         onClick={(e) => handleItemClick('marca', e)}
@@ -149,7 +143,7 @@ export default function Dashboard({ auth, products, brands, categories, filters 
                                     >
                                         <div className="relative flex flex-col items-center">
                                             <div className="relative group w-24 h-24">
-                                                <img src={category.image} alt={category.name} className="w-full h-full object-contain" />
+                                                <img src={category.image_url} alt={category.name} className="w-full h-full object-contain" />
                                                 <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-full">
                                                     <button 
                                                         onClick={(e) => handleItemClick('categoría', e)}
