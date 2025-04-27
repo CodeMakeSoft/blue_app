@@ -17,19 +17,16 @@ class AddressSeeder extends Seeder
             'id' => 484,
             'name' => 'México',
         ]);
-
         DB::table('states')->insert([
             'id' => 13,
             'name' => 'Hidalgo',
             'country_id' => 484,
         ]);
-
         DB::table('municipalities')->insert([
             'id' => 48,
             'name' => 'Pachuca de Soto',
             'state_id' => 13,
         ]);
-
         DB::table('cities')->insert([
             'id' => 3,
             'name' => 'Pachuca de Soto',

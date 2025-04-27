@@ -31,7 +31,6 @@ class RoleSeeder extends Seeder
             'product-edit',
             'can-access-admin-panel',
         ];
-
         // Crear roles y asignar permisos
         $admin = Role::firstOrCreate(['name' => 'Admin']);
         $admin->syncPermissions($adminPermissions);

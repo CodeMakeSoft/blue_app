@@ -26,12 +26,12 @@ export default function Index({ locations }) {
                     <Breadcrumb
                         routes={[
                             { name: "Inicio", link: route("dashboard") },
-                            { name: "Catálogo de Marcas", link: route("address.index") },
+                            { name: "Mi Cuenta", link: route("account") },
                         ]}
-                        currentPage="Catálogo de Marcas"
+                        currentPage="Mis Direcciones"
                     />
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
-                        Catálogo de Marcas
+                        Mis Direcciones
                     </h2>
                 </div>
             }
