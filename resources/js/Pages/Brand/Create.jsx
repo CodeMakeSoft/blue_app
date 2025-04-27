@@ -1,4 +1,4 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import Form from "@/Components/Category/Form"; // Asegúrate de tener este componente
 import PrimaryButton from "@/Components/PrimaryButton";
@@ -30,7 +30,7 @@ export default function Create({ auth }) {
     };
 
     return (
-        <AuthenticatedLayout
+        <AdminLayout
             user={auth.user}
             header={
                 <div>
@@ -77,6 +77,6 @@ export default function Create({ auth }) {
                     </div>
                 </Form>
             </div>
-        </AuthenticatedLayout>
+        </AdminLayout>
     );
 }

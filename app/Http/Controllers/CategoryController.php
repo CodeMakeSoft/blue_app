@@ -9,16 +9,33 @@ use App\Http\Requests\Category\StoreRequest;
 use App\Http\Requests\Category\UpdateRequest;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:category-view', only: ['index']),
+            new Middleware('permission:category-create', only: ['store']),
+            new Middleware('permission:category-edit', only: ['update']),
+            new Middleware('permission:category-delete', only: ['destroy']),
+        ];
+    }
     
-    public function index(): Response 
+    public function index(Request $request): Response 
     {
         $categories = Category::with('image')->get(); 
         return Inertia::render('Category/Index', [
             'categories' => $categories,
+            'can' => [
+                'category_edit' => $request->user() ? $request->user()->can('category-edit') : false,
+                'category_delete' => $request->user() ? $request->user()->can('category-delete') : false,
+                'category_create' => $request->user() ? $request->user()->can('category-create') : false,
+                
+            ],
         ]);
     }
 

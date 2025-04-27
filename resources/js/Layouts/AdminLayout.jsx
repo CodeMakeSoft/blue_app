@@ -3,7 +3,6 @@ import { Sidebar } from "@/Components/Sidebar";
 import { Head, Link } from "@inertiajs/react";
 import { route } from "ziggy-js";
 
-
 import {
     UsersIcon,
     TagIcon,

@@ -2,26 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
+use App\Models\Brand;
+use App\Models\Image;
+use Inertia\Response;
+use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Products\StoreRequest;
 use App\Http\Requests\Products\UpdateRequest;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Image;
-use App\Models\Product;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Response;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            
+            new Middleware('permission:product-view', only: ['index']),
+            new Middleware('permission:product-create', only: ['store']),
+            new Middleware('permission:product-edit', only: ['update']),
+            new Middleware('permission:product-delete', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the products.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         return Inertia::render('Products/Index', [
-            'products' => Product::with(['images', 'category', 'brand'])->get()
+            'products' => Product::with(['images', 'category', 'brand'])->get(),
+            'can' => [
+                'product_edit' => $request->user() ? $request->user()->can('product-edit') : false,
+                'product_delete' => $request->user() ? $request->user()->can('product-delete') : false,
+                'product_create' => $request->user() ? $request->user()->can('product-create') : false,
+                
+            ],
         ]);
     }
 
