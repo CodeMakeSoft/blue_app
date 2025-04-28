@@ -7,6 +7,8 @@ import { calculateCartTotals } from "@/Utils/CartUtils";
 import { Link } from '@inertiajs/react';
 import { useToast } from "@/hooks/use-toast";
 import Breadcrumb from "@/Components/Breadcrumb";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
 export default function Index({ cart = [] }) {
     const { toast } = useToast();
@@ -58,7 +60,8 @@ export default function Index({ cart = [] }) {
                         ]}
                         currentPage="Carrito"
                     />
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2 flex items-center gap-2">
+                        <FontAwesomeIcon icon={faShoppingCart} className="text-blue-600 dark:text-blue-500" />
                         Tu Carrito
                     </h2>
                 </div>

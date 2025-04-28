@@ -93,13 +93,14 @@ export default function AuthenticatedLayout({ header, children }) {
     // Detecta si estamos en rutas de carrito o checkout
     const { url } = usePage();
     const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout') || url.startsWith('/purchases');
-    const activeLink = route().current('checkout.index')
+    const activeLink = url.startsWith('/checkout')
         ? 'checkout.index'
-        : route().current('cart.index')
+        : url.startsWith('/cart')
         ? 'cart.index'
-        : route().current('purchases.index')
+        : url.startsWith('/purchases')
         ? 'purchases.index'
         : '';
+
     const userCanAccessAdminPanel = auth.permissions.includes("can-access-admin-panel");
 
     // Menú items para Sidebar

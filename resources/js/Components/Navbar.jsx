@@ -31,7 +31,20 @@ export default function Navbar({
         setIsCheckoutConfirmVisible(false);
     };
 
-    const getActiveClass = (link) => activeLink === link ? 'active' : '';
+    // Updated active class to be visible in both light and dark modes
+    const getActiveClass = (routeName) => {
+        return activeLink === routeName 
+            ? 'bg-blue-500 text-white font-semibold rounded-lg border-b-2 border-blue-700 shadow-md'
+            : '';
+    };
+
+    // Updated with consistent hover color
+    const sharedClasses = "navbar-link flex items-center text-gray-800 dark:text-white hover:bg-blue-100 dark:hover:bg-blue-700 transition duration-200 px-3 py-2 rounded-lg";
+
+    // Consistent button styling
+    const buttonClasses = "navbar-button flex items-center px-4 py-2 rounded-lg transition duration-200";
+    const activeButtonClasses = "bg-blue-500 text-white hover:bg-blue-600 dark:hover:bg-blue-600";
+    const disabledButtonClasses = "bg-gray-300 text-gray-600 cursor-not-allowed dark:bg-gray-600 dark:text-gray-300";
 
     return (
         <nav className="navbar bg-white dark:bg-gray-700 text-gray-800 dark:text-white p-4 shadow-md rounded-md">
@@ -39,30 +52,30 @@ export default function Navbar({
                 <li className="navbar-item">
                     <Link
                         href={route('dashboard')}
-                        className="navbar-link flex items-center text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"
+                        className={`${sharedClasses} ${getActiveClass('dashboard')}`}
                     >
                         <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
                         Seguir Comprando
                     </Link>
                 </li>
                 <li className="navbar-item">
-                    {activeLink === 'checkout.index' ? (
-                        <button
-                            onClick={() => setIsCheckoutConfirmVisible(true)}
-                            className="navbar-button bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400 transition duration-200"
-                        >
-                            <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
-                            Volver al Carrito
-                        </button>
-                    ) : (
-                        <Link
-                            href={route('cart.index')}
-                            className={`navbar-link flex items-center text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 ${getActiveClass('cart.index')}`}
-                        >
-                            <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
-                            Carrito
-                        </Link>
-                    )}
+                {activeLink === 'checkout.index' ? (
+                    <button
+                        onClick={() => setIsCheckoutConfirmVisible(true)}
+                        className={`${sharedClasses} ${getActiveClass('cart.index')}`}
+                    >
+                        <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
+                        Volver al Carrito
+                    </button>
+                ) : (
+                    <Link
+                        href={route('cart.index')}
+                        className={`${sharedClasses} ${getActiveClass('cart.index')}`}
+                    >
+                        <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
+                        Carrito
+                    </Link>
+                )}
                 </li>
                 <li className="navbar-item">
                     {activeLink === 'cart.index' ? (
@@ -71,7 +84,7 @@ export default function Navbar({
                             e.preventDefault();
                             isCartEmpty ? setIsConfirmVisible(false) : setIsConfirmVisible(true);
                         }}
-                        className={`navbar-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 dark:hover:bg-green-400 transition duration-200 ${isCartEmpty ? 'disabled opacity-50 cursor-not-allowed' : ''}`}
+                        className={`${sharedClasses} ${getActiveClass('checkout.index')} ${buttonClasses} ${isCartEmpty ? disabledButtonClasses : activeButtonClasses}`}
                         disabled={isCartEmpty}
                         >
                         <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
@@ -84,9 +97,7 @@ export default function Navbar({
                             router.visit(route('checkout.index'));
                             }
                         }}
-                        className={`navbar-button flex items-center px-4 py-2 rounded-lg transition duration-200 ${isCartEmpty 
-                            ? 'bg-gray-300 text-gray-600 cursor-not-allowed dark:bg-gray-600 dark:text-gray-300' 
-                            : 'bg-blue-500 text-white hover:bg-blue-600 dark:hover:bg-blue-400'}`}
+                        className={`${sharedClasses} ${getActiveClass('checkout.index')} ${buttonClasses} ${isCartEmpty ? disabledButtonClasses : activeButtonClasses}`}
                         disabled={isCartEmpty}
                         >
                         <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
@@ -97,7 +108,7 @@ export default function Navbar({
                 <li className="navbar-item">
                     <Link
                         href={route('purchases.index')}
-                        className={`navbar-link flex items-center text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 ${getActiveClass('purchases.index')}`}
+                        className={`${sharedClasses} ${getActiveClass('purchases.index')}`}
                     >
                         <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
                         Mis Compras
