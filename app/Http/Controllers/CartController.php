@@ -105,9 +105,26 @@ class CartController extends Controller
 
         $products = $cart->products()->with('images')->withPivot('quantity')->get();
 
-        // return Inertia::render('Cart/Index', [
-        //     'cart' => $products,
-        // ]);
         return redirect()->route('cart.index');
+    }
+
+    public function getCartStatus()
+    {
+        $user = Auth::user();
+        $cart = $user->cart;
+    
+        if (!$cart) {
+            return response()->json([
+                'count' => 0,
+                'items' => []
+            ]);
+        }
+    
+        $products = $cart->products()->with('images')->withPivot('quantity')->get();
+    
+        return response()->json([
+            'count' => $products->count(),
+            'items' => $products
+        ]);
     }
 }

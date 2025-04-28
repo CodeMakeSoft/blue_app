@@ -41,7 +41,7 @@ export default function Create({ auth, countries, districts }) {
                 <div>
                     <Breadcrumb
                         routes={[
-                            { name: "Dashboard", link: route("dashboard") },
+                            { name: "Inicio", link: route("dashboard") },
                             {
                                 name: "Mis Direcciones",
                                 link: route("address.index"),
