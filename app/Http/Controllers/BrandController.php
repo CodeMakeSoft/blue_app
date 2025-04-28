@@ -130,4 +130,20 @@ class BrandController extends Controller implements HasMiddleware
             'brands' => $brands
         ]);
     }
+
+    public function products(Brand $brand)
+    {
+        $user = auth()->user();
+        
+        return Inertia::render('Brand/Partials/Products', [
+            'auth' => [
+                'user' => $user,
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+            ],
+            'brand' => $brand->load('image'),
+            'products' => $brand->products()
+                ->with(['images', 'category', 'brand'])
+                ->paginate(12)
+        ]);
+    }
 }

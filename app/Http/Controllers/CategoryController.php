@@ -140,4 +140,14 @@ class CategoryController extends Controller implements HasMiddleware
             'categories' => $categories 
         ]);
     }
+
+    public function products(Category $category)
+    {
+        return Inertia::render('Category/Partials/Products', [
+            'category' => $category->load('image'),
+            'products' => $category->products()
+                ->with(['images', 'category', 'brand'])
+                ->paginate(12)
+        ]);
+    }
 }

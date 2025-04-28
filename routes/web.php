@@ -67,6 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
     Route::get('/categories/catalog', [CategoryController::class, 'catalog'])->name('category.catalog');
     Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('category.show');
+    Route::get('/categories/{category}/products', [CategoryController::class, 'products'])->name('categories.products');
 
     // Marcas
     Route::get('brands', [BrandController::class, 'index'])->name('brand.index');
@@ -77,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('brands/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
     Route::get('/brands/catalog', [BrandController::class, 'catalog'])->name('brand.catalog');
     Route::get('/brands/{brand}', [BrandController::class, 'show'])->name('brand.show');
+    Route::get('/brands/{brand}/products', [BrandController::class, 'products'])->name('brands.products');
 
     // Productos
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');

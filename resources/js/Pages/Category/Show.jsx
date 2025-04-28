@@ -45,7 +45,7 @@ export default function Show({ auth, category }) {
 
                                 <div className="mt-8">
                                     <Link
-                                        href={route('dashboard', { category: category.id })}
+                                        href={route('categories.products', { category: category.id })}
                                         className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md"
                                     >
                                         <span className="font-semibold">Ver productos</span>

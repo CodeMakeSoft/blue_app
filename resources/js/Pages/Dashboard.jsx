@@ -125,6 +125,14 @@ export default function Dashboard({ auth, products, brands, categories, filters 
         router.get(`/products/${product.id}`);
     };
 
+    const handleCategoryClick = (category) => {
+        router.get(route('categories.products', category.id));
+    };
+
+    const handleBrandClick = (brand) => {
+        router.get(route('brands.products', brand.id));
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -271,12 +279,12 @@ export default function Dashboard({ auth, products, brands, categories, filters 
                                             />
                                         </div>
                                         <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg">
-                                            <button
-                                                onClick={() => handleImageClick(brand)}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transform hover:scale-110 transition-all"
-                                            >
-                                                <FontAwesomeIcon icon={faEye} />
-                                            </button>
+                                        <button
+                                            onClick={() => handleBrandClick(brand)}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transform hover:scale-110 transition-all"
+                                        >
+                                            <FontAwesomeIcon icon={faEye} />
+                                        </button>
                                         </div>
                                     </div>
                                     <h3 className="text-center mt-4 font-semibold text-gray-900 dark:text-gray-100">
@@ -309,7 +317,7 @@ export default function Dashboard({ auth, products, brands, categories, filters 
                                         </div>
                                         <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg">
                                             <button
-                                                onClick={() => handleImageClick(category)}
+                                                onClick={() => handleCategoryClick(category)}
                                                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transform hover:scale-110 transition-all"
                                             >
                                                 <FontAwesomeIcon icon={faEye} />
