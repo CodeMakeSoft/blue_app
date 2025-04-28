@@ -71,7 +71,8 @@ export default function Index({ auth, brands, can }) {
                 <div>
                     <Breadcrumb
                         routes={[{ name: "Inicio", link: route("dashboard") }]}
-                        currentPage="Catálogo de Marcas"
+                        
+                        currentPage="Marcas"
                     />
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
                         Catálogo de Marcas
