@@ -12,6 +12,7 @@ import {
     TrashIcon,
 } from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Role({ activeRoute, can }) {
     const { roles, permissions } = usePage().props;
@@ -47,13 +48,26 @@ export default function Role({ activeRoute, can }) {
     };
 
     return (
-        <AdminLayout activeRoute={activeRoute}>
-            <Head title="Roles" />
+        <AdminLayout
+            activeRoute={activeRoute}
+            header={
+                <div>
+                    <Breadcrumb
+                        routes={[{ name: "Admin", link: route("admin.panel") }]}
+                        currentPage="Gestión de Roles"
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Roles
+                    </h2>
+                </div>
+            }
+        >
+            <Head title="Gestión de Roles" />
             <Toaster position="top-right" richColors />
             <div className="card dark:bg-gray-800 dark:text-gray-100">
-                <div className="card-header">
-                    <h2 className="text-xl font-semibold dark:text-gray-200">Roles</h2>
-                </div>
+                <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                    Gestión de Roles
+                </h1>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.role_create && (

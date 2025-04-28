@@ -9,9 +9,9 @@ const Pagination = ({ data, onPageChange }) => {
                                 onClick={() => onPageChange(link.url)}
                                 className={`px-3 py-1 rounded transition-all ${
                                     link.active
-                                        ? "bg-blue-500 text-white"
-                                        : "bg-gray-200 text-gray-700 hover:ring-2 hover:ring-blue-400 hover:bg-gray-100"
-                                }`}
+                                        ? "bg-blue-500 dark:bg-blue-600 text-white"
+                                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:ring-2 hover:ring-blue-400 dark:hover:ring-blue-500 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 disabled={!link.url}
                             >
                                 {link.label

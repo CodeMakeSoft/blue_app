@@ -23,61 +23,73 @@ export default function Show({ auth, brand }) {
                 </div>
             }
         >
-            <div className="py-6 px-3 sm:px-6 lg:px-8">
-                {/* Contenedor principal */}
-                <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-                    <div className="p-6 flex flex-col md:flex-row gap-8">
-                        {/* Información de la Marca (40%) */}
-                        <div className="md:w-2/5 flex flex-col justify-center">
-                            <div className="text-center md:text-left">
-                                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-                                    {brand.name}
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line mb-8">
-                                    {brand.description}
-                                </p>
+            <div className="py-8 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    {/* Card principal */}
+                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl">
+                        <div className="p-8 flex flex-col md:flex-row gap-12">
+                            {/* Información de la Marca */}
+                            <div className="md:w-2/5 flex flex-col justify-between">
+                                <div className="space-y-6">
+                                    <div className="space-y-4">
+                                        <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+                                            {brand.name}
+                                        </h3>
+                                        <div className="h-1 w-20 bg-blue-500 rounded-full"></div>
+                                    </div>
+                                    
+                                    <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed whitespace-pre-line">
+                                        {brand.description}
+                                    </p>
+                                </div>
 
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                                <div className="mt-8">
                                     <Link
-                                        href={route("brand.edit", {
-                                            brand: brand.id,
-                                        })}
-                                        className="inline-block bg-blue-800 hover:bg-blue-900 text-white px-6 py-2 rounded-md transition"
+                                        href={route('dashboard', { brand: brand.id })}
+                                        className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md"
                                     >
-                                        Editar Marca
-                                    </Link>
-                                    <Link
-                                        href="#"
-                                        className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium px-6 py-2 border border-blue-200 dark:border-blue-700 rounded-md transition"
-                                    >
-                                        Ver productos →
+                                        <span className="font-semibold">Ver productos</span>
+                                        <ChevronLeftIcon className="h-5 w-5 rotate-180" />
                                     </Link>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Contenedor de Imagen (60%) */}
-                        <div className="md:w-3/5">
-                            <div className="bg-white dark:bg-gray-800 h-full flex items-center justify-center">
-                                {brand.image ? (
-                                    <div className="relative w-full">
-                                        <img
-                                            src={`/storage/${brand.image.url}`}
-                                            alt={`Imagen de ${brand.name}`}
-                                            className="w-full h-auto max-h-96 object-contain mx-auto"
-                                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src = "/images/placeholder.jpg";
-                                            }}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-12 w-full bg-gray-50 dark:bg-gray-700 rounded">
-                                        <p className="text-gray-500 dark:text-gray-400">
-                                            No hay imagen disponible
-                                        </p>
-                                    </div>
-                                )}
+                            {/* Contenedor de Imagen */}
+                            <div className="md:w-3/5">
+                                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 h-full flex items-center justify-center transition-all duration-300 hover:shadow-inner">
+                                    {brand.image ? (
+                                        <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg">
+                                            <img
+                                                src={`/storage/${brand.image.url}`}
+                                                alt={`Imagen de ${brand.name}`}
+                                                className="w-full h-full object-contain transform transition-transform duration-300 hover:scale-105"
+                                                onError={(e) => {
+                                                    e.target.onerror = null;
+                                                    e.target.src = "/images/placeholder.jpg";
+                                                }}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-16 w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+                                            <svg
+                                                className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={1}
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                />
+                                            </svg>
+                                            <p className="mt-4 text-gray-500 dark:text-gray-400 text-lg">
+                                                No hay imagen disponible
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

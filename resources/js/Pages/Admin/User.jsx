@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/solid";
 import Pagination from "@/Components/Pagination";
 import ConfirmDelete from "@/Components/ConfirmDelete";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function User({ activeRoute, can }) {
     const { users, roles } = usePage().props;
@@ -53,13 +54,26 @@ export default function User({ activeRoute, can }) {
     };
 
     return (
-        <AdminLayout activeRoute={activeRoute}>
-            <Head title="Users" />
+        <AdminLayout
+            activeRoute={activeRoute}
+            header={
+                <div>
+                    <Breadcrumb
+                        routes={[{ name: "Admin", link: route("admin.panel") }]}
+                        currentPage="Gestión de Usuarios"
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Usuarios
+                    </h2>
+                </div>
+            }
+        >
+            <Head title="Gestión de Usuarios" />
             <Toaster position="top-right" richColors />
             <div className="card dark:bg-gray-800 dark:text-white">
-                <div className="card-header">
-                    <h2 className="text-xl font-semibold">Users</h2>
-                </div>
+                <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                    Gestión de Usuarios
+                </h1>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.user_create && (

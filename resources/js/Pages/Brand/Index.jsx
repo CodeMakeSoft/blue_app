@@ -90,10 +90,8 @@ export default function Index({ auth, brands, can }) {
                         </h1>
                         {can.brand_create && (
                             <button
-                                onClick={() =>
-                                    (window.location.href = route("brand.create"))
-                                }
-                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
+                                onClick={() => (window.location.href = route("brand.create"))}
+                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
                             >
                                 <PlusCircleIcon className="w-5 h-5 mr-2" />
                                 Nueva Marca
@@ -116,11 +114,11 @@ export default function Index({ auth, brands, can }) {
                     </div>
 
                     {/* Contenedor de la tabla */}
-                    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                         <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg mx-6 my-2 pt-4">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+                                    <tr className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                                         <th className="px-4 py-3 text-left text-sm font-medium w-1/5 rounded-tl-lg">
                                             Nombre
                                         </th>
@@ -141,13 +139,12 @@ export default function Index({ auth, brands, can }) {
                                             <tr
                                                 key={brand.id}
                                                 className={`${
-                                                    index !==
-                                                    paginatedBrands.length - 1
+                                                    index !== paginatedBrands.length - 1
                                                         ? "border-b border-gray-200 dark:border-gray-700"
                                                         : ""
-                                                } hover:bg-gray-50 dark:hover:bg-gray-800`}
+                                                } hover:bg-gray-50 dark:hover:bg-gray-700`}
                                             >
-                                                <td className="px-4 py-3 align-middle text-gray-700 dark:text-gray-200">
+                                                <td className="px-4 py-3 align-middle text-gray-900 dark:text-gray-100">
                                                     {brand.name}
                                                 </td>
                                                 <td className="px-4 py-3 align-middle">
@@ -173,26 +170,16 @@ export default function Index({ auth, brands, can }) {
                                                 <td className="px-4 py-3 align-middle">
                                                     <div className="flex justify-center space-x-4">
                                                         <Link
-                                                            href={route(
-                                                                "brand.show",
-                                                                {
-                                                                    brand: brand.id,
-                                                                }
-                                                            )}
-                                                            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                            href={route("brand.show", { brand: brand.id })}
+                                                            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
                                                             title="Ver detalle"
                                                         >
                                                             <EyeIcon className="w-6 h-6" />
                                                         </Link>
                                                         {can.brand_edit && (
                                                             <Link
-                                                                href={route(
-                                                                    "brand.edit",
-                                                                    {
-                                                                        brand: brand.id,
-                                                                    }
-                                                                )}
-                                                                className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900"
+                                                                href={route("brand.edit", { brand: brand.id })}
+                                                                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50"
                                                                 title="Editar"
                                                             >
                                                                 <PencilSquareIcon className="w-6 h-6" />
@@ -200,39 +187,8 @@ export default function Index({ auth, brands, can }) {
                                                         )}
                                                         {can.brand_delete && (
                                                             <button
-                                                                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900"
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        brand
-                                                                    )
-                                                                }
-                                                                title="Eliminar"
-                                                            >
-                                                                <TrashIcon className="w-6 h-6" />
-                                                            </button>
-                                                        )}
-                                                        {can.brand_edit && (
-                                                            <Link
-                                                                href={route(
-                                                                    "brand.edit",
-                                                                    {
-                                                                        brand: brand.id,
-                                                                    }
-                                                                )}
-                                                                className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                                                                title="Editar"
-                                                            >
-                                                                <PencilSquareIcon className="w-6 h-6" />
-                                                            </Link>
-                                                        )}
-                                                        {can.brand_delete && (
-                                                            <button
-                                                                className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30"
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        brand
-                                                                    )
-                                                                }
+                                                                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
+                                                                onClick={() => handleDelete(brand)}
                                                                 title="Eliminar"
                                                             >
                                                                 <TrashIcon className="w-6 h-6" />
@@ -259,12 +215,10 @@ export default function Index({ auth, brands, can }) {
                         </div>
 
                         {/* Paginación */}
-                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                        <div className="px-3 py-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                             <Pagination
                                 currentPage={currentPage}
-                                totalPages={Math.ceil(
-                                    filteredBrands.length / itemsPerPage
-                                )}
+                                totalPages={Math.ceil(filteredBrands.length / itemsPerPage)}
                                 onPageChange={handlePageChange}
                                 itemsPerPage={itemsPerPage}
                                 setItemsPerPage={setItemsPerPage}

@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/solid";
 import PermissionFormModal from "@/Components/PermissionFormModal";
 import Pagination from "@/Components/Pagination";
+import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Permission({ activeRoute, can }) {
     const { permissions } = usePage().props;
@@ -41,14 +42,27 @@ export default function Permission({ activeRoute, can }) {
     };
 
     return (
-        <AdminLayout activeRoute={activeRoute}>
-            <Head title="Permissions" />
+        <AdminLayout
+            activeRoute={activeRoute}
+            header={
+                <div>
+                    <Breadcrumb
+                        routes={[{ name: "Admin", link: route("admin.panel") }]}
+                        currentPage="Gestión de Permisos"
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Permisos
+                    </h2>
+                </div>
+            }
+        >
+            <Head title="Gestión de Permisos" />
             <Toaster position="top-right" richColors />
 
             <div className="card bg-white dark:bg-gray-800">
-                <div className="card-header">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Permissions</h2>
-                </div>
+                <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                    Gestión de Permisos
+                </h1>
                 <div className="card-body">
                     <div className="flex justify-end mb-4">
                         {can.permission_create && (

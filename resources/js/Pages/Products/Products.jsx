@@ -85,57 +85,75 @@ export default function View({ products = [] }) {
             header={
                 <div>
                     <Breadcrumb
-                    routes={[
-                        { name: "Dashboard", link: route("dashboard") },
-                        { name: "Productos", link: route("products.view") },
-                    ]}
-                    currentPage="Lista de Productos"
+                        routes={[
+                            { name: "Inicio", link: route("dashboard") },
+                            { name: "Productos", link: route("products.view") },
+                        ]}
+                        currentPage="Catálogo"
                     />
                     <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faBox} className="text-blue-600" />
-                        Menú de Productos
+                        <FontAwesomeIcon icon={faBox} className="text-blue-600 dark:text-blue-500" />
+                        Catálogo de Productos
                     </h2>
                 </div>
-                
             }
         >
+            <Head title="Catálogo de Productos" />
 
-            <Head title="Menú de Productos" />
-
-            <div className="">
+            <div className="py-6">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="mb-6">
+                    <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                         <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
                             {/* Barra de búsqueda */}
                             <div className="relative w-full md:w-96">
                                 <input
                                     type="text"
                                     placeholder="Buscar productos..."
-                                    className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all"
+                                    className="w-full px-4 py-2 pl-10 rounded-lg 
+                                        border border-gray-300 dark:border-gray-600 
+                                        bg-white dark:bg-gray-700 
+                                        text-gray-900 dark:text-gray-100 
+                                        placeholder-gray-500 dark:placeholder-gray-400
+                                        focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 
+                                        focus:border-transparent 
+                                        transition-all duration-200"
                                     value={search}
                                     onChange={handleSearchChange}
                                 />
                                 <FontAwesomeIcon
                                     icon={faSearch}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                                 />
                             </div>
 
                             {/* Botón de filtros */}
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 
+                                    bg-blue-600 dark:bg-blue-500 
+                                    hover:bg-blue-700 dark:hover:bg-blue-600 
+                                    text-white rounded-lg 
+                                    transition-colors duration-200
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-blue-500 dark:focus:ring-blue-400 
+                                    focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                             >
                                 <FontAwesomeIcon icon={faFilter} />
                                 Filtros
                             </button>
                         </div>
                     </div>
+
+                    {/* Grid de productos */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {filteredProducts.map((product) => (
                             <div
                                 key={product.id}
-                                className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300 relative"
+                                className="bg-white dark:bg-gray-800 
+                                    shadow-lg rounded-lg overflow-hidden 
+                                    transform hover:scale-105 
+                                    transition-all duration-300 
+                                    border border-gray-200 dark:border-gray-700"
                             >
                                 <div className="relative">
                                     <img

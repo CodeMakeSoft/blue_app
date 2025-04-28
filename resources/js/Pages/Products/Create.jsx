@@ -45,33 +45,47 @@ const Create = ({ categories, brands }) => {
     return (
         <AdminLayout
             header={
-                <>
+                <div>
                     <Breadcrumb
                         routes={[
+                            { name: "Admin", link: route("admin.panel") },
                             { name: "Productos", link: route("products.index") },
-                            { name: "Crear Producto", link: route("products.create") },
                         ]}
                         currentPage="Crear Producto"
                     />
-                    <Head title="Crear Producto" />
-                </>
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Crear Producto
+                    </h2>
+                </div>
             }
         >
-            <div className="max-w-5xl mx-auto mt-10 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-                <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-sm font-semibold px-6 py-3 rounded-t-lg">
-                        Crear Producto
-                    </div>
-                    <div className="p-6 text-gray-900 dark:text-gray-100">
-                        <Form
-                            data={data}
-                            setData={setData}
-                            errors={errors}
-                            categories={categories}
-                            brands={brands}
-                            handleFileChange={handleFileChange}
-                            submit={submit}
-                        />
+            <Head title="Crear Producto" />
+
+            <div className="py-8 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-5xl mx-auto">
+                    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                            <div className="px-6 py-3">
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                                    Información del Producto
+                                </h3>
+                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                    Ingresa los detalles del nuevo producto
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div className="p-6">
+                            <Form
+                                data={data}
+                                setData={setData}
+                                errors={errors}
+                                categories={categories}
+                                brands={brands}
+                                handleFileChange={handleFileChange}
+                                submit={submit}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

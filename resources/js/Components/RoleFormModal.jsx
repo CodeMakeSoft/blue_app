@@ -86,17 +86,21 @@ export default function RoleFormModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            {/* Formulario principal */}
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
-                <h2 className="text-lg font-semibold mb-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 dark:bg-black/70 z-50">
+            {/* Main Form */}
+            <div
+                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:shadow-2xl 
+                w-full max-w-xl max-h-[90vh] overflow-y-auto 
+                border border-gray-200 dark:border-gray-700"
+            >
+                <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
                     {role ? "Edit Role" : "Create Role"}
                 </h2>
 
                 <form onSubmit={handleSubmit}>
-                    {/* Nombre del Rol */}
+                    {/* Role Name */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
                             Role Name *
                         </label>
                         <input
@@ -104,23 +108,28 @@ export default function RoleFormModal({
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className={`w-full border rounded p-2 ${
-                                errors.name
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                            }`}
+                            className={`w-full rounded p-2 
+                                bg-white dark:bg-gray-700 
+                                text-gray-900 dark:text-gray-100 
+                                ${
+                                    errors.name
+                                        ? "border-red-500 dark:border-red-400"
+                                        : "border-gray-300 dark:border-gray-600"
+                                }
+                                focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 
+                                focus:border-transparent transition-colors`}
                             required
                         />
                         {errors.name && (
-                            <p className="text-red-500 text-xs mt-1">
+                            <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                                 {errors.name}
                             </p>
                         )}
                     </div>
 
-                    {/* Permisos */}
+                    {/* Permissions */}
                     <div className="mb-6" ref={permissionsRef}>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                             Permissions *
                         </label>
                         <div className="grid grid-cols-2 gap-3">
@@ -140,11 +149,13 @@ export default function RoleFormModal({
                                                 permission.id
                                             )
                                         }
-                                        className="h-4 w-4 text-blue-600 rounded"
+                                        className="h-4 w-4 text-blue-600 dark:text-blue-500 
+                                            rounded border-gray-300 dark:border-gray-600
+                                            focus:ring-blue-500 dark:focus:ring-blue-400"
                                     />
                                     <label
                                         htmlFor={`perm-${permission.id}`}
-                                        className="ml-2 text-sm"
+                                        className="ml-2 text-sm text-gray-700 dark:text-gray-300"
                                     >
                                         {permission.name.replace("-", " ")}
                                     </label>
@@ -152,24 +163,30 @@ export default function RoleFormModal({
                             ))}
                         </div>
                         {errors.permissions && (
-                            <p className="text-red-500 text-xs mt-1">
+                            <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                                 {errors.permissions}
                             </p>
                         )}
                     </div>
 
                     {/* Form Actions */}
-                    <div className="flex justify-end gap-3 pt-4 border-t">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                            className="px-4 py-2 bg-gray-300 dark:bg-gray-700 
+                                text-gray-700 dark:text-gray-300 
+                                rounded hover:bg-gray-400 dark:hover:bg-gray-600 
+                                transition-colors duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                            className="px-4 py-2 bg-blue-600 dark:bg-blue-500 
+                                text-white rounded 
+                                hover:bg-blue-700 dark:hover:bg-blue-600 
+                                transition-colors duration-200"
                         >
                             {role ? "Update Role" : "Create Role"}
                         </button>
@@ -177,7 +194,7 @@ export default function RoleFormModal({
                 </form>
             </div>
 
-            {/* Componentes de confirmación */}
+            {/* Confirmation Components */}
             <ConfirmEdit
                 isOpen={showConfirmEdit}
                 onConfirm={handleConfirmAction}
