@@ -126,6 +126,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('admin/permissions', PermissionController::class);
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/api/cart/status', [CartController::class, 'getCartStatus'])->name('api.cart.status');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Auth

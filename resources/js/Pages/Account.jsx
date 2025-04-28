@@ -32,7 +32,7 @@ export default function Account() {
                 <div className="grid grid-cols-1 w-fit gap-4">
                     {/* Botón Mis pedidos */}
                     <Link
-                        href={route("admin.panel")}
+                        href={route("purchases.index")}
                         className="flex items-start gap-4 p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
                     >
                         <MagnifyingGlassIcon className="h-6 w-6 text-gray-700 dark:text-gray-300 mt-0.5 flex-shrink-0" />

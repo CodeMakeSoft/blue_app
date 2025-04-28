@@ -1,6 +1,6 @@
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage, useForm } from '@inertiajs/react';
-import { useState, lazy, Suspense, useEffect } from 'react';
+import { useState, lazy, Suspense, useEffect, useTransition } from 'react';
 import { ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid';
 import { Sidebar } from "@/Components/Sidebar";
 import { Toaster } from "@/Components/ui/toaster";
@@ -12,6 +12,7 @@ import {
     faLayerGroup,
     faUserShield,
 } from "@fortawesome/free-solid-svg-icons";
+import axios from 'axios';
 
 const Footer = lazy(() => import('@/Components/Footer'));
 const Navbar = lazy(() => import('@/Components/Navbar'));
@@ -30,26 +31,68 @@ const childrenWrapperClasses = `
     transition-all duration-200
 `;
 
+const updateCart = async (productId, quantity = 1) => {
+    try {
+        await axios.post('/cart/add', {
+            product_id: productId,
+            quantity: quantity
+        });
+        
+        // Trigger cart status refresh
+        window.dispatchEvent(new CustomEvent('cart-updated'));
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating cart:', error);
+        return { 
+            success: false, 
+            error: error.response?.data?.message || 'Error updating cart' 
+        };
+    }
+};
+
+export { updateCart };
+
 export default function AuthenticatedLayout({ header, children }) {
     const { auth } = usePage().props;
     const user = auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
     const [isCheckoutConfirmVisible, setIsCheckoutConfirmVisible] = useState(false);
-    
+    const [cartCount, setCartCount] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchCartStatus = async () => {
+        try {
+            const response = await axios.get(route('api.cart.status'));
+            setCartCount(response.data.count);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching cart status:', error);
+            setCartCount(0);
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartStatus();
+
+        // Set up polling every 30 seconds
+        const interval = setInterval(fetchCartStatus, 30000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        const handleCartUpdate = () => fetchCartStatus();
+        window.addEventListener('cart-updated', handleCartUpdate);
+
+        return () => window.removeEventListener('cart-updated', handleCartUpdate);
+    }, []);
+
     // Detecta si estamos en rutas de carrito o checkout
     const { url } = usePage();
     const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout') || url.startsWith('/purchases');
-    const cart = usePage().props.cart || [];
-    const [cartError, setCartError] = useState(false);
-
-    useEffect(() => {
-        if (!Array.isArray(cart)) {
-            setCartError(true);
-            console.error('Cart data is not an array');
-        }
-    }, [cart]);
-
     const activeLink = route().current('checkout.index')
         ? 'checkout.index'
         : route().current('cart.index')
@@ -195,17 +238,26 @@ export default function AuthenticatedLayout({ header, children }) {
                                     >
                                         <UserIcon className="h-6 w-6 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
                                     </Link>
-                                    <div className="relative">
+                                    <div className="relative inline-block p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                         <Link 
                                             href={route('cart.index')}
-                                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                         >
                                             <ShoppingCartIcon className="h-6 w-6 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
-                                            {cart.length > 0 && (
-                                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white dark:border-gray-800">
-                                                    {cart.length}
-                                                </span>
-                                            )}
+                                            <span 
+                                                className={`
+                                                    absolute -top-2 -right-2
+                                                    ${cartCount > 0 ? 'bg-blue-600' : 'bg-gray-400 dark:bg-gray-600'} 
+                                                    text-white text-xs font-bold 
+                                                    min-w-[20px] h-5 
+                                                    flex items-center justify-center 
+                                                    rounded-full 
+                                                    border-2 border-white dark:border-gray-800
+                                                    transition-colors duration-200
+                                                    px-1
+                                                `}
+                                            >
+                                                {isLoading ? '...' : cartCount}
+                                            </span>
                                         </Link>
                                     </div>
                                 </div>
@@ -272,7 +324,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('cart.index')}
                                     active={route().current('cart.index')}
                                 >
-                                    Carrito {cart.length > 0 && `(${cart.length})`}
+                                    Carrito {cartCount > 0 && `(${cartCount})`}
                                 </ResponsiveNavLink>
     
                                 <ResponsiveNavLink
@@ -337,7 +389,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         setIsConfirmVisible={setIsConfirmVisible}
                                         isCheckoutConfirmVisible={isCheckoutConfirmVisible}
                                         setIsCheckoutConfirmVisible={setIsCheckoutConfirmVisible}
-                                        isCartEmpty={cart.length === 0}
+                                        isCartEmpty={cartCount === 0}
                                     />
                                 </Suspense>
                             )}
