@@ -42,7 +42,7 @@ export default function Create({ auth }) {
                         currentPage="Crear Marca"
                     />
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
-                        Crear Marca
+                        Marcas
                     </h2>
                 </div>
             }

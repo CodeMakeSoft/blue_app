@@ -50,7 +50,7 @@ export default function Edit({ auth, brand }) {
                         currentPage={`Editar: ${brand.name}`}
                     />
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
-                        Editar Marca
+                        Marcas
                     </h2>
                 </div>
             }
@@ -58,6 +58,16 @@ export default function Edit({ auth, brand }) {
             <Head title="Editar Marca" />
 
             <div className="py-6 px-3">
+                <Link
+                    href={route("brand.index")}
+                    className="inline-flex items-center p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                >
+                    <ChevronLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
+                </Link>
+
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-4 mb-6 ml-1">
+                    Actualizar Marca
+                </h1>
                 <Form
                     data={data}
                     errors={errors}
@@ -67,7 +77,7 @@ export default function Edit({ auth, brand }) {
                 >
                     <div className="w-[65%] ml-auto">
                         <div className="flex justify-end">
-                            <PrimaryButton 
+                            <PrimaryButton
                                 type="submit"
                                 className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600"
                             >

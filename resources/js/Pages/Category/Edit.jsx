@@ -45,13 +45,16 @@ export default function Edit({ auth, category }) {
                     <Breadcrumb
                         routes={[
                             { name: "Inicio", link: route("dashboard") },
-                            { name: "Categorías", link: route("category.index") },
+                            {
+                                name: "Categorías",
+                                link: route("category.index"),
+                            },
                         ]}
                         currentPage="Actualizar Categoría"
                     />
-                    <h1 className="text-2xl font-bold text-gray-800 mt-2">
-                        Actualizar Categoría
-                    </h1>
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Categorias
+                    </h2>
                 </>
             }
         >
@@ -61,12 +64,12 @@ export default function Edit({ auth, category }) {
             <div className="py-6 px-3">
                 <Link
                     href={route("category.index")}
-                    className="inline-flex items-center p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                    className="inline-flex items-center p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
                 >
-                    <ChevronLeftIcon className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+                    <ChevronLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
                 </Link>
 
-                <h1 className="text-2xl font-bold text-gray-800 mt-4 mb-6 ml-1">
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-4 mb-6 ml-1">
                     Actualizar Categoría
                 </h1>
                 <Form
@@ -88,4 +91,3 @@ export default function Edit({ auth, category }) {
         </AdminLayout>
     );
 }
-

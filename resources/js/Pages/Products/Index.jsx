@@ -24,7 +24,6 @@ export default function Index({ products, can }) {
     const [searchTerm, setSearchTerm] = useState("");
     const carouselRefs = useRef({});
     const [scrollStates, setScrollStates] = useState({});
-    
 
     const filteredProducts = products.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -130,7 +129,10 @@ export default function Index({ products, can }) {
                     <Breadcrumb
                         routes={[
                             { name: "Admin", link: route("admin.panel") },
-                            { name: "Productos", link: route("products.index") },
+                            {
+                                name: "Productos",
+                                link: route("products.index"),
+                            },
                         ]}
                         currentPage="Lista de Productos"
                     />
@@ -142,52 +144,56 @@ export default function Index({ products, can }) {
         >
             <Head title="Productos" />
 
-            <div className="py-6 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                        {/* Header section with search and add button */}
-                        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-                            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                                {/* Search input */}
-                                <div className="w-full sm:w-auto relative">
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar productos..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 dark:border-gray-600 
-                                        bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                                        focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 
-                                        focus:border-transparent transition duration-150 ease-in-out"
-                                    />
-                                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-                                </div>
+            <div className="py-5">
+                <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
+                    {/* Header con título y botón */}
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                            Gestión de Productos
+                        </h1>
+                        {can.product_create && (
+                            <Link
+                                href={route("products.create")}
+                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
+                            >
+                                <PlusCircleIcon className="w-5 h-5 mr-2" />
+                                Agregar Producto
+                            </Link>
+                        )}
+                    </div>
 
-                                {/* Add product button */}
-                                {can.product_create && (
-                                    <Link
-                                        href={route('products.create')}
-                                        className="flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white 
-                                        rounded-lg shadow-sm hover:bg-blue-700 dark:hover:bg-blue-600 
-                                        transition-all duration-200 focus:outline-none focus:ring-2 
-                                        focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                                    >
-                                        <PlusCircleIcon className="h-5 w-5 mr-2" />
-                                        <span>Agregar Producto</span>
-                                    </Link>
-                                )}
-                            </div>
+                    {/* Barra de búsqueda */}
+                    <div className="mb-6 relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                         </div>
+                        <input
+                            type="text"
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            placeholder="Buscar productos por nombre..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
 
-                        {/* Table section */}
-                        <div className="w-full overflow-x-auto">
+                    {/* Contenedor de la tabla */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
                             <table className="w-full text-left">
-                                <thead className="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                                     <tr>
-                                        <th className="px-6 py-3 text-sm font-semibold">Nombre</th>
-                                        <th className="px-6 py-3 text-sm font-semibold">Precio</th>
-                                        <th className="px-6 py-3 text-sm font-semibold">Imágenes</th>
-                                        <th className="px-6 py-3 text-sm font-semibold text-center">Acciones</th>
+                                        <th className="px-6 py-3 text-sm font-semibold">
+                                            Nombre
+                                        </th>
+                                        <th className="px-6 py-3 text-sm font-semibold">
+                                            Precio
+                                        </th>
+                                        <th className="px-6 py-3 text-sm font-semibold">
+                                            Imágenes
+                                        </th>
+                                        <th className="px-6 py-3 text-sm font-semibold text-center">
+                                            Acciones
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -203,8 +209,7 @@ export default function Index({ products, can }) {
                                                 ${product.price}
                                             </td>
                                             <td className="px-6 py-4">
-                                                {product.images?.length >
-                                                0 ? (
+                                                {product.images?.length > 0 ? (
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             onClick={() =>
@@ -213,7 +218,7 @@ export default function Index({ products, can }) {
                                                                     "left"
                                                                 )
                                                             }
-                                                            className="p-1 rounded-full bg-gray-700 text-white hover:bg-gray-600"
+                                                            className="p-1 rounded-full bg-gray-700 dark:bg-gray-600 text-white hover:bg-gray-600 dark:hover:bg-gray-500"
                                                         >
                                                             <ChevronLeftIcon className="w-5 h-5" />
                                                         </button>
@@ -239,7 +244,7 @@ export default function Index({ products, can }) {
                                                                         key={
                                                                             index
                                                                         }
-                                                                        src={`/storage/${img.url}`} // Asumiendo que la propiedad que contiene la URL es 'url'
+                                                                        src={`/storage/${img.url}`}
                                                                         alt={`Producto ${product.id} - ${index}`}
                                                                         className="h-20 w-20 object-cover rounded-md border border-gray-300 dark:border-gray-600 flex-shrink-0"
                                                                     />
@@ -253,13 +258,13 @@ export default function Index({ products, can }) {
                                                                     "right"
                                                                 )
                                                             }
-                                                            className="p-1 rounded-full bg-gray-700 text-white hover:bg-gray-600"
+                                                            className="p-1 rounded-full bg-gray-700 dark:bg-gray-600 text-white hover:bg-gray-600 dark:hover:bg-gray-500"
                                                         >
                                                             <ChevronRightIcon className="w-5 h-5" />
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-sm text-gray-400">
+                                                    <span className="text-sm text-gray-400 dark:text-gray-500">
                                                         Sin imágenes
                                                     </span>
                                                 )}
@@ -268,7 +273,7 @@ export default function Index({ products, can }) {
                                                 {can.product_edit && (
                                                     <Link
                                                         href={`/products/${product.id}/edit`}
-                                                        className="inline-flex items-center text-blue-500 hover:text-blue-700"
+                                                        className="inline-flex items-center text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
                                                     >
                                                         <PencilSquareIcon className="w-5 h-5" />
                                                     </Link>
@@ -280,7 +285,7 @@ export default function Index({ products, can }) {
                                                                 product
                                                             )
                                                         }
-                                                        className="inline-flex items-center text-red-500 hover:text-red-700"
+                                                        className="inline-flex items-center text-red-500 hover:text-red-700 dark:hover:text-red-400"
                                                     >
                                                         <TrashIcon className="w-5 h-5" />
                                                     </button>
@@ -308,7 +313,6 @@ export default function Index({ products, can }) {
                 product={selectedProduct}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
-                className="dark:bg-gray-800"
             />
         </AdminLayout>
     );
