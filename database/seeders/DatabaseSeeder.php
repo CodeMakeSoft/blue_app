@@ -31,6 +31,44 @@ class DatabaseSeeder extends Seeder
         'garment', 'outfit', 'attire'
     ];
 
+    private $productNames = [
+        // Playeras
+        'Playera UPP Ingenieria en Software',
+        'Playera Polo UPP Software',
+        'Playera Manga Larga Software',
+        'Playera Sport UPP Software',
+        // Medicina
+        'Sudadera UPP Medicina',
+        'Playera UPP Medicina',
+        'Bata Médica UPP',
+        'Uniforme Quirúrgico UPP',
+        // Biomedicina
+        'Pantalón Deportivo Biomedicina',
+        'Playera UPP Biomedicina',
+        'Sudadera Biomedicina Classic',
+        'Bata Laboratorio Biomedicina',
+        // Fisioterapia
+        'Playera Manga Larga Fisioterapia',
+        'Uniforme Deportivo Fisioterapia',
+        'Sudadera UPP Fisioterapia',
+        'Playera Sport Fisioterapia',
+        // Generales UPP
+        'Suéter Clásico UPP',
+        'Hoodie UPP University',
+        'Chamarra UPP Varsity',
+        'Jersey Deportivo UPP',
+        // Deportivos
+        'Jogger UppFit Negro',
+        'Shorts Deportivos UPP',
+        'Leggings UPP Sport',
+        'Top Deportivo UPP',
+        // Accesorios
+        'Gorra UPP Classic',
+        'Mochila UPP Pro',
+        'Bolso Deportivo UPP',
+        'Kit Deportivo UPP'
+    ];
+
     public function run(): void
     {
         $this->call([
@@ -73,41 +111,26 @@ class DatabaseSeeder extends Seeder
         });
 
         // Crear productos con imágenes
-        $productNames = [
-            'Playera UPP Ingenieria en Software',
-            'Sudadera UPP Medicina',
-            'Pantalón Deportivo Biomedicina',
-            'Playera Manga Larga Fisioterapia',
-            'Suéter Clásico UPP',
-            'Jogger UppFit Negro',
-            'Sudadera BioTrend Azul',
-            'Playera Blanca Ingeniería',
-            'Chamarra MedStyle',
-            'Playera UPP Negra Fisioterapia',
-        ];
-
-        $colors = ['Rojo', 'Azul marino', 'Amarillo', 'Blanco', 'Negro', 'Gris claro', 'Gris oscuro'];
-
-        foreach ($productNames as $name) {
+        foreach ($this->productNames as $name) {
             $product = Product::create([
                 'name' => $name,
                 'description' => $this->generateProductDescription($name),
-                'price' => rand(150, 500) + (rand(0, 99) / 100),
-                'stock' => rand(10, 50),
-                'size' => ['S', 'M', 'L', 'XL'][rand(0, 3)],
-                'color' => $colors[rand(0, count($colors) - 1)],
+                'price' => $this->generatePrice($name),
+                'stock' => rand(10, 100),
+                'size' => $this->generateSizes(),
+                'color' => $this->generateColor(),
                 'status' => rand(0, 1),
                 'availability' => now()->addDays(rand(0, 30)),
                 'category_id' => $categories->random()->id,
                 'brand_id' => $brands->random()->id,
             ]);
 
-            // 1-3 imágenes por producto
+            // 1-4 imágenes por producto
             $this->downloadAndAttachImage(
                 $product,
                 'products',
                 $this->productImageCategories[array_rand($this->productImageCategories)],
-                rand(1, 3)
+                rand(1, 4)
             );
         }
     }
@@ -140,6 +163,36 @@ class DatabaseSeeder extends Seeder
                             ["algodón 100%", "poliéster 80%/algodón 20%", "algodón orgánico"][rand(0, 2)] . ".";
         
         return $baseDescription . $additionalDetails;
+    }
+
+    protected function generatePrice(string $name): float
+    {
+        $basePrice = match(true) {
+            str_contains($name, 'Chamarra') => rand(600, 800),
+            str_contains($name, 'Sudadera') => rand(400, 600),
+            str_contains($name, 'Pantalón') || str_contains($name, 'Jogger') => rand(350, 500),
+            str_contains($name, 'Playera') => rand(200, 350),
+            str_contains($name, 'Gorra') => rand(150, 250),
+            default => rand(200, 400)
+        };
+
+        return $basePrice + (rand(0, 99) / 100);
+    }
+
+    protected function generateSizes(): string
+    {
+        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+        return $sizes[array_rand($sizes)];
+    }
+
+    protected function generateColor(): string
+    {
+        $colors = [
+            'Negro', 'Blanco', 'Azul marino', 'Gris oxford',
+            'Rojo vino', 'Verde militar', 'Azul royal',
+            'Gris claro', 'Negro carbón', 'Blanco hueso'
+        ];
+        return $colors[array_rand($colors)];
     }
 
     protected function downloadAndAttachImage($model, string $directory, string $keyword, int $count = 1): void

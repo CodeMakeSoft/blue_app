@@ -1,11 +1,8 @@
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, lazy, Suspense, useEffect } from 'react';
 import { ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid';
-import Navbar from '@/Components/Navbar';
 import { Sidebar } from "@/Components/Sidebar";
-import Footer from "@/Components/Footer";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
 import { Toaster } from "@/Components/ui/toaster";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,6 +12,23 @@ import {
     faLayerGroup,
     faUserShield,
 } from "@fortawesome/free-solid-svg-icons";
+
+const Footer = lazy(() => import('@/Components/Footer'));
+const Navbar = lazy(() => import('@/Components/Navbar'));
+const ThemeSwitcher = lazy(() => import('@/Components/ThemeSwitcher'));
+
+const mainContentClasses = `
+    flex-1 ml-16 p-4 
+    bg-white dark:bg-gray-800 
+    transition-colors duration-200
+`;
+
+const childrenWrapperClasses = `
+    flex-1 w-full 
+    bg-white dark:bg-gray-800 
+    shadow-sm px-4 py-6
+    transition-all duration-200
+`;
 
 export default function AuthenticatedLayout({ header, children }) {
     const { auth } = usePage().props;
@@ -27,6 +41,15 @@ export default function AuthenticatedLayout({ header, children }) {
     const { url } = usePage();
     const showCartNavbar = url.startsWith('/cart') || url.startsWith('/checkout') || url.startsWith('/purchases');
     const cart = usePage().props.cart || [];
+    const [cartError, setCartError] = useState(false);
+
+    useEffect(() => {
+        if (!Array.isArray(cart)) {
+            setCartError(true);
+            console.error('Cart data is not an array');
+        }
+    }, [cart]);
+
     const activeLink = route().current('checkout.index')
         ? 'checkout.index'
         : route().current('cart.index')
@@ -180,6 +203,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <button
                                         onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
                                         className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 focus:outline-none"
+                                        aria-label="Toggle navigation menu"
+                                        aria-expanded={showingNavigationDropdown}
                                     >
                                         <svg
                                             className="h-6 w-6"
@@ -289,22 +314,24 @@ export default function AuthenticatedLayout({ header, children }) {
                     )}
     
                     {/* Main */}
-                    <main className="flex-1 ml-16 p-4 bg-white dark:bg-gray-800">
+                    <main className={mainContentClasses}>
                         <div className="max-w-full mx-auto">
                             {/* Navbar de carrito, checkout, etc. */}
                             {showCartNavbar && (
-                                <Navbar 
-                                    activeLink={activeLink}
-                                    isConfirmVisible={isConfirmVisible}
-                                    setIsConfirmVisible={setIsConfirmVisible}
-                                    isCheckoutConfirmVisible={isCheckoutConfirmVisible}
-                                    setIsCheckoutConfirmVisible={setIsCheckoutConfirmVisible}
-                                    isCartEmpty={cart.length === 0}
-                                />
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <Navbar 
+                                        activeLink={activeLink}
+                                        isConfirmVisible={isConfirmVisible}
+                                        setIsConfirmVisible={setIsConfirmVisible}
+                                        isCheckoutConfirmVisible={isCheckoutConfirmVisible}
+                                        setIsCheckoutConfirmVisible={setIsCheckoutConfirmVisible}
+                                        isCartEmpty={cart.length === 0}
+                                    />
+                                </Suspense>
                             )}
     
                             {/* Children */}
-                            <div className="flex-1 w-full bg-white dark:bg-gray-800 shadow-sm px-4 py-6">
+                            <div className={childrenWrapperClasses}>
                                 {children}
                             </div>
                         </div>
@@ -314,10 +341,14 @@ export default function AuthenticatedLayout({ header, children }) {
     
             {/* Footer */}
             <div className="ml-16">
-                {user && <Footer />}
+                {user && (
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Footer />
+                    </Suspense>
+                )}
             </div>
     
             <Toaster />
         </div>
     );
-}    
+}

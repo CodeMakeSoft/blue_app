@@ -4,7 +4,18 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Confirm from '@/Components/Confirm';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faSignInAlt, faUserPlus, faEye } from '@fortawesome/free-solid-svg-icons';
+import { 
+    faTachometerAlt, 
+    faSignInAlt, 
+    faUserPlus, 
+    faEye,
+    faShoppingBag,
+    faTags,
+    faStar,
+    faArrowRight,
+    faTrademark,
+    faLayerGroup
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function Welcome({ auth, products, brands, categories }) {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -12,8 +23,12 @@ export default function Welcome({ auth, products, brands, categories }) {
 
     const handleItemClick = (type, e) => {
         if (e) e.stopPropagation();
-        setSelectedType(type);
-        setShowConfirm(true);
+        if (auth.user) {
+            window.location.href = route('dashboard');
+        } else {
+            setSelectedType(type);
+            setShowConfirm(true);
+        }
     };
 
     const handleConfirm = () => {
@@ -31,45 +46,65 @@ export default function Welcome({ auth, products, brands, categories }) {
             <div className="bg-white dark:bg-black text-gray-800 dark:text-white min-h-screen transition-colors duration-500">
                 {/* Header */}
                 <header className="flex items-center justify-between px-6 py-4">
-    <div className="flex items-center space-x-4">
-        <ApplicationLogo className="h-12 w-auto dark:invert transition duration-500" />
-        <span className="text-2xl font-semibold text-gray-800 dark:text-white">UPP Store</span>
-    </div>
-    <div className="flex space-x-4">
-        {auth.user ? (
-            <Link
-                href={route('dashboard')}
-                className="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-500 transition duration-300 font-medium py-2 px-4 rounded-lg border border-transparent hover:border-blue-500 flex items-center space-x-2"
-            >
-                <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />
-                <span>Dashboard</span>
-            </Link>
-        ) : (
-            <>
-                <Link
-                    href={route('login')}
-                    className="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-500 transition duration-300 font-medium py-2 px-4 rounded-lg border border-transparent hover:border-blue-500 flex items-center space-x-2"
-                >
-                    <FontAwesomeIcon icon={faSignInAlt} className="text-lg" />
-                    <span>Log in</span>
-                </Link>
-                <Link
-                    href={route('register')}
-                    className="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-500 transition duration-300 font-medium py-2 px-4 rounded-lg border border-transparent hover:border-blue-500 flex items-center space-x-2"
-                >
-                    <FontAwesomeIcon icon={faUserPlus} className="text-lg" />
-                    <span>Register</span>
-                </Link>
-            </>
-        )}
-    </div>
-</header>
+                    <div className="flex items-center space-x-4">
+                        <ApplicationLogo className="h-12 w-auto dark:invert transition duration-500" />
+                        <span className="text-2xl font-semibold text-gray-800 dark:text-white">UPP Store</span>
+                    </div>
+                    <div className="flex space-x-4">
+                        {auth.user ? (
+                            <Link
+                                href={route('dashboard')}
+                                className="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-500 transition duration-300 font-medium py-2 px-4 rounded-lg border border-transparent hover:border-blue-500 flex items-center space-x-2"
+                            >
+                                <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />
+                                <span>Dashboard</span>
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    href={route('login')}
+                                    className="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-500 transition duration-300 font-medium py-2 px-4 rounded-lg border border-transparent hover:border-blue-500 flex items-center space-x-2"
+                                >
+                                    <FontAwesomeIcon icon={faSignInAlt} className="text-lg" />
+                                    <span>Log in</span>
+                                </Link>
+                                <Link
+                                    href={route('register')}
+                                    className="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-500 transition duration-300 font-medium py-2 px-4 rounded-lg border border-transparent hover:border-blue-500 flex items-center space-x-2"
+                                >
+                                    <FontAwesomeIcon icon={faUserPlus} className="text-lg" />
+                                    <span>Register</span>
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </header>
 
+                {/* Welcome Section */}
+                <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+                    <div className="max-w-7xl mx-auto px-4 text-center">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                            <FontAwesomeIcon icon={faShoppingBag} className="mr-4" />
+                            Bienvenido a UPP Store
+                        </h1>
+                        <p className="text-xl mb-8">Descubre los mejores productos para ti</p>
+                        <button 
+                            onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })}
+                            className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition duration-300 flex items-center gap-2 mx-auto"
+                        >
+                            Explorar
+                            <FontAwesomeIcon icon={faArrowRight} />
+                        </button>
+                    </div>
+                </div>
 
                 <main className="max-w-7xl mx-auto px-4 py-10 space-y-20">
                     {/* Productos */}
                     <section>
-                        <h2 className="text-3xl font-bold text-center mb-6">Productos</h2>
+                        <h2 className="text-3xl font-bold text-center mb-6 flex items-center justify-center gap-3">
+                            <FontAwesomeIcon icon={faShoppingBag} className="text-blue-600" />
+                            Productos Destacados
+                        </h2>
                         <div className="relative">
                             <div className="flex overflow-x-auto space-x-6 pb-4">
                                 {products.map((product) => (
@@ -79,6 +114,12 @@ export default function Welcome({ auth, products, brands, categories }) {
                                     >
                                         <div className="relative">
                                             <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />
+                                            <div className="absolute top-2 right-2">
+                                                <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                                                    <FontAwesomeIcon icon={faStar} className="text-yellow-300" />
+                                                    Destacado
+                                                </span>
+                                            </div>
                                             <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                                 <button
                                                     onClick={(e) => handleItemClick('producto', e)}
@@ -91,7 +132,7 @@ export default function Welcome({ auth, products, brands, categories }) {
                                         </div>
                                         <div className="p-4">
                                             <h3 className="font-semibold text-lg">{product.name}</h3>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">{product.description}</p>
+                                            {/* <p className="text-sm text-gray-600 dark:text-gray-400">{product.description}</p> */}
                                             <p className="mt-2 font-bold text-blue-600 dark:text-blue-400">${product.price}</p>
                                         </div>
                                     </div>
@@ -102,7 +143,10 @@ export default function Welcome({ auth, products, brands, categories }) {
 
                     {/* Marcas Destacadas */}
                     <section>
-                        <h2 className="text-3xl font-bold text-center mb-6">Marcas Destacadas</h2>
+                        <h2 className="text-3xl font-bold text-center mb-6 flex items-center justify-center gap-3">
+                            <FontAwesomeIcon icon={faTrademark} className="text-blue-600" />
+                            Marcas Destacadas
+                        </h2>
                         <div className="flex justify-center">
                             <div className="flex overflow-x-auto space-x-6 pb-4">
                                 {brands.slice(0, 5).map((brand) => (
@@ -133,7 +177,10 @@ export default function Welcome({ auth, products, brands, categories }) {
 
                     {/* Categorías Destacadas */}
                     <section>
-                        <h2 className="text-3xl font-bold text-center mb-6">Categorías Destacadas</h2>
+                        <h2 className="text-3xl font-bold text-center mb-6 flex items-center justify-center gap-3">
+                            <FontAwesomeIcon icon={faLayerGroup} className="text-blue-600" />
+                            Categorías Destacadas
+                        </h2>
                         <div className="flex justify-center">
                             <div className="flex overflow-x-auto space-x-6 pb-4">
                                 {categories.slice(0, 5).map((category) => (
@@ -162,7 +209,6 @@ export default function Welcome({ auth, products, brands, categories }) {
                         </div>
                     </section>
                 </main>
-
                 <Footer />
             </div>
 

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
-import BrandCard from "@/Components/Brand/BrandCard";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+    faSearch, 
+    faEye,
+    faTrademark,
+    faFilter
+} from '@fortawesome/free-solid-svg-icons';
 import Pagination from "@/Components/Category/Pagination";
 import Breadcrumb from "@/Components/Breadcrumb";
 
@@ -11,6 +16,7 @@ export default function Catalog({ auth, brands = [] }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(4);
     const [paginatedBrands, setPaginatedBrands] = useState([]);
+    const [showFilters, setShowFilters] = useState(false);
 
     const itemsPerPageOptions = [
         { value: 4, label: "4" },
@@ -67,7 +73,8 @@ export default function Catalog({ auth, brands = [] }) {
                         ]}
                         currentPage="Catálogo de Marcas"
                     />
-                    <h2 className="text-lg sm:text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2">
+                    <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2 flex items-center gap-2">
+                        <FontAwesomeIcon icon={faTrademark} className="text-blue-600" />
                         Catálogo de Marcas
                     </h2>
                 </div>
@@ -75,83 +82,101 @@ export default function Catalog({ auth, brands = [] }) {
         >
             <Head title="Catálogo de Marcas" />
 
-            <div className="py-6 sm:py-8 lg:py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-                        Catálogo de Marcas
-                    </h1>
-
-                    <div className="mb-8">
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+            <div className="py-6">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {/* Barra de búsqueda */}
+                    <form className="mb-6">
+                        <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+                            <div className="relative w-full md:w-96">
+                                <input
+                                    type="text"
+                                    placeholder="Buscar marcas por nombre o descripción..."
+                                    className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all"
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                                <FontAwesomeIcon
+                                    icon={faSearch}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                />
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Buscar marcas por nombre o descripción..."
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-400 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                value={searchTerm}
-                                onChange={(e) => {
-                                    setSearchTerm(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                            />
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                >
+                                    <FontAwesomeIcon icon={faFilter} />
+                                    Filtros
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
 
                     {filteredBrands.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {paginatedBrands.map((brand) => (
-                                    <BrandCard
+                                    <div
                                         key={brand.id}
-                                        brand={{
-                                            ...brand,
-                                            image: brand.image
-                                                ? {
-                                                      url: brand.image.url,
-                                                      id: brand.image.id,
-                                                  }
-                                                : null,
-                                        }}
-                                        showLink={true}
-                                    />
+                                        className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 transform hover:scale-105 transition-all duration-300"
+                                    >
+                                        <div className="relative group">
+                                            <div className="w-full h-32 flex items-center justify-center">
+                                                <img
+                                                    src={brand.image?.url ? `/storage/${brand.image.url}` : 'https://via.placeholder.com/150'}
+                                                    alt={brand.name}
+                                                    className="max-h-full max-w-full object-contain"
+                                                />
+                                            </div>
+                                            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg">
+                                                <Link
+                                                    href={route("brand.show", brand.id)}
+                                                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transform hover:scale-110 transition-all"
+                                                >
+                                                    <FontAwesomeIcon icon={faEye} />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        <h3 className="text-center mt-4 font-semibold text-gray-900 dark:text-gray-100">
+                                            {brand.name}
+                                        </h3>
+                                        <p className="text-center text-gray-600 dark:text-gray-400 mt-2 text-sm line-clamp-2">
+                                            {brand.description}
+                                        </p>
+                                    </div>
                                 ))}
                             </div>
 
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
                                 <div className="flex items-center space-x-2 w-full sm:w-auto">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                                         Mostrar:
                                     </label>
                                     <select
-                                        className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 text-center w-40 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 text-center w-40 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         value={itemsPerPage}
                                         onChange={handleItemsPerPageChange}
                                     >
                                         {itemsPerPageOptions.map((option) => (
-                                            <option
-                                                key={option.value}
-                                                value={option.value}
-                                            >
+                                            <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                <div className="w-full sm:w-auto">
-                                    <Pagination
-                                        currentPage={currentPage}
-                                        totalPages={Math.ceil(
-                                            filteredBrands.length / itemsPerPage
-                                        )}
-                                        onPageChange={handlePageChange}
-                                        itemsPerPage={itemsPerPage}
-                                        totalItems={filteredBrands.length}
-                                        hideItemsPerPage={true}
-                                    />
-                                </div>
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={Math.ceil(filteredBrands.length / itemsPerPage)}
+                                    onPageChange={handlePageChange}
+                                    itemsPerPage={itemsPerPage}
+                                    totalItems={filteredBrands.length}
+                                    hideItemsPerPage={true}
+                                />
                             </div>
                         </>
                     ) : (
