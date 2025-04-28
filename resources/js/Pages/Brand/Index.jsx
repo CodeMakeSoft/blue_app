@@ -70,12 +70,11 @@ export default function Index({ auth, brands, can }) {
             header={
                 <div>
                     <Breadcrumb
-                        routes={[{ name: "Inicio", link: route("dashboard") }]}
-                        
-                        currentPage="Marcas"
+                        routes={[{ name: "Admin", link: route("admin.panel") }]}
+                        currentPage="Gestión de Marcas"
                     />
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
-                        Catálogo de Marcas
+                        Marcas
                     </h2>
                 </div>
             }

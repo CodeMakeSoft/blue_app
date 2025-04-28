@@ -10,7 +10,7 @@ import {
     ChevronRightIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import Pagination from "@/Components/category/Pagination";
+import Pagination from "@/Components/Category/Pagination";
 import ConfirmDeleteModal from "@/Components/Product/ConfirmDelete";
 import Breadcrumb from "@/Components/Breadcrumb";
 import { usePage } from "@inertiajs/react";
@@ -24,6 +24,7 @@ export default function Index({ products, can }) {
     const [searchTerm, setSearchTerm] = useState("");
     const carouselRefs = useRef({});
     const [scrollStates, setScrollStates] = useState({});
+    
 
     const filteredProducts = products.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -185,7 +186,7 @@ export default function Index({ products, can }) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {currentProducts.map((product) => (
+                                        {paginatedProducts.map((product) => (
                                             <tr
                                                 key={product.id}
                                                 className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200"

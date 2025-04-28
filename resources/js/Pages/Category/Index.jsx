@@ -9,8 +9,8 @@ import {
     EyeIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import Pagination from "@/Components/category/Pagination";
-import ConfirmDeleteModal from "@/Components/category/ConfirmDeleteModal";
+import Pagination from "@/Components/Category/Pagination";
+import ConfirmDeleteModal from "@/Components/Category/ConfirmDeleteModal";
 import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Index({ auth, categories, can }) {
@@ -68,21 +68,20 @@ export default function Index({ auth, categories, can }) {
         <AdminLayout
             user={auth.user}
             header={
-                <Breadcrumb
-                    routes={[
-                        { name: "Inicio", link: route("dashboard") },
-                        {
-                            name: "Panel de Administración",
-                            link: route("admin.panel"),
-                        },
-                    ]}
-                    currentPage="Categorias"
-                />
+                <div>
+                    <Breadcrumb
+                        routes={[{ name: "Admin", link: route("admin.panel") }]}
+                        currentPage="Gestión de Categorías"
+                    />
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                        Categorías
+                    </h2>
+                </div>
             }
         >
             <Head title="Categorías" />
 
-            <div className="py-5">
+            <div className="py-10">
                 <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
                     {/* Header con título y botón */}
                     <div className="flex justify-between items-center mb-6">
@@ -91,11 +90,8 @@ export default function Index({ auth, categories, can }) {
                         </h1>
                         {can.category_create && (
                             <button
-                                onClick={() =>
-                                    (window.location.href =
-                                        route("category.create"))
-                                }
-                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
+                                onClick={() => (window.location.href = route("category.create"))}
+                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
                             >
                                 <PlusCircleIcon className="w-5 h-5 mr-2" />
                                 Nueva Categoría
@@ -119,7 +115,8 @@ export default function Index({ auth, categories, can }) {
 
                     {/* Contenedor de la tabla */}
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
+                        {/* Tabla con bordes redondeados y espacio superior */}
+                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg mx-6 my-2 pt-4">
                             <table className="w-full">
                                 <thead>
                                     <tr className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
@@ -139,91 +136,69 @@ export default function Index({ auth, categories, can }) {
                                 </thead>
                                 <tbody>
                                     {paginatedCategories.length > 0 ? (
-                                        paginatedCategories.map(
-                                            (category, index) => (
-                                                <tr
-                                                    key={category.id}
-                                                    className={`${
-                                                        index !==
-                                                        paginatedCategories.length -
-                                                            1
-                                                            ? "border-b border-gray-200 dark:border-gray-700"
-                                                            : ""
-                                                    } hover:bg-gray-50 dark:hover:bg-gray-700/50`}
-                                                >
-                                                    <td className="px-4 py-3 align-middle text-gray-900 dark:text-gray-100">
-                                                        {category.name}
-                                                    </td>
-                                                    <td className="px-4 py-3 align-middle">
-                                                        <p className="line-clamp-2 text-gray-600 dark:text-gray-300">
-                                                            {
-                                                                category.description
-                                                            }
-                                                        </p>
-                                                    </td>
-                                                    <td className="px-4 py-3 align-middle text-center">
-                                                        <div className="flex justify-center">
-                                                            {category.image ? (
-                                                                <img
-                                                                    src={`/storage/${category.image.url}`}
-                                                                    alt={`Imagen de ${category.name}`}
-                                                                    className="w-12 h-12 object-cover rounded"
-                                                                />
-                                                            ) : (
-                                                                <span className="text-gray-400 dark:text-gray-500 text-sm">
-                                                                    Sin imagen
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-3 align-middle">
-                                                        <div className="flex justify-center space-x-4">
+                                        paginatedCategories.map((category, index) => (
+                                            <tr
+                                                key={category.id}
+                                                className={`${
+                                                    index !== paginatedCategories.length - 1
+                                                        ? "border-b border-gray-200 dark:border-gray-700"
+                                                        : ""
+                                                } hover:bg-gray-50 dark:hover:bg-gray-700`}
+                                            >
+                                                <td className="px-4 py-3 align-middle text-gray-900 dark:text-gray-100">
+                                                    {category.name}
+                                                </td>
+                                                <td className="px-4 py-3 align-middle">
+                                                    <p className="line-clamp-2 text-gray-600 dark:text-gray-300">
+                                                        {category.description}
+                                                    </p>
+                                                </td>
+                                                <td className="px-4 py-3 align-middle text-center">
+                                                    <div className="flex justify-center">
+                                                        {category.image ? (
+                                                            <img
+                                                                src={`/storage/${category.image.url}`}
+                                                                alt={`Imagen de ${category.name}`}
+                                                                className="w-12 h-12 object-cover rounded"
+                                                            />
+                                                        ) : (
+                                                            <span className="text-gray-400 dark:text-gray-500 text-sm">
+                                                                Sin imagen
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 align-middle">
+                                                    <div className="flex justify-center space-x-4">
+                                                        <Link
+                                                            href={route("category.show", { category: category.id })}
+                                                            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                            title="Ver detalle"
+                                                        >
+                                                            <EyeIcon className="w-6 h-6" />
+                                                        </Link>
+                                                        {can.category_edit && (
                                                             <Link
-                                                                href={route(
-                                                                    "category.show",
-                                                                    {
-                                                                        category:
-                                                                            category.id,
-                                                                    }
-                                                                )}
-                                                                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                                title="Ver detalle"
+                                                                href={route("category.edit", { category: category.id })}
+                                                                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50"
+                                                                title="Editar"
                                                             >
-                                                                <EyeIcon className="w-6 h-6" />
+                                                                <PencilSquareIcon className="w-6 h-6" />
                                                             </Link>
-                                                            {can.category_edit && (
-                                                                <Link
-                                                                    href={route(
-                                                                        "category.edit",
-                                                                        {
-                                                                            category:
-                                                                                category.id,
-                                                                        }
-                                                                    )}
-                                                                    className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                                                                    title="Editar"
-                                                                >
-                                                                    <PencilSquareIcon className="w-6 h-6" />
-                                                                </Link>
-                                                            )}
-                                                            {can.category_delete && (
-                                                                <button
-                                                                    className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30"
-                                                                    onClick={() =>
-                                                                        handleDelete(
-                                                                            category
-                                                                        )
-                                                                    }
-                                                                    title="Eliminar"
-                                                                >
-                                                                    <TrashIcon className="w-6 h-6" />
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )
-                                        )
+                                                        )}
+                                                        {can.category_delete && (
+                                                            <button
+                                                                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
+                                                                onClick={() => handleDelete(category)}
+                                                                title="Eliminar"
+                                                            >
+                                                                <TrashIcon className="w-6 h-6" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
                                     ) : (
                                         <tr>
                                             <td
@@ -241,12 +216,10 @@ export default function Index({ auth, categories, can }) {
                         </div>
 
                         {/* Paginación */}
-                        <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <div className="px-3 py-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                             <Pagination
                                 currentPage={currentPage}
-                                totalPages={Math.ceil(
-                                    filteredCategories.length / itemsPerPage
-                                )}
+                                totalPages={Math.ceil(filteredCategories.length / itemsPerPage)}
                                 onPageChange={handlePageChange}
                                 itemsPerPage={itemsPerPage}
                                 setItemsPerPage={setItemsPerPage}
