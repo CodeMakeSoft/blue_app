@@ -172,25 +172,37 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {/* Logo */}
                                 <div className="flex">
                                     <div className="flex shrink-0 items-center">
-                                        <Link href="/dashboard">
-                                            <BoxIcon className="text-gray-800 dark:text-gray-200" />
-                                        </Link>
-                                        <Link
-                                            href={route("account")}
+                                        <Link 
+                                            href="/dashboard" 
+                                            className="flex items-center gap-4 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
-                                            <UserIcon className="h-8 w-8 text-gray-500 dark:text-gray-300 ml-[2rem]" />
+                                            <BoxIcon className="h-10 w-10 text-black dark:text-white" />
+                                            <div className="flex flex-col">
+                                                <span className="text-xl font-fira font-bold text-gray-800 dark:text-gray-200 tracking-tight">
+                                                    UPP Store
+                                                </span>
+                                            </div>
                                         </Link>
                                     </div>
                                 </div>
     
                                 {/* Right side: Theme switcher + Cart */}
-                                <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                                <div className="hidden sm:ms-6 sm:flex sm:items-center gap-4">
                                     <ThemeSwitcher />
-                                    <div className="flex shrink-0 items-center ml-4 relative">
-                                        <Link href={route('cart.index')}>
-                                            <ShoppingCartIcon className="h-6 w-6 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200" />
+                                    <Link
+                                        href={route("account")}
+                                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    >
+                                        <UserIcon className="h-6 w-6 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
+                                    </Link>
+                                    <div className="relative">
+                                        <Link 
+                                            href={route('cart.index')}
+                                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            <ShoppingCartIcon className="h-6 w-6 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
                                             {cart.length > 0 && (
-                                                <span className="absolute -top-2 -right-2 rounded-full bg-red-500 text-white text-xs h-5 w-5 flex items-center justify-center">
+                                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white dark:border-gray-800">
                                                     {cart.length}
                                                 </span>
                                             )}

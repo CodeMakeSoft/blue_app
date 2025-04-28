@@ -17,7 +17,8 @@ export default {
     			sans: [
     				'Figtree',
                     ...defaultTheme.fontFamily.sans
-                ]
+                ],
+                'fira': ['"Fira Sans"', 'sans-serif'],
     		},
     		borderRadius: {
     			lg: 'var(--radius)',
