@@ -18,6 +18,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,6 +91,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::get('/products/{product}/confirm-delete', [ProductController::class, 'confirmDelete'])->name('products.confirmDelete');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    // Favoritos
+    Route::resource('favorites', FavoriteController::class)->only(['index', 'store', 'destroy']);
+    Route::get('favorites/contains/{product}', [FavoriteController::class, 'contains'])->name('favorites.contains');
 
     // Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
