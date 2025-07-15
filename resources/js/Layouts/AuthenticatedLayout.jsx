@@ -11,6 +11,7 @@ import {
     faTags,
     faLayerGroup,
     faUserShield,
+    faHeart
 } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
 
@@ -115,6 +116,17 @@ export default function AuthenticatedLayout({ header, children }) {
             ),
             text: "Inicio",
             active: route().current("dashboard"),
+        },
+        {
+            href: route("favorites.index"),
+            icon: (
+                <FontAwesomeIcon
+                    icon={faHeart}
+                    className="h-5 w-5 text-red-600"
+                />
+            ),
+            text: "Favoritos",
+            active: route().current("favorites.index"),
         },
         {
             href: route("products.view"),
