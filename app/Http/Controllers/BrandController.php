@@ -120,7 +120,7 @@ class BrandController extends Controller implements HasMiddleware
         
         $brand->delete();
 
-        return redirect()->route('brand.index')->with('success', 'Marca eliminada con éxito.');
+        return redirect()->route('brand.index')->with('success', '¡Marca eliminada exitosamente!');
     }
 
     public function catalog()

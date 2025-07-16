@@ -60,8 +60,7 @@ class CategoryController extends Controller implements HasMiddleware
             $path = $image->store('images', 'public');
             $category->image()->create(['url' => $path]);
         }
-
-        return redirect()->route('category.index')->with('success', 'Categoría creada exitosamente.');
+        return redirect()->route('category.index') ->with('success', "¡La categoría fue creada correctamente!");
     }
 
    
@@ -72,7 +71,7 @@ class CategoryController extends Controller implements HasMiddleware
         ]);
     }
 
- public function edit(Category $category)
+    public function edit(Category $category)
     {
         return Inertia::render('Category/Edit', [
             'category' => $category->load('image')
@@ -84,33 +83,32 @@ class CategoryController extends Controller implements HasMiddleware
    public function update(UpdateRequest $request, Category $category)
     {
         $category->update([
-            'name' => $request->name,
-            'description' => $request->description
-        ]);
+        'name' => $request->name,
+        'description' => $request->description
+    ]);
 
-        // Eliminar imagen existente si se solicitó
-        if ($request->deleted_image) {
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image->url);
-                $category->image()->delete();
-            }
+    if ($request->boolean('remove_picture')) {
+        if ($category->image) {
+            Storage::disk('public')->delete($category->image->url);
+            $category->image()->delete();
         }
-
-        // Agregar nueva imagen si se proporcionó
-        if ($request->hasFile('image')) {
-            // Eliminar imagen anterior si existe
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image->url);
-                $category->image()->delete();
-            }
-            
-            $image = $request->file('image');
-            $path = $image->store('images', 'public');
-            $category->image()->create(['url' => $path]);
-        }
-
-        return redirect()->route('category.index');
     }
+
+
+    if ($request->hasFile('image')) {
+        // Eliminar imagen anterior si existe
+        if ($category->image) {
+            Storage::disk('public')->delete($category->image->url);
+            $category->image()->delete();
+        }
+
+        $image = $request->file('image');
+        $path = $image->store('images', 'public');
+        $category->image()->create(['url' => $path]);
+    }
+    return redirect()->route('category.index')->with('success', '¡Categoría actualizada exitosamente!');
+}
+
 
 
     public function confirmDelete($categoryId)
@@ -130,7 +128,7 @@ class CategoryController extends Controller implements HasMiddleware
         }
         $category->delete();
 
-        return redirect()->route('category.index')->with('success', 'Categoría eliminada con éxito.');
+        return redirect()->route('category.index')->with('success', '¡Categoría eliminada exitosamente!');
     }
 
     public function catalog()

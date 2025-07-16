@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextInput from "@/Components/TextInput";
 import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
@@ -7,11 +7,24 @@ import { Link } from "@inertiajs/react";
 
 const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
     const [successMessage, setSuccessMessage] = useState("");
-    const [imagePreviews, setImagePreviews] = useState(
-        isEdit && data.existing_images
-            ? data.existing_images.map((img) => `/storage/${img.url}`)
-            : []
-    );
+    const [imagePreviews, setImagePreviews] = useState([]);
+    const [mainPreviewIndex, setMainPreviewIndex] = useState(0);
+    const [blobUrls, setBlobUrls] = useState([]);
+
+    useEffect(() => {
+        if (isEdit && data.existing_images) {
+            const previews = data.existing_images.map(
+                (img) => `/storage/${img.url}`
+            );
+            setImagePreviews(previews);
+        }
+    }, [isEdit, data.existing_images]);
+
+    useEffect(() => {
+        return () => {
+            blobUrls.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [blobUrls]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -24,32 +37,43 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
 
     const handleImageChange = (files) => {
         const fileArray = Array.from(files);
-        setData("new_images", [...(data.images || []), ...fileArray]);
+        const newPreviews = fileArray.map((file) => URL.createObjectURL(file));
 
-        const previews = fileArray.map((file) => URL.createObjectURL(file));
-        setImagePreviews([...imagePreviews, ...previews]);
+        setData("new_images", [...(data.new_images || []), ...fileArray]);
+        setImagePreviews((prev) => [...prev, ...newPreviews]);
+        setBlobUrls((prev) => [...prev, ...newPreviews]);
     };
 
     const removeImage = (index) => {
-        if (index < imagePreviews.length - (data.new_images?.length || 0)) {
+        const isExisting = index < (data.existing_images?.length || 0);
+
+        if (isExisting) {
             const deletedId = data.existing_images[index].id;
             setData("deleted_images", [
                 ...(data.deleted_images || []),
                 deletedId,
             ]);
+        } else {
+            const newIndex = index - (data.existing_images?.length || 0);
+            const newImages = [...(data.new_images || [])];
+            newImages.splice(newIndex, 1);
+            setData("new_images", newImages);
+
+            // Revoke blob URL to prevent memory leaks
+            const urlToRevoke = imagePreviews[index];
+            URL.revokeObjectURL(urlToRevoke);
+            setBlobUrls((prev) => prev.filter((url) => url !== urlToRevoke));
         }
 
         const updatedPreviews = [...imagePreviews];
         updatedPreviews.splice(index, 1);
         setImagePreviews(updatedPreviews);
 
-        if (index >= imagePreviews.length - (data.new_images?.length || 0)) {
-            const newImages = [...(data.new_images || [])];
-            newImages.splice(
-                index - (imagePreviews.length - newImages.length),
-                1
-            );
-            setData("new_images", newImages);
+        // Reset main preview if needed
+        if (mainPreviewIndex === index) {
+            setMainPreviewIndex(0);
+        } else if (mainPreviewIndex > index) {
+            setMainPreviewIndex((prev) => prev - 1);
         }
     };
 
@@ -149,6 +173,7 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                     <InputError message={errors.images} className="mt-2" />
                 </div>
             </div>
+
             {imagePreviews.length > 0 && (
                 <div className="mt-4">
                     <h3 className="text-gray-700 dark:text-gray-300 font-semibold mb-2">
@@ -156,28 +181,21 @@ const Form = ({ data, errors, setData, submit, isEdit = false, children }) => {
                     </h3>
                     <div className="flex flex-wrap gap-4">
                         <div className="w-full h-80 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
-                            {imagePreviews.length > 0 && (
-                                <img
-                                    src={imagePreviews[0]}
-                                    alt="Vista previa"
-                                    className="h-full object-contain"
-                                />
-                            )}
+                            <img
+                                src={imagePreviews[mainPreviewIndex]}
+                                alt="Vista previa"
+                                className="h-full object-contain"
+                            />
                         </div>
                         <div className="grid grid-cols-4 gap-2">
                             {imagePreviews.map((preview, index) => (
                                 <div key={index} className="relative">
                                     <img
                                         src={preview}
-                                        alt="Vista previa"
+                                        alt="Miniatura"
                                         className="w-full h-24 object-cover rounded-md border dark:border-gray-500 cursor-pointer hover:opacity-75"
                                         onClick={() =>
-                                            setImagePreviews([
-                                                preview,
-                                                ...imagePreviews.filter(
-                                                    (_, i) => i !== index
-                                                ),
-                                            ])
+                                            setMainPreviewIndex(index)
                                         }
                                     />
                                     <button
