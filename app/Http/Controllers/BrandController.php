@@ -82,7 +82,7 @@ class BrandController extends Controller implements HasMiddleware
         ]);
 
         // Eliminar imagen existente si se solicitó
-        if ($request->deleted_image) {
+        if ($request->boolean('remove_picture')) {
             if ($brand->image) {
                 Storage::disk('public')->delete($brand->image->url);
                 $brand->image()->delete();
@@ -133,13 +133,7 @@ class BrandController extends Controller implements HasMiddleware
 
     public function products(Brand $brand)
     {
-        $user = auth()->user();
-        
         return Inertia::render('Brand/Partials/Products', [
-            'auth' => [
-                'user' => $user,
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-            ],
             'brand' => $brand->load('image'),
             'products' => $brand->products()
                 ->with(['images', 'category', 'brand'])

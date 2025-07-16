@@ -58,7 +58,7 @@ export default function Edit({ auth, category }) {
                 </>
             }
         >
-            <Head title="Crear Categoría" />
+            <Head title="Editar Categoría" />
 
             {/* Contenedor principal con márgenes de 3cm (3rem) */}
             <div className="py-6 px-3">

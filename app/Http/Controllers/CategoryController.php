@@ -64,7 +64,7 @@ class CategoryController extends Controller implements HasMiddleware
     }
 
    
- public function show(Category $category)
+    public function show(Category $category)
     {
         return Inertia::render('Category/Show', [
             'category' => $category->load('image')
@@ -77,8 +77,6 @@ class CategoryController extends Controller implements HasMiddleware
             'category' => $category->load('image')
         ]);
     }
-    
-
     
    public function update(UpdateRequest $request, Category $category)
     {

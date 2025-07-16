@@ -19,9 +19,11 @@ const Form = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [nameTouched, setNameTouched] = useState(false);
+    const [descriptionTouched, setDescriptionTouched] = useState(false);
     const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
     const fileInputRef = useRef(null);
 
+    // Manejo vista previa imagen
     useEffect(() => {
         if (data.image && typeof data.image === "object") {
             const objectUrl = URL.createObjectURL(data.image);
@@ -32,8 +34,9 @@ const Form = ({
         } else {
             setImagePreview(null);
         }
-    }, [data.image, data.existing_image, data.remove_picture]);
+    }, [data.image, data.existing_image, data.remove_picture, isEdit]);
 
+    // Cerrar menú editar imagen si se clickea afuera
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (isEditMenuOpen && !event.target.closest(".relative")) {
@@ -46,27 +49,53 @@ const Form = ({
         };
     }, [isEditMenuOpen]);
 
-    const validateName = (name) => {
-        if (!name) return "El nombre es requerido";
-        if (existingNames.includes(name.trim().toLowerCase())) {
-            return "Ya existe una categoría con este nombre";
+    // Validación por campo
+    const validateField = (fieldName, value) => {
+        switch (fieldName) {
+            case "name":
+                if (!value || value.trim() === "")
+                    return "El nombre es requerido";
+                if (
+                    existingNames.includes(value.trim().toLowerCase()) &&
+                    (!isEdit ||
+                        value.trim().toLowerCase() !==
+                            (data.originalName || "").toLowerCase())
+                ) {
+                    return "Ya existe una categoría con este nombre";
+                }
+                return null;
+
+            case "description":
+                if (!value || value.trim() === "")
+                    return "La descripción es requerida";
+                return null;
+
+            default:
+                return null;
         }
-        return null;
     };
 
-    const handleNameChange = (e) => {
-        const value = e.target.value;
-        setData("name", value);
-        setNameTouched(true);
+    // Maneja cambios para todos inputs (nombre, descripción, etc)
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-        const error = validateName(value);
+        setData(name, value);
+
+        // Validar en tiempo real
+        const error = validateField(name, value);
         if (error) {
-            setFormErrors({ ...formErrors, name: error });
+            setFormErrors((prev) => ({ ...prev, [name]: error }));
         } else {
-            const newErrors = { ...formErrors };
-            delete newErrors.name;
-            setFormErrors(newErrors);
+            setFormErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
         }
+
+        // Marcar campos como tocados para mostrar error
+        if (name === "name") setNameTouched(true);
+        if (name === "description") setDescriptionTouched(true);
     };
 
     const handleImageChange = (file) => {
@@ -78,7 +107,6 @@ const Form = ({
             return;
         }
 
-        // Limpia datos previos y actualiza
         setData((prev) => ({
             ...prev,
             image: file,
@@ -87,12 +115,14 @@ const Form = ({
         }));
 
         setFileInputKey(Date.now()); // Forzar reinicio input
-        fileInputRef.current.value = ""; // Limpia selección anterior
-        setIsEditMenuOpen(false); // Cierra menú
+        if (fileInputRef.current) fileInputRef.current.value = ""; // Limpiar input
+        setIsEditMenuOpen(false);
 
-        const newErrors = { ...formErrors };
-        delete newErrors.image;
-        setFormErrors(newErrors);
+        setFormErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.image;
+            return newErrors;
+        });
     };
 
     const removeImage = () => {
@@ -135,8 +165,27 @@ const Form = ({
         }
     };
 
+    // Validar todo al enviar
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setNameTouched(true);
+        setDescriptionTouched(true);
+
+        const errorsFound = {};
+        ["name", "description"].forEach((field) => {
+            const error = validateField(field, data[field]);
+            if (error) errorsFound[field] = error;
+        });
+
+        setFormErrors(errorsFound);
+
+        if (Object.keys(errorsFound).length === 0) {
+            submit(e);
+        }
+    };
+
     return (
-        <form onSubmit={submit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Datos */}
                 <div className="w-full md:w-[65%] bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
@@ -153,7 +202,7 @@ const Form = ({
                                     ? "border-red-500"
                                     : "border-gray-300 dark:border-gray-600"
                             } rounded-md shadow-sm`}
-                            onChange={handleNameChange}
+                            onChange={handleChange}
                             onBlur={() => setNameTouched(true)}
                             disabled={isSubmitting}
                             placeholder="e.g. Deportes, Electrodomésticos"
@@ -172,13 +221,21 @@ const Form = ({
                             id="description"
                             name="description"
                             value={data.description || ""}
-                            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm h-40"
-                            onChange={(e) =>
-                                setData("description", e.target.value)
-                            }
+                            className={`w-full mt-1 p-2 border rounded-md shadow-sm h-40 ${
+                                descriptionTouched && formErrors.description
+                                    ? "border-red-500"
+                                    : "border-gray-300 dark:border-gray-600"
+                            }`}
+                            onChange={handleChange}
+                            onBlur={() => setDescriptionTouched(true)}
+                            disabled={isSubmitting}
                         />
-                        {errors.description && (
-                            <InputError message={errors.description} />
+                        {descriptionTouched && formErrors.description ? (
+                            <InputError message={formErrors.description} />
+                        ) : (
+                            errors.description && (
+                                <InputError message={errors.description} />
+                            )
                         )}
                     </div>
                 </div>
