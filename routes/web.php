@@ -18,6 +18,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StatisticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,15 @@ Route::get('/', function () {
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Estadísticas administrativas
+    Route::prefix('admin/statistics')->name('admin.statistics.')->group(function () {
+        Route::get('/', [StatisticsController::class, 'index'])->name('index');
+        Route::get('/sales-data', [StatisticsController::class, 'salesData'])->name('salesData');
+        Route::get('/top-products', [StatisticsController::class, 'topProducts'])->name('topProducts');
+        Route::get('/sales-by-brand', [StatisticsController::class, 'salesByBrand'])->name('salesByBrand');
+        Route::get('/export-csv', [StatisticsController::class, 'exportCSV'])->name('exportCSV');
+    });
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
