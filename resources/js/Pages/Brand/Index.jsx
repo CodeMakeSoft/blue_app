@@ -12,11 +12,16 @@ import {
 import Pagination from "@/Components/Category/Pagination";
 import ConfirmDeleteModal from "@/Components/Brand/ConfirmDeleteModal";
 import Breadcrumb from "@/Components/Breadcrumb";
+import { toast, Toaster } from "sonner";
 
+<<<<<<< HEAD
 export default function Index({ brands, can }) {
     const { delete: destroy } = useForm();
     const { auth, filters = {} } = usePage().props;
     const [selectedBrand, setSelectedBrand] = useState(null);
+=======
+export default function Index({ auth, brands, can, flash }) {
+>>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState(() => filters.search ?? "");
@@ -25,9 +30,31 @@ export default function Index({ brands, can }) {
     const paginatedBrands = brands.data;
 
     useEffect(() => {
+<<<<<<< HEAD
         if (!isMounted.current) {
             isMounted.current = true;
             return;
+=======
+        console.log("Flash success:", flash);
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+    }, [flash]);
+
+    useEffect(() => {
+        const filtered = brands.filter((brand) =>
+            brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        const totalFiltered = filtered.length;
+
+        if (itemsPerPage >= totalFiltered) {
+            setPaginatedBrands(filtered);
+        } else {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            setPaginatedBrands(filtered.slice(startIndex, endIndex));
+>>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
         }
         const delay = setTimeout(() => {
             router.get(
@@ -72,6 +99,7 @@ export default function Index({ brands, can }) {
             }
         >
             <Head title="Marcas" />
+            <Toaster richColors position="top-right" />
 
             <div className="py-10">
                 <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
@@ -80,9 +108,18 @@ export default function Index({ brands, can }) {
                             Gestión de Marcas
                         </h1>
                         {can.brand_create && (
+<<<<<<< HEAD
                             <Link
                                 href={route("brand.create")}
                                 className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
+=======
+                            <button
+                                onClick={() =>
+                                    (window.location.href =
+                                        route("brand.create"))
+                                }
+                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
+>>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                             >
                                 <PlusCircleIcon className="w-5 h-5 mr-2" />
                                 Nueva Marca
@@ -133,7 +170,16 @@ export default function Index({ brands, can }) {
                                         paginatedBrands.map((brand) => (
                                             <tr
                                                 key={brand.id}
+<<<<<<< HEAD
                                                 className="hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
+=======
+                                                className={`${
+                                                    index !==
+                                                    paginatedBrands.length - 1
+                                                        ? "border-b border-gray-200 dark:border-gray-700"
+                                                        : ""
+                                                } hover:bg-gray-50 dark:hover:bg-gray-700`}
+>>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                                             >
                                                 <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
                                                     {brand.name}
@@ -194,6 +240,14 @@ export default function Index({ brands, can }) {
                                                                     )
                                                                 }
                                                                 className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
+<<<<<<< HEAD
+=======
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        brand
+                                                                    )
+                                                                }
+>>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                                                                 title="Eliminar"
                                                             >
                                                                 <TrashIcon className="w-6 h-6" />
@@ -221,9 +275,17 @@ export default function Index({ brands, can }) {
                         <div className="px-3 py-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                             <Pagination
                                 currentPage={currentPage}
+<<<<<<< HEAD
                                 totalPages={brands.last_page}
                                 onPageChange={setCurrentPage}
                                 itemsPerPage={brands.per_page}
+=======
+                                totalPages={Math.ceil(
+                                    filteredBrands.length / itemsPerPage
+                                )}
+                                onPageChange={handlePageChange}
+                                itemsPerPage={itemsPerPage}
+>>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                                 setItemsPerPage={setItemsPerPage}
                                 totalItems={brands.total}
                             />
