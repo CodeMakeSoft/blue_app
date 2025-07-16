@@ -93,7 +93,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
     // Favoritos
-    Route::resource('favorites', FavoriteController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('favorites', FavoriteController::class)->only(['index', 'store']);
+    // Ruta DELETE personalizada para eliminar favorito por producto
+    Route::delete('favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+    // Ruta para verificar si un producto está en favoritos
     Route::get('favorites/contains/{product}', [FavoriteController::class, 'contains'])->name('favorites.contains');
 
     // Perfil
