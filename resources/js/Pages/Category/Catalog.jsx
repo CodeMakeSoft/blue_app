@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-    faSearch, 
-    faEye, 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faSearch,
+    faEye,
     faLayerGroup,
-    faFilter 
-} from '@fortawesome/free-solid-svg-icons';
+    faFilter,
+} from "@fortawesome/free-solid-svg-icons";
 import Pagination from "@/Components/Category/Pagination";
 import Breadcrumb from "@/Components/Breadcrumb";
 
@@ -66,13 +66,14 @@ export default function Catalog({ auth, categories = [] }) {
             header={
                 <div>
                     <Breadcrumb
-                        routes={[
-                            { name: "Inicio", link: route("dashboard") },
-                        ]}
+                        routes={[{ name: "Inicio", link: route("dashboard") }]}
                         currentPage="Catálogo de Categorías"
                     />
                     <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faLayerGroup} className="text-blue-600" />
+                        <FontAwesomeIcon
+                            icon={faLayerGroup}
+                            className="text-blue-600"
+                        />
                         Catálogo de Categorías
                     </h2>
                 </div>
@@ -83,7 +84,7 @@ export default function Catalog({ auth, categories = [] }) {
             <div className="py-6">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {/* Barra de búsqueda */}
-                    <form className="mb-6">
+                    <form className="mb-6" onSubmit={(e) => e.preventDefault()}>
                         <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
                             <div className="relative w-full md:w-96">
                                 <input
@@ -124,19 +125,28 @@ export default function Catalog({ auth, categories = [] }) {
                                         className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 transform hover:scale-105 transition-all duration-300"
                                     >
                                         <div className="relative group">
-                                            <div className="w-full h-32 flex items-center justify-center">
+                                            <div className="w-full h-40 overflow-hidden rounded-md">
                                                 <img
-                                                    src={category.image ? `/storage/${category.image.url}` : 'https://via.placeholder.com/150'}
+                                                    src={
+                                                        category.image?.url
+                                                            ? `/storage/${category.image.url}`
+                                                            : "https://via.placeholder.com/300x180.png?text=Marca"
+                                                    }
                                                     alt={category.name}
-                                                    className="max-h-full max-w-full object-contain"
+                                                    className="w-full h-full object-cover"
                                                 />
                                             </div>
                                             <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg">
                                                 <Link
-                                                    href={route("category.show", category.id)}
+                                                    href={route(
+                                                        "category.show",
+                                                        category.id
+                                                    )}
                                                     className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transform hover:scale-110 transition-all"
                                                 >
-                                                    <FontAwesomeIcon icon={faEye} />
+                                                    <FontAwesomeIcon
+                                                        icon={faEye}
+                                                    />
                                                 </Link>
                                             </div>
                                         </div>
@@ -162,7 +172,10 @@ export default function Catalog({ auth, categories = [] }) {
                                         onChange={handleItemsPerPageChange}
                                     >
                                         {itemsPerPageOptions.map((option) => (
-                                            <option key={option.value} value={option.value}>
+                                            <option
+                                                key={option.value}
+                                                value={option.value}
+                                            >
                                                 {option.label}
                                             </option>
                                         ))}
@@ -171,7 +184,9 @@ export default function Catalog({ auth, categories = [] }) {
 
                                 <Pagination
                                     currentPage={currentPage}
-                                    totalPages={Math.ceil(filteredCategories.length / itemsPerPage)}
+                                    totalPages={Math.ceil(
+                                        filteredCategories.length / itemsPerPage
+                                    )}
                                     onPageChange={handlePageChange}
                                     itemsPerPage={itemsPerPage}
                                     totalItems={filteredCategories.length}
