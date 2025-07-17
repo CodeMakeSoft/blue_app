@@ -15,10 +15,10 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 export default function Statistics({ activeRoute }) {
     const data = {
-        labels: ['EnerOO', 'FebrerooO', 'Marzzzzo', 'Abriiiil'],
+        labels: ['Enero', 'Febrero', 'Marzo', 'Abril'],
         datasets: [
             {
-                label: 'Ventaz',
+                label: 'Ventas',
                 data: [1200, 1500, 1000, 1900],
                 backgroundColor: 'rgba(54, 162, 235, 0.6)',
             },

@@ -49,6 +49,12 @@ export default function AdminPanel({ activeRoute }) {
             icon: <CubeIcon className="h-8 w-8 text-emerald-500" />,
             route: "products.index",
         },
+        {
+            title: "Estadísticas del Sistemaa",
+            description: "Visualiza métricas de ventas y productos",
+            icon: <ChartPieIcon className="h-8 w-8 text-orange-500" />,
+            route: "admin.statistics.index",
+        },
     ];
 
     return (
