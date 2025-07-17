@@ -50,7 +50,7 @@ export default function AdminPanel({ activeRoute }) {
             route: "products.index",
         },
         {
-            title: "Estadísticas del Sistemaa",
+            title: "Idols on the wall",
             description: "Visualiza métricas de ventas y productos",
             icon: <ChartPieIcon className="h-8 w-8 text-orange-500" />,
             route: "admin.statistics.index",
