@@ -7,7 +7,6 @@ import {
     ShoppingBagIcon,
     TagIcon,
     CubeIcon,
-    ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
 import Breadcrumb from "@/Components/Breadcrumb";
 
@@ -49,6 +48,12 @@ export default function AdminPanel({ activeRoute }) {
             icon: <CubeIcon className="h-8 w-8 text-emerald-500" />,
             route: "products.index",
         },
+        {
+            title: "Estadísticas del Sistema",
+            description: "Visualiza métricas de ventas y productos",
+            icon: <ChartPieIcon className="h-8 w-8 text-orange-500" />,
+            route: "admin.statistics.index",
+        },
     ];
 
     return (
@@ -86,11 +91,11 @@ export default function AdminPanel({ activeRoute }) {
                         <Link
                             key={index}
                             href={route(feature.route)}
-                            className={`group block bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-all duration-300 hover:shadow-md hover:ring-2 hover:ring-blue-500 hover:bg-blue-50/50 dark:hover:bg-gray-700 cursor-pointer ${feature.color}`}
+                            className={`group block bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-all duration-300 hover:shadow-md hover:ring-2 hover:ring-blue-500 hover:bg-blue-50/50 dark:hover:bg-gray-700 cursor-pointer`}
                         >
                             <div className="flex flex-col items-center text-center">
                                 <div
-                                    className={`rounded-full p-3 mb-4 ${feature.color} group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30`}
+                                    className={`rounded-full p-3 mb-4 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30`}
                                 >
                                     {feature.icon}
                                 </div>

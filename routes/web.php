@@ -43,14 +43,23 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Estadísticas administrativas
-    Route::prefix('admin/statistics')->name('admin.statistics.')->group(function () {
-        Route::get('/', [StatisticsController::class, 'index'])->name('index');
-        Route::get('/sales-data', [StatisticsController::class, 'salesData'])->name('salesData');
-        Route::get('/top-products', [StatisticsController::class, 'topProducts'])->name('topProducts');
-        Route::get('/sales-by-brand', [StatisticsController::class, 'salesByBrand'])->name('salesByBrand');
-        Route::get('/export-csv', [StatisticsController::class, 'exportCSV'])->name('exportCSV');
-    });
+ // Estadísticas administrativas
+Route::prefix('admin/statistics')->name('admin.statistics.')->group(function () {
+    Route::get('/', [StatisticsController::class, 'index'])->name('index');
+    Route::get('/sales-data', [StatisticsController::class, 'salesData'])->name('salesData');
+    Route::get('/top-products', [StatisticsController::class, 'topProducts'])->name('topProducts');
+    Route::get('/sales-by-brand', [StatisticsController::class, 'salesByBrand'])->name('salesByBrand');
+    Route::get('/export-csv', [StatisticsController::class, 'exportCSV'])->name('exportCSV');
+    
+    // 🔍 Búsqueda para sugerencias de productos
+    Route::get('/products/search', [StatisticsController::class, 'searchProducts'])->name('products.search');
+    Route::get('/admin/statistics/autocomplete', [StatisticsController::class, 'autocomplete'])->name('admin.statistics.autocomplete');
+    Route::get('/brands/search', [StatisticsController::class, 'searchBrands'])->name('brands.search');
+    Route::get('/categories/search', [StatisticsController::class, 'searchCategories'])->name('categories.search');
+
+
+});
+
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
