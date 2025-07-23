@@ -18,7 +18,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\Admin\StatisticsController; // ✅ CORREGIDO
 
 /*
 |--------------------------------------------------------------------------
@@ -43,29 +43,26 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
- // Estadísticas administrativas
-Route::prefix('admin/statistics')->name('admin.statistics.')->group(function () {
-    Route::get('/', [StatisticsController::class, 'index'])->name('index');
-    Route::get('/sales-data', [StatisticsController::class, 'salesData'])->name('salesData');
-    Route::get('/top-products', [StatisticsController::class, 'topProducts'])->name('topProducts');
-    Route::get('/sales-by-brand', [StatisticsController::class, 'salesByBrand'])->name('salesByBrand');
-    Route::get('/export-csv', [StatisticsController::class, 'exportCSV'])->name('exportCSV');
-    
-    // 🔍 Búsqueda para sugerencias de productos
-    Route::get('/products/search', [StatisticsController::class, 'searchProducts'])->name('products.search');
-    Route::get('/admin/statistics/autocomplete', [StatisticsController::class, 'autocomplete'])->name('admin.statistics.autocomplete');
-    Route::get('/brands/search', [StatisticsController::class, 'searchBrands'])->name('brands.search');
-    Route::get('/categories/search', [StatisticsController::class, 'searchCategories'])->name('categories.search');
+    // Estadísticas administrativas
+    Route::prefix('admin/statistics')->name('admin.statistics.')->group(function () {
+        Route::get('/', [StatisticsController::class, 'index'])->name('index');
+        Route::get('/sales-data', [StatisticsController::class, 'salesData'])->name('salesData');
+        Route::get('/top-products', [StatisticsController::class, 'topProducts'])->name('topProducts');
+        Route::get('/sales-by-brand', [StatisticsController::class, 'salesByBrand'])->name('salesByBrand');
+        Route::get('/export-csv', [StatisticsController::class, 'exportCSV'])->name('exportCSV');
 
-
-});
-
+        // 🔍 Autocompletado y búsqueda
+        Route::get('/products/search', [StatisticsController::class, 'searchProducts'])->name('products.search');
+        Route::get('/autocomplete', [StatisticsController::class, 'autocomplete'])->name('autocomplete');
+        Route::get('/brands/search', [StatisticsController::class, 'searchBrands'])->name('brands.search');
+        Route::get('/categories/search', [StatisticsController::class, 'searchCategories'])->name('categories.search');
+    });
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Cuenta
-    Route::get('/account', fn() => Inertia::render('Account'))->name('account');
+    Route::get('/account', fn () => Inertia::render('Account'))->name('account');
 
     // Admin Panel
     Route::get('/admin', fn () => Inertia::render('Admin/AdminPanel', [
@@ -147,6 +144,7 @@ Route::prefix('admin/statistics')->name('admin.statistics.')->group(function () 
     Route::resource('admin/permissions', PermissionController::class);
 });
 
+// API interna para carrito
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/api/cart/status', [CartController::class, 'getCartStatus'])->name('api.cart.status');
 });
@@ -156,7 +154,9 @@ Route::middleware('auth:sanctum')->group(function () {
 | Auth
 |--------------------------------------------------------------------------
 */
-// Ruta para vista home
+
+// Página principal
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 
 require __DIR__.'/auth.php';
+Route::get('/admin/statistics/export-pdf', [StatisticsController::class, 'exportPdf'])->name('statistics.exportPdf');
