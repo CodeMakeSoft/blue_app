@@ -101,10 +101,10 @@ const AddressCard = ({ location, onSetDefault }) => {
                 )}
             </div>
 
-            <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className= "flex justify-end gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <Link
                     href={route("address.edit", location.id)}
-                    className="flex items-center border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                    className= "flex items-center border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition"
                 >
                     <PencilSquareIcon className="h-5 w-5 mr-2" />
                     Editar
