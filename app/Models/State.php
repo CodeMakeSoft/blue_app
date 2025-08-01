@@ -6,13 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class State extends Model
 {
-    public function municipalities()
-    {
+    protected $fillable = [
+        'name', 
+        'country_id', 
+    ];
+    public function country() {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function municipalities() {
         return $this->hasMany(Municipality::class);
     }
 
-    public function country()
+    public function getCountryName()
     {
-        return $this->belongsTo(Country::class);
+        return optional($this->country)->name;
     }
 }

@@ -6,14 +6,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Address;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -51,12 +51,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
-    }
-
-
     public function cart()
     {
         return $this->hasOne(Cart::class); 
@@ -66,8 +60,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
-    public function locations()
+
+    public function shippingAddresses()
     {
-        return $this->hasMany(Location::class);
+        return $this->hasMany(ShippingAddress::class);
     }
+    
 }

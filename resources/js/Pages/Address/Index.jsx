@@ -4,21 +4,32 @@ import { PlusIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 import { Toaster, toast } from "sonner";
 import ConfirmDelete from "@/Components/ConfirmDelete";
 import Breadcrumb from "@/Components/Breadcrumb";
+import AddressCard from "@/Components/Address/AddressCard";
 
 export default function Index({ locations }) {
     const handleDelete = (id) => {
-        router.delete(`/address/${id}`, {
-            onSuccess: () => {
-                console.log("Eliminado correctamente");
-                toast.success("Dirección eliminada correctamente");
-                router.visit();
-            },
-            onError: () => {
-                toast.error("Error al eliminar la dirección");
-            },
-        });
+         router.delete(route("address.destroy", id), {
+             onSuccess: () => {
+                 toast.success("Dirección eliminada correctamente");
+             },
+             onError: () => {
+                 toast.error("Error al eliminar la dirección");
+             },
+         });
     };
 
+    const handleSetDefault = (id) => {
+         router.post(route("address.set-default", id), {
+             onSuccess: () => {
+                 toast.success("Dirección predeterminada actualizada");
+             },
+             onError: () => {
+                 toast.error("Error al actualizar la dirección predeterminada");
+             },
+         });
+    };
+
+    console.log("Locations data:", locations);
     return (
         <AuthenticatedLayout
             header={
@@ -50,77 +61,16 @@ export default function Index({ locations }) {
                         </h2>
                     </Link>
                 </div>
-
                 {/* Contenedor grid responsivo */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {locations.length > 0 ? (
                         locations.map((location) => (
-                            <div
+                            <AddressCard
                                 key={location.id}
-                                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700 flex flex-col h-full"
-                            >
-                                <div className="flex-grow">
-                                    <h3 className="font-bold text-lg mb-2 dark:text-gray-100">
-                                        {location.alias}
-                                    </h3>
-                                    <p className="text-gray-600 dark:text-gray-300">
-                                        {location.street} #{location.ext_number}
-                                        {location.int_number &&
-                                            ` Int. ${location.int_number}`}
-                                    </p>
-                                    <p className="text-gray-600 dark:text-gray-300 mt-1">
-                                        {
-                                            location.district?.city
-                                                ?.municipality?.state?.name
-                                        }
-                                        ,{" "}
-                                        {
-                                            location.district?.city
-                                                ?.municipality?.state?.country
-                                                ?.name
-                                        }
-                                    </p>
-                                    <p className="text-gray-600 dark:text-gray-300">
-                                        {location.district?.name},{" "}
-                                        {location.district?.city?.name}
-                                    </p>
-                                    <p className="text-gray-600 dark:text-gray-300">
-                                        C.P. {location.district?.postal_code}
-                                    </p>
-                                    {location.phone && (
-                                        <p className="text-gray-600 dark:text-gray-300">
-                                            Tel: {location.phone}
-                                        </p>
-                                    )}
-                                </div>
-                                {location.delivery_instructions && (
-                                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            <span className="font-medium">
-                                                Instrucciones:
-                                            </span>{" "}
-                                            {location.delivery_instructions}
-                                        </p>
-                                    </div>
-                                )}
-                                <div className="flex justify-end gap-2 mt-4">
-                                    <Link
-                                        href={route(
-                                            "address.edit",
-                                            location.id
-                                        )}
-                                        className="flex items-center border border-gray-500 dark:border-gray-400 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
-                                    >
-                                        <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                        Edit
-                                    </Link>
-                                    <ConfirmDelete
-                                        id={location.id}
-                                        onConfirm={handleDelete}
-                                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded"
-                                    />
-                                </div>
-                            </div>
+                                location={location}
+                                onDelete={handleDelete}
+                                onSetDefault={handleSetDefault}
+                            />
                         ))
                     ) : (
                         <div className="col-span-full text-center py-10 bg-white dark:bg-gray-800 rounded-lg shadow">

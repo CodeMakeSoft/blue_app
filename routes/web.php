@@ -1,23 +1,24 @@
 <?php
 
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
-use Inertia\Inertia;
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AddressController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\LocationController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ShippingAddressController;
 use App\Http\Controllers\Admin\StatisticsController; // ✅ CORREGIDO
 
 /*
@@ -113,12 +114,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // CRUD Direcciones
-    Route::get('/address', [LocationController::class, 'index'])->name('address.index');
-    Route::get('/address/create', [LocationController::class, 'create'])->name('address.create');
-    Route::get('/address/{address}/edit', [LocationController::class, 'edit'])->name('address.edit');
-    Route::post('/address', [LocationController::class, 'store'])->name('address.store');
-    Route::put('/address/{address}', [LocationController::class, 'update'])->name('address.update');
-    Route::delete('/address/{address}', [LocationController::class, 'destroy'])->name('address.destroy');
+    Route::middleware(['auth'])->group(function () {
+    Route::resource('address', ShippingAddressController::class);
+    Route::post('address/{id}/default', [ShippingAddressController::class, 'setDefault'])->name('address.set-default');
+    });
+     Route::get('/address', [ShippingAddressController::class, 'index'])->name('address.index');
+    Route::get('/address/create', [ShippingAddressController::class, 'create'])->name('address.create');
+    Route::get('/address/{address}/edit', [ShippingAddressController::class, 'edit'])->name('address.edit');
+    Route::post('/address', [ShippingAddressController::class, 'store'])->name('address.store');
+    Route::put('/address/{address}', [ShippingAddressController::class, 'update'])->name('address.update');
+    Route::delete('/address/{address}', [ShippingAddressController::class, 'destroy'])->name('address.destroy');
+
+
 
     // Carrito
     Route::resource('cart', CartController::class)->only(['index', 'update', 'destroy']);
