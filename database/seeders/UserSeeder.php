@@ -26,8 +26,19 @@ class UserSeeder extends Seeder
             ]
         );
 
+        $SuperAdmin = User::firstOrCreate(
+            ['email' => 'SuperAdmin@example.com'], // Evita duplicados
+            [
+                'name' => 'SuperAdmin',
+                'password' => Hash::make('password'), // Contraseña por defecto (cámbiala en producción)
+            ]
+        );
+
 
         // Asignar rol 'Admin' (usando el nombre exacto del rol creado en RoleSeeder)
+        $SuperAdminRole = Role::where('name', 'SuperAdmin')->first();
+        $SuperAdmin->assignRole($SuperAdminRole);
+
         $adminRole = Role::where('name', 'Admin')->first();
         $admin->assignRole($adminRole);
 
