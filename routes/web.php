@@ -18,7 +18,11 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
+<<<<<<< HEAD
 use App\Http\Controllers\FavoriteController;
+=======
+use App\Http\Controllers\ReturnController;
+>>>>>>> main
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +138,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('admin/users', UserController::class);
     Route::resource('admin/roles', RoleController::class);
     Route::resource('admin/permissions', PermissionController::class);
+
+    //rutas mamastrosas asi bien masizas todas diabolicas .php 
+    Route::get('/devolucion', [ReturnController::class, 'showForm'])->name('return.form');
+    Route::post('/devolucion', [ReturnController::class, 'submitForm'])->name('return.submit');
+
 });
 
 Route::middleware('auth:sanctum')->group(function () {
