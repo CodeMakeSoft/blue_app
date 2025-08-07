@@ -40,8 +40,13 @@ class CategoryController extends Controller implements HasMiddleware
     }
 
     
-    public function create()
+    public function create(Request $request)
     {
+        if ($request->session()->get('recently_created')) {
+        return redirect()
+            ->route('category.index')
+            ->with('info', 'Ya creaste una categoría. Usa el botón "Nueva categoría" si deseas crear otra.');
+    }
         return Inertia::render('Category/Create');
     }
 
@@ -64,17 +69,45 @@ class CategoryController extends Controller implements HasMiddleware
     }
 
    
-    public function show(Category $category)
+    public function show($id)
     {
+        $category = Category::with('image')->find($id);
+
+        if (!$category) {
+            // Redirección más robusta con headers anti-caché
+            return redirect()
+                ->route('category.index')
+                ->with('error', 'La categoría que intentas ver ya no existe.')
+                ->withHeaders([
+                    'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
+                    'Pragma' => 'no-cache',
+                    'Expires' => '0'
+                ]);
+        }
+
         return Inertia::render('Category/Show', [
-            'category' => $category->load('image')
+            'category' => $category
         ]);
     }
 
-    public function edit(Category $category)
+    public function edit($id)
     {
+        $category = Category::with('image')->find($id);
+
+        if (!$category) {
+            // Redirección con headers anti-caché
+            return redirect()
+                ->route('category.index')
+                ->with('error', 'La categoría que intentas editar ya no existe.')
+                ->withHeaders([
+                    'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
+                    'Pragma' => 'no-cache',
+                    'Expires' => '0'
+                ]);
+        }
+
         return Inertia::render('Category/Edit', [
-            'category' => $category->load('image')
+            'category' => $category
         ]);
     }
     
@@ -126,7 +159,14 @@ class CategoryController extends Controller implements HasMiddleware
         }
         $category->delete();
 
-        return redirect()->route('category.index')->with('success', '¡Categoría eliminada exitosamente!');
+        return redirect()
+            ->route('category.index', ['nocache' => time()])
+            ->with('success', '¡Categoría eliminada exitosamente!')
+            ->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
     }
 
     public function catalog()

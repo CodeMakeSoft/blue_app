@@ -22,6 +22,7 @@ const Form = ({
     const [descriptionTouched, setDescriptionTouched] = useState(false);
     const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
     const fileInputRef = useRef(null);
+    const [localErrors, setLocalErrors] = useState({});
 
     // Manejo vista previa imagen
     useEffect(() => {

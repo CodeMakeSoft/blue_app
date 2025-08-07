@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 import Form from "@/Components/Category/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -79,9 +79,12 @@ export default function Edit({ auth, category }) {
                     submit={submit}
                     isEdit={true}
                 >
-                    <div className="w-[65%] ml-auto">
+                    <div className="w-[65%] ml-auto  ">
                         <div className="flex justify-end">
-                            <PrimaryButton type="submit">
+                            <PrimaryButton
+                                type="submit"
+                                // ← Igual que el label de "Añadir imagen"
+                            >
                                 Actualizar Categoría
                             </PrimaryButton>
                         </div>
