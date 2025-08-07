@@ -14,48 +14,39 @@ import ConfirmDeleteModal from "@/Components/Brand/ConfirmDeleteModal";
 import Breadcrumb from "@/Components/Breadcrumb";
 import { toast, Toaster } from "sonner";
 
-<<<<<<< HEAD
-export default function Index({ brands, can }) {
-    const { delete: destroy } = useForm();
-    const { auth, filters = {} } = usePage().props;
-    const [selectedBrand, setSelectedBrand] = useState(null);
-=======
 export default function Index({ auth, brands, can, flash }) {
->>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
-    const [searchTerm, setSearchTerm] = useState(() => filters.search ?? "");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedBrand, setSelectedBrand] = useState(null);
+    const [paginatedBrands, setPaginatedBrands] = useState(brands.data);
+    const { delete: destroy } = useForm();
     const isMounted = useRef(false);
 
-    const paginatedBrands = brands.data;
-
     useEffect(() => {
-<<<<<<< HEAD
-        if (!isMounted.current) {
-            isMounted.current = true;
-            return;
-=======
-        console.log("Flash success:", flash);
         if (flash?.success) {
             toast.success(flash.success);
         }
     }, [flash]);
 
     useEffect(() => {
-        const filtered = brands.filter((brand) =>
+        const filtered = brands.data.filter((brand) =>
             brand.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
         const totalFiltered = filtered.length;
+        let result;
 
         if (itemsPerPage >= totalFiltered) {
-            setPaginatedBrands(filtered);
+            result = filtered;
         } else {
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            setPaginatedBrands(filtered.slice(startIndex, endIndex));
->>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
+            result = filtered.slice(startIndex, endIndex);
         }
+
+        setPaginatedBrands(result);
+
         const delay = setTimeout(() => {
             router.get(
                 route("brand.index"),
@@ -66,8 +57,9 @@ export default function Index({ auth, brands, can, flash }) {
                 }
             );
         }, 300);
+        
         return () => clearTimeout(delay);
-    }, [searchTerm]);
+    }, [searchTerm, currentPage, itemsPerPage]);
 
     const handleDelete = (brand) => {
         setSelectedBrand(brand);
@@ -76,12 +68,20 @@ export default function Index({ auth, brands, can, flash }) {
     const handleConfirmDelete = () => {
         if (selectedBrand) {
             destroy(route("brand.destroy", selectedBrand.id), {
-                onSuccess: () => setSelectedBrand(null),
+                onSuccess: () => {
+                    setSelectedBrand(null);
+                    toast.success("Marca eliminada correctamente");
+                },
+                onError: () => {
+                    toast.error("Error al eliminar la marca");
+                },
             });
         }
     };
 
     const handleCloseModal = () => setSelectedBrand(null);
+
+    const handlePageChange = (page) => setCurrentPage(page);
 
     return (
         <AdminLayout
@@ -108,18 +108,9 @@ export default function Index({ auth, brands, can, flash }) {
                             Gestión de Marcas
                         </h1>
                         {can.brand_create && (
-<<<<<<< HEAD
                             <Link
                                 href={route("brand.create")}
-                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
-=======
-                            <button
-                                onClick={() =>
-                                    (window.location.href =
-                                        route("brand.create"))
-                                }
                                 className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
->>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                             >
                                 <PlusCircleIcon className="w-5 h-5 mr-2" />
                                 Nueva Marca
@@ -136,12 +127,7 @@ export default function Index({ auth, brands, can, flash }) {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    e.preventDefault();
-                                }
-                            }}
-                            className="..."
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             placeholder="Buscar marcas por nombre o descripción..."
                         />
                     </div>
@@ -167,19 +153,14 @@ export default function Index({ auth, brands, can, flash }) {
                                 </thead>
                                 <tbody>
                                     {paginatedBrands.length > 0 ? (
-                                        paginatedBrands.map((brand) => (
+                                        paginatedBrands.map((brand, index) => (
                                             <tr
                                                 key={brand.id}
-<<<<<<< HEAD
-                                                className="hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
-=======
                                                 className={`${
-                                                    index !==
-                                                    paginatedBrands.length - 1
+                                                    index !== paginatedBrands.length - 1
                                                         ? "border-b border-gray-200 dark:border-gray-700"
                                                         : ""
                                                 } hover:bg-gray-50 dark:hover:bg-gray-700`}
->>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                                             >
                                                 <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
                                                     {brand.name}
@@ -207,12 +188,7 @@ export default function Index({ auth, brands, can, flash }) {
                                                 <td className="px-4 py-3 text-center">
                                                     <div className="flex justify-center space-x-4">
                                                         <Link
-                                                            href={route(
-                                                                "brand.show",
-                                                                {
-                                                                    brand: brand.id,
-                                                                }
-                                                            )}
+                                                            href={route("brand.show", brand.id)}
                                                             className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
                                                             title="Ver detalle"
                                                         >
@@ -220,12 +196,7 @@ export default function Index({ auth, brands, can, flash }) {
                                                         </Link>
                                                         {can.brand_edit && (
                                                             <Link
-                                                                href={route(
-                                                                    "brand.edit",
-                                                                    {
-                                                                        brand: brand.id,
-                                                                    }
-                                                                )}
+                                                                href={route("brand.edit", brand.id)}
                                                                 className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50"
                                                                 title="Editar"
                                                             >
@@ -234,20 +205,8 @@ export default function Index({ auth, brands, can, flash }) {
                                                         )}
                                                         {can.brand_delete && (
                                                             <button
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        brand
-                                                                    )
-                                                                }
+                                                                onClick={() => handleDelete(brand)}
                                                                 className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
-<<<<<<< HEAD
-=======
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        brand
-                                                                    )
-                                                                }
->>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                                                                 title="Eliminar"
                                                             >
                                                                 <TrashIcon className="w-6 h-6" />
@@ -275,17 +234,9 @@ export default function Index({ auth, brands, can, flash }) {
                         <div className="px-3 py-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                             <Pagination
                                 currentPage={currentPage}
-<<<<<<< HEAD
-                                totalPages={brands.last_page}
-                                onPageChange={setCurrentPage}
-                                itemsPerPage={brands.per_page}
-=======
-                                totalPages={Math.ceil(
-                                    filteredBrands.length / itemsPerPage
-                                )}
+                                totalPages={Math.ceil(brands.total / itemsPerPage)}
                                 onPageChange={handlePageChange}
                                 itemsPerPage={itemsPerPage}
->>>>>>> d759c88db0b87172a6b36b43653f54fd68c23fb8
                                 setItemsPerPage={setItemsPerPage}
                                 totalItems={brands.total}
                             />
