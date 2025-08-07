@@ -45,7 +45,7 @@ class RoleSeeder extends Seeder
         ];
         
         // Crear roles y asignar permisos
-        $SuperAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
+        $SuperAdmin = Role::firstOrCreate(['name' => 'SuperAdmin']);
         $SuperAdmin->syncPermissions($SuperAdminPermissions);
         
         $admin = Role::firstOrCreate(['name' => 'Admin']);
