@@ -99,8 +99,6 @@ export default function View({ products = [] }) {
             }
         >
             <Head title="Catálogo de Productos" />
-
-            <div className="py-6">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                         <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
@@ -207,7 +205,6 @@ export default function View({ products = [] }) {
                         ))}
                     </div>
                 </div>
-            </div>
         </AuthenticatedLayout>
     );
 }

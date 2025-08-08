@@ -37,17 +37,29 @@ export default function Form({
 
     // Nueva función para manejar el cambio de precio y evitar NaN
     const handlePriceChange = (e) => {
-        const value = e.target.value;
-        const price = value ? parseFloat(value) : 0; // Si no hay valor, asigna 0
+        let value = e.target.value;
+        let price = value ? parseFloat(value) : 0; // Si no hay valor, asigna 0
         setData("price", price);
     };
+
+    const handleFocus = (e) => {
+        if (e.target.value === "0") {
+            setData("price", "");
+        }
+    }
+
+    const handleBlur = (e) => {
+        if (e.target.value === "") {
+            setData("price", 0);
+        }
+    }
 
     // Función modificada para calcular el precio con IVA e IEPS
     const calculatePriceWithTaxes = (price) => {
         const validPrice = price && !isNaN(price) && price > 0 ? price : 0; // Valida el precio
 
         if (validPrice === 0) {
-            return "0.00"; // Si el precio no es válido, retorna 0.00
+            return ""; // Si el precio no es válido, retorna 0.00
         }
 
         const iva = 0.16; // 16% IVA
@@ -188,9 +200,19 @@ export default function Form({
                                 type="number"
                                 name="price"
                                 value={data.price}
+                                min={0}
+                                max={9999999999.99}
+                                step="0.01"
                                 className="w-full pl-7 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                                 onChange={handlePriceChange}
+                                onFocus={handleFocus}
+                                onBlur={handleBlur  }
                             />
+                            {data.price > 9999999999.99 && (
+                                <span className="text-red-500 text-xs ml-4">
+                                    El precio máximo permitido es 9,999,999,999.99
+                                </span>
+                            )}
                         </div>
                         <InputError
                             message={errors.price}
@@ -214,11 +236,22 @@ export default function Form({
                         type="number"
                         name="stock"
                         value={data.stock}
+                        min={0}
+                        max={60000}
                         className="w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                        onChange={(e) =>
-                            setData("stock", parseInt(e.target.value))
-                        }
+                        onFocus={e => {
+                            if (e.target.value === "0") setData("stock", "");
+                        }}
+                        onBlur={e => {
+                            if (e.target.value === "") setData("stock", 0);
+                        }}
+                        onChange={e => setData("stock", parseInt(e.target.value) || "")}
                     />
+                    {data.stock > 60000 && (
+                        <span className="text-red-500 text-xs ml-4">
+                            El stock máximo permitido es 60, 000
+                        </span>
+                    )}
                     <InputError
                         message={errors.stock}
                         className="dark:text-red-400"
@@ -236,11 +269,11 @@ export default function Form({
                     <select
                         id="category_id"
                         name="category_id"
-                        value={data.category_id}
+                        value={data.category_id || ""}
                         className="w-full border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                        onChange={(e) => setData("category_id", e.target.value)}
+                        onChange={e => setData("category_id", e.target.value)}
                     >
-                        <option value="">Seleccionar Opción</option>
+                        <option value="" disabled hidden>Seleccionar Opción</option>
                         {categories.map((category) => (
                             <option
                                 key={category.id}
@@ -266,11 +299,11 @@ export default function Form({
                     <select
                         id="brand_id"
                         name="brand_id"
-                        value={data.brand_id}
+                        value={data.brand_id || ""}
                         className="w-full border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         onChange={(e) => setData("brand_id", e.target.value)}
                     >
-                        <option value="">Seleccionar Opción</option>
+                        <option value="" disabled hidden>Seleccionar Opción</option>
                         {brands.map((brand) => (
                             <option
                                 key={brand.id}
@@ -300,7 +333,7 @@ export default function Form({
                         className="w-full border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         onChange={(e) => setData("size", e.target.value)}
                     >
-                        <option value="">Seleccionar Talla</option>
+                        <option value="" disabled hidden>Seleccionar Talla</option>
                         <option value="S">S</option>
                         <option value="M">M</option>
                         <option value="L">L</option>
@@ -325,18 +358,14 @@ export default function Form({
                         className="w-full border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         onChange={(e) => setData("color", e.target.value)}
                     >
-                        <option value="">Seleccionar Color</option>
+                        <option value="" disabled hidden>Seleccionar Color</option>
                         <option className="dark:bg-gray-700">Rojo</option>
-                        <option className="dark:bg-gray-700">
-                            Azul marino
-                        </option>
+                        <option className="dark:bg-gray-700">Azul marino</option>
                         <option className="dark:bg-gray-700">Amarillo</option>
                         <option className="dark:bg-gray-700">Blanco</option>
                         <option className="dark:bg-gray-700">Negro</option>
                         <option className="dark:bg-gray-700">Gris claro</option>
-                        <option className="dark:bg-gray-700">
-                            Gris oscuro
-                        </option>
+                        <option className="dark:bg-gray-700">Gris oscuro</option>
                         <option className="dark:bg-gray-700">Verde</option>
                         <option className="dark:bg-gray-700">Naranja</option>
                         <option className="dark:bg-gray-700">Púrpura</option>
@@ -346,7 +375,7 @@ export default function Form({
                         <option className="dark:bg-gray-700">Turquesa</option>
                     </select>
                     <InputError
-                        message={errors.size}
+                        message={errors.color}
                         className="dark:text-red-400"
                     />
                 </div>

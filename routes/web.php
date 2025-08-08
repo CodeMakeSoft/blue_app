@@ -18,11 +18,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
-<<<<<<< HEAD
 use App\Http\Controllers\FavoriteController;
-=======
 use App\Http\Controllers\ReturnController;
->>>>>>> main
 
 /*
 |--------------------------------------------------------------------------

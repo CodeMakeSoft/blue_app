@@ -17,6 +17,7 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class ProductController extends Controller implements HasMiddleware
 {
+    
     public static function middleware(): array
     {
         return [
