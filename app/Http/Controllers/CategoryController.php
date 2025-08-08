@@ -11,7 +11,7 @@ use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller implements HasMiddleware
 {
