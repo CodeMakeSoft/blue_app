@@ -21,7 +21,8 @@ export default function Index({ products, can }) {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
-    const [searchTerm, setSearchTerm] = useState("");
+    const { filters = {} } = usePage().props;
+    const [searchTerm, setSearchTerm] = useState(filters.search || "");
     const carouselRefs = useRef({});
     const [scrollStates, setScrollStates] = useState({});
 
@@ -33,21 +34,20 @@ export default function Index({ products, can }) {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-
     useEffect(() => {
-        const initialStates = {};
-        paginatedProducts.forEach((product) => {
-            if (product.images?.length > 0) {
-                initialStates[product.id] = {
-                    position: 0,
-                    maxScroll: (product.images.length - 1) * 116,
-                    canScrollLeft: false,
-                    canScrollRight: product.images.length > 2,
-                };
-            }
-        });
-        setScrollStates(initialStates);
-    }, [paginatedProducts]);
+        const delay = setTimeout(() => {
+            router.get(
+                route("products.index"),
+                { search: searchTerm },
+                {
+                    preserveState: true,
+                    replace: true,
+                }
+            );
+        }, 300); // debounce de 300ms
+
+        return () => clearTimeout(delay);
+    }, [searchTerm]);
 
     const handleDelete = (product) => {
         setSelectedProduct(product);
@@ -169,10 +169,10 @@ export default function Index({ products, can }) {
                         </div>
                         <input
                             type="text"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            placeholder="Buscar productos por nombre..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            className="..."
+                            placeholder="Buscar marcas por nombre o descripción..."
                         />
                     </div>
 

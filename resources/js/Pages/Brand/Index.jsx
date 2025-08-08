@@ -1,6 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
-import React, { useState, useEffect } from "react";
+import { Head, Link, useForm, usePage, router } from "@inertiajs/react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     PencilSquareIcon,
     TrashIcon,
@@ -18,13 +18,17 @@ import { toast, Toaster } from "sonner";
 export default function Index({ auth, brands, can, flash }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
-    const [selectedBrand, setSelectedBrand] = useState(null);
-    const [paginatedBrands, setPaginatedBrands] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+<<<<<<< HEAD
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
+=======
+    const [selectedBrand, setSelectedBrand] = useState(null);
+    const [paginatedBrands, setPaginatedBrands] = useState(brands.data);
+>>>>>>> a7b66f4dd3dd0c955eb3024861bcf83d19b841bd
     const { delete: destroy } = useForm();
+    const isMounted = useRef(false);
 
     useEffect(() => {
         if (flash?.success) {
@@ -33,6 +37,7 @@ export default function Index({ auth, brands, can, flash }) {
     }, [flash]);
 
     useEffect(() => {
+<<<<<<< HEAD
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
         };
@@ -44,27 +49,38 @@ export default function Index({ auth, brands, can, flash }) {
 
     useEffect(() => {
         const filtered = brands.filter((brand) =>
+=======
+        const filtered = brands.data.filter((brand) =>
+>>>>>>> a7b66f4dd3dd0c955eb3024861bcf83d19b841bd
             brand.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
         const totalFiltered = filtered.length;
+        let result;
 
         if (itemsPerPage >= totalFiltered) {
-            setPaginatedBrands(filtered);
+            result = filtered;
         } else {
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            setPaginatedBrands(filtered.slice(startIndex, endIndex));
+            result = filtered.slice(startIndex, endIndex);
         }
-    }, [currentPage, itemsPerPage, brands, searchTerm]);
 
-    const filteredBrands = brands.filter((brand) =>
-        brand.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        setPaginatedBrands(result);
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+        const delay = setTimeout(() => {
+            router.get(
+                route("brand.index"),
+                { search: searchTerm },
+                {
+                    preserveState: true,
+                    replace: true,
+                }
+            );
+        }, 300);
+        
+        return () => clearTimeout(delay);
+    }, [searchTerm, currentPage, itemsPerPage]);
 
     const handleDelete = (brand) => {
         setSelectedBrand(brand);
@@ -75,14 +91,18 @@ export default function Index({ auth, brands, can, flash }) {
             destroy(route("brand.destroy", selectedBrand.id), {
                 onSuccess: () => {
                     setSelectedBrand(null);
+                    toast.success("Marca eliminada correctamente");
+                },
+                onError: () => {
+                    toast.error("Error al eliminar la marca");
                 },
             });
         }
     };
 
-    const handleCloseModal = () => {
-        setSelectedBrand(null);
-    };
+    const handleCloseModal = () => setSelectedBrand(null);
+
+    const handlePageChange = (page) => setCurrentPage(page);
 
     return (
         <AdminLayout
@@ -93,7 +113,7 @@ export default function Index({ auth, brands, can, flash }) {
                         routes={[{ name: "Admin", link: route("admin.panel") }]}
                         currentPage="Gestión de Marcas"
                     />
-                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mt-2">
                         Marcas
                     </h2>
                 </div>
@@ -102,6 +122,7 @@ export default function Index({ auth, brands, can, flash }) {
             <Head title="Marcas" />
             <Toaster richColors position="top-right" />
 
+<<<<<<< HEAD
             <div className="py-4 md:py-10">
                 <div className="mx-auto px-2 sm:px-4 lg:px-4 max-w-7xl">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
@@ -161,6 +182,45 @@ export default function Index({ auth, brands, can, flash }) {
                                 <thead className="bg-gray-100 dark:bg-gray-700">
                                     <tr>
                                         <th className="px-3 py-3 text-left text-xs md:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+=======
+            <div className="py-10">
+                <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                            Gestión de Marcas
+                        </h1>
+                        {can.brand_create && (
+                            <Link
+                                href={route("brand.create")}
+                                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
+                            >
+                                <PlusCircleIcon className="w-5 h-5 mr-2" />
+                                Nueva Marca
+                            </Link>
+                        )}
+                    </div>
+
+                    {/* Search */}
+                    <div className="mb-6 relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="Buscar marcas por nombre o descripción..."
+                        />
+                    </div>
+
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg mx-6 my-2 pt-4">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                        <th className="px-4 py-3 text-left text-sm font-medium w-1/5 rounded-tl-lg">
+>>>>>>> a7b66f4dd3dd0c955eb3024861bcf83d19b841bd
                                             Nombre
                                         </th>
                                         {!isMobile && (
@@ -183,11 +243,41 @@ export default function Index({ auth, brands, can, flash }) {
                                         paginatedBrands.map((brand) => (
                                             <tr
                                                 key={brand.id}
+<<<<<<< HEAD
                                                 className="hover:bg-gray-50 dark:hover:bg-gray-700"
                                             >
                                                 <td className="px-3 py-3 whitespace-nowrap">
                                                     <div className="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100">
                                                         {brand.name}
+=======
+                                                className={`${
+                                                    index !== paginatedBrands.length - 1
+                                                        ? "border-b border-gray-200 dark:border-gray-700"
+                                                        : ""
+                                                } hover:bg-gray-50 dark:hover:bg-gray-700`}
+                                            >
+                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                    {brand.name}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <p className="line-clamp-2 text-gray-600 dark:text-gray-300">
+                                                        {brand.description}
+                                                    </p>
+                                                </td>
+                                                <td className="px-4 py-3 text-center">
+                                                    <div className="flex justify-center">
+                                                        {brand.image ? (
+                                                            <img
+                                                                src={`/storage/${brand.image.url}`}
+                                                                alt={`Imagen de ${brand.name}`}
+                                                                className="w-12 h-12 object-cover rounded"
+                                                            />
+                                                        ) : (
+                                                            <span className="text-gray-400 dark:text-gray-500 text-sm">
+                                                                Sin imagen
+                                                            </span>
+                                                        )}
+>>>>>>> a7b66f4dd3dd0c955eb3024861bcf83d19b841bd
                                                     </div>
                                                     {isMobile && (
                                                         <div className="mt-1 flex flex-col space-y-1">
@@ -217,6 +307,7 @@ export default function Index({ auth, brands, can, flash }) {
                                                         </div>
                                                     )}
                                                 </td>
+<<<<<<< HEAD
                                                 {!isMobile && (
                                                     <>
                                                         <td className="px-3 py-3">
@@ -247,13 +338,12 @@ export default function Index({ auth, brands, can, flash }) {
                                                 )}
                                                 <td className="px-3 py-3 text-center text-sm font-medium">
                                                     <div className="flex justify-center space-x-2 md:space-x-4">
+=======
+                                                <td className="px-4 py-3 text-center">
+                                                    <div className="flex justify-center space-x-4">
+>>>>>>> a7b66f4dd3dd0c955eb3024861bcf83d19b841bd
                                                         <Link
-                                                            href={route(
-                                                                "brand.show",
-                                                                {
-                                                                    brand: brand.id,
-                                                                }
-                                                            )}
+                                                            href={route("brand.show", brand.id)}
                                                             className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
                                                             title="Ver detalle"
                                                         >
@@ -261,12 +351,7 @@ export default function Index({ auth, brands, can, flash }) {
                                                         </Link>
                                                         {can.brand_edit && (
                                                             <Link
-                                                                href={route(
-                                                                    "brand.edit",
-                                                                    {
-                                                                        brand: brand.id,
-                                                                    }
-                                                                )}
+                                                                href={route("brand.edit", brand.id)}
                                                                 className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50"
                                                                 title="Editar"
                                                             >
@@ -275,12 +360,8 @@ export default function Index({ auth, brands, can, flash }) {
                                                         )}
                                                         {can.brand_delete && (
                                                             <button
+                                                                onClick={() => handleDelete(brand)}
                                                                 className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        brand
-                                                                    )
-                                                                }
                                                                 title="Eliminar"
                                                             >
                                                                 <TrashIcon className="w-4 h-4 md:w-5 md:h-5" />
@@ -305,18 +386,24 @@ export default function Index({ auth, brands, can, flash }) {
                                 </tbody>
                             </table>
                         </div>
+<<<<<<< HEAD
 
                         <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
+=======
+                        <div className="px-3 py-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+>>>>>>> a7b66f4dd3dd0c955eb3024861bcf83d19b841bd
                             <Pagination
                                 currentPage={currentPage}
-                                totalPages={Math.ceil(
-                                    filteredBrands.length / itemsPerPage
-                                )}
+                                totalPages={Math.ceil(brands.total / itemsPerPage)}
                                 onPageChange={handlePageChange}
                                 itemsPerPage={itemsPerPage}
                                 setItemsPerPage={setItemsPerPage}
+<<<<<<< HEAD
                                 totalItems={filteredBrands.length}
                                 isMobile={isMobile}
+=======
+                                totalItems={brands.total}
+>>>>>>> a7b66f4dd3dd0c955eb3024861bcf83d19b841bd
                             />
                         </div>
                     </div>

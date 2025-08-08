@@ -24,20 +24,29 @@ class CategoryController extends Controller implements HasMiddleware
             new Middleware('permission:category-delete', only: ['destroy']),
         ];
     }
-    
-    public function index(Request $request): Response 
-    {
-        $categories = Category::with('image')->get(); 
-        return Inertia::render('Category/Index', [
-            'categories' => $categories,
-            'can' => [
-                'category_edit' => $request->user() ? $request->user()->can('category-edit') : false,
-                'category_delete' => $request->user() ? $request->user()->can('category-delete') : false,
-                'category_create' => $request->user() ? $request->user()->can('category-create') : false,
-                
-            ],
-        ]);
+     public function index(Request $request): Response
+{
+    $search = $request->input('search');
+
+    $query = Category::query()->with('image');
+
+    if ($search) {
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
     }
+
+    return Inertia::render('Category/Index', [
+        'categories' => $query->get(), // sin paginación
+        'filters' => $request->only(['search']),
+        'can' => [
+            'category_edit' => $request->user()?->can('category-edit'),
+            'category_delete' => $request->user()?->can('category-delete'),
+            'category_create' => $request->user()?->can('category-create'),
+        ],
+    ]);
+}
+
+
 
     
     public function create(Request $request)

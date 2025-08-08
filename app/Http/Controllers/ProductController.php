@@ -30,18 +30,27 @@ class ProductController extends Controller implements HasMiddleware
     /**
      * Display a listing of the products.
      */
-    public function index(Request $request): Response
-    {
-        return Inertia::render('Products/Index', [
-            'products' => Product::with(['images', 'category', 'brand'])->get(),
-            'can' => [
-                'product_edit' => $request->user() ? $request->user()->can('product-edit') : false,
-                'product_delete' => $request->user() ? $request->user()->can('product-delete') : false,
-                'product_create' => $request->user() ? $request->user()->can('product-create') : false,
-                
-            ],
-        ]);
+public function index(Request $request): Response
+{
+    $search = $request->input('search');
+
+    $query = Product::query()->with(['images', 'category', 'brand']);
+
+    if ($search) {
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
     }
+
+    return Inertia::render('Products/Index', [
+        'products' => $query->get(), // sin paginación
+        'filters' => $request->only(['search']),
+        'can' => [
+            'product_edit' => $request->user()?->can('product-edit'),
+            'product_delete' => $request->user()?->can('product-delete'),
+            'product_create' => $request->user()?->can('product-create'),
+        ],
+    ]);
+}
 
     /**
      * Show the form for creating a new product.

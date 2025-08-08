@@ -23,19 +23,29 @@ class BrandController extends Controller implements HasMiddleware
             new Middleware('permission:brand-delete', only: ['destroy']),
         ];
     }
-    public function index(Request $request): Response 
-    {
-        $brands = Brand::with('image')->get();
-        return Inertia::render('Brand/Index', [
-            'brands' => $brands,
-            'can' => [
-                'brand_edit' => $request->user() ? $request->user()->can('brand-edit') : false,
-                'brand_delete' => $request->user() ? $request->user()->can('brand-delete') : false,
-                'brand_create' => $request->user() ? $request->user()->can('brand-create') : false,
-                
-            ],
-        ]);
+    public function index(Request $request): Response
+{
+    $search = $request->input('search');
+
+    $query = Brand::query()->with('image');
+
+    if ($search) {
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
     }
+
+    return Inertia::render('Brand/Index', [
+        'brands' => $query->paginate(10)->withQueryString(),
+        'filters' => $request->only(['search']),
+        'can' => [
+            'brand_edit' => $request->user()?->can('brand-edit'),
+            'brand_delete' => $request->user()?->can('brand-delete'),
+            'brand_create' => $request->user()?->can('brand-create'),
+        ],
+    ]);
+}
+
+
 
     public function create()
     {
