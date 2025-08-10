@@ -15,6 +15,12 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
     const [neighbourhoods, setNeighbourhoods] = useState([]);
     const [neighbourhoodWarning, setNeighbourhoodWarning] = useState(false);
     const timeoutRefs = useRef([]);
+    const [phoneToast, setPhoneToast] = useState(false);
+    const phoneToastTimer = useRef(null);
+
+    useEffect(() => {
+        return () => clearTimeout(phoneToastTimer.current);
+    }, []);
 
     // Limpieza de timeouts al desmontar
     useEffect(() => {
@@ -190,11 +196,34 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
         setNeighbourhoodWarning("");
     };
 
+    const onPhoneChange = (e) => {
+        const raw = e.target.value;
+        const onlyDigits = raw.replace(/\D/g, '');
+        // si intentó pasar de 10, mostramos toast
+        if (onlyDigits.length > 10) triggerPhoneToast();
+        // guardamos recortado a 10
+        setData('phone', onlyDigits.slice(0, 10));
+    };
+
     const handleNeighbourhoodChange = (e) => {
         setData((prev) => ({
             ...prev,
             neighbourhood: e.target.value,
         }));
+    };
+
+    const triggerPhoneToast = () => {
+        setPhoneToast(true);
+        clearTimeout(phoneToastTimer.current);
+        phoneToastTimer.current = setTimeout(() => setPhoneToast(false), 2000); // 2s
+    };
+
+    const onPhoneKeyDown = (e) => {
+    const isDigit = /^[0-9]$/.test(e.key);
+    if (isDigit && (data.phone?.length ?? 0) >= 10) {
+        e.preventDefault();   // bloquea el 11º dígito
+        triggerPhoneToast();  // y muestra el pop-out
+        }
     };
 
     const handleDefaultChange = (e) => {
@@ -456,16 +485,32 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                         {/* Teléfono y referencias */}
                         <div>
                             <InputLabel htmlFor="phone" value="Teléfono *" />
+                            <div className="relative">
                             <TextInput
                                 id="phone"
-                                value={data.phone}
-                                onChange={(e) =>
-                                    setData("phone", e.target.value)
-                                }
+                                type="tel"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                value={data.phone || ''}
+                                onChange={onPhoneChange}
+                                onKeyDown={onPhoneKeyDown}
+                                placeholder="10 dígitos"
                                 className="mt-1 block w-full dark:bg-gray-700 dark:text-white"
                                 required
                             />
-                            <InputError message={errors.phone} />
+
+                        {/* Pop-out temporal */}
+                        <div
+                        aria-live="polite"
+                        className={`pointer-events-none absolute right-0 -top-10 transition-opacity duration-300
+                                ${phoneToast ? 'opacity-100' : 'opacity-0'}
+                                 bg-gray-900 text-white text-xs rounded-md px-3 py-2 shadow-lg`}
+                        >
+                        Por el momento solo se permiten números de América del Norte
+                        </div>
+                        </div>
+
+                        <InputError message={errors.phone} />
                         </div>
 
                         <div>
@@ -533,7 +578,7 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                 <div className="flex justify-end pt-4">
                     <button
                         type="submit"
-                        disabled={!addressValidated}
+                        disabled={!addressValidated || !(data.phone && data.phone.length === 10)}
                         className={`px-6 py-2 rounded-md transition-colors ${
                             addressValidated
                                 ? "bg-blue-600 text-white hover:bg-blue-700"
