@@ -1,36 +1,30 @@
+import React from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import BrandForm from "@/Components/Brand/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Breadcrumb from "@/Components/Breadcrumb";
+import { toast } from "sonner";
 
-export default function Create({ auth }) {
+export default function Create({ auth, flash }) {
     const { existingNames } = usePage().props;
 
-    const { data, setData, errors, post, processing } = useForm({
+    const { data, setData, errors, post, processing, reset } = useForm({
         name: "",
         description: "",
         image: null,
         deleted_image: false,
     });
 
-    const submit = (e) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("description", data.description);
-        formData.append("deleted_image", data.deleted_image);
-
-        if (data.image) {
-            formData.append("image", data.image);
-        }
-
+    const handleSubmit = (formData) => {
         post(route("brand.store"), {
             data: formData,
             preserveScroll: true,
-            forceFormData: true,
+            onSuccess: () => {
+                reset();
+                toast.success("Marca creada exitosamente");
+            },
         });
     };
 
@@ -77,22 +71,30 @@ export default function Create({ auth }) {
                         data={data}
                         errors={errors}
                         setData={setData}
-                        submit={submit}
+                        submit={handleSubmit}
                         isEdit={false}
                         isSubmitting={processing}
                         existingNames={existingNames}
                     >
-                        <PrimaryButton
-                            type="submit"
-                            disabled={processing}
-                            className={`${
-                                processing
-                                    ? "opacity-75 cursor-not-allowed"
-                                    : ""
-                            }`}
-                        >
-                            {processing ? "Creando..." : "Crear Marca"}
-                        </PrimaryButton>
+                        <div className="flex justify-end space-x-4 mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+                            <Link
+                                href={route("brand.index")}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                            >
+                                Cancelar
+                            </Link>
+                            <PrimaryButton
+                                type="submit"
+                                disabled={processing}
+                                className={`${
+                                    processing
+                                        ? "opacity-75 cursor-not-allowed"
+                                        : ""
+                                }`}
+                            >
+                                {processing ? "Creando..." : "Crear Marca"}
+                            </PrimaryButton>
+                        </div>
                     </BrandForm>
                 </div>
             </div>

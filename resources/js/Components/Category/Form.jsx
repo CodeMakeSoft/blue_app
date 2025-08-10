@@ -1,4 +1,4 @@
-import React from "react"; // Importación de React añadida
+import React from "react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import TextInput from "@/Components/TextInput";
 import InputLabel from "@/Components/InputLabel";
@@ -18,6 +18,7 @@ const Form = ({
     isSubmitting = false,
 }) => {
     // Estados del componente
+    const [fileInputKey, setFileInputKey] = useState(Date.now());
     const [imagePreview, setImagePreview] = useState(
         isEdit && data.existing_image
             ? `/storage/${data.existing_image.url}`
@@ -26,6 +27,7 @@ const Form = ({
     const [formErrors, setFormErrors] = useState({});
     const [isDragging, setIsDragging] = useState(false);
     const [nameTouched, setNameTouched] = useState(false);
+    const [descriptionTouched, setDescriptionTouched] = useState(false);
     const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
     const fileInputRef = useRef(null);
 
@@ -52,89 +54,200 @@ const Form = ({
         return flattenCategories(parentCategories);
     }, [parentCategories]);
 
-    // Efectos secundarios
+    // Manejo vista previa imagen
     useEffect(() => {
-        if (isEdit && data.existing_image) {
+        if (data.image && typeof data.image === "object") {
+            const objectUrl = URL.createObjectURL(data.image);
+            setImagePreview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl);
+        } else if (isEdit && data.existing_image && !data.deleted_image) {
             setImagePreview(`/storage/${data.existing_image.url}`);
+        } else {
+            setImagePreview(null);
         }
-    }, [isEdit, data.existing_image]);
+    }, [data.image, data.existing_image, data.deleted_image, isEdit]);
 
+    // Cerrar menú editar imagen si se clickea afuera
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (isEditMenuOpen && !event.target.closest(".relative")) {
                 setIsEditMenuOpen(false);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
         return () =>
             document.removeEventListener("mousedown", handleClickOutside);
     }, [isEditMenuOpen]);
 
-    // Manejadores de eventos
-    const validateName = (name) => {
-        if (!name) return "El nombre es requerido";
-        if (existingNames.includes(name.trim().toLowerCase())) {
-            return "Ya existe una categoría con este nombre";
+    // Validación por campo
+    const validateField = (fieldName, value) => {
+        switch (fieldName) {
+            case "name":
+                if (!value || value.trim() === "")
+                    return "El nombre es requerido";
+                if (
+                    existingNames.includes(value.trim().toLowerCase()) &&
+                    (!isEdit ||
+                        value.trim().toLowerCase() !==
+                            (data.originalName || "").toLowerCase())
+                ) {
+                    return "Ya existe una categoría con este nombre";
+                }
+                return null;
+
+            case "description":
+                if (!value || value.trim() === "")
+                    return "La descripción es requerida";
+                return null;
+
+            default:
+                return null;
         }
-        return null;
     };
 
-    const handleNameChange = (e) => {
-        const value = e.target.value;
-        setData("name", value);
-        setNameTouched(true);
+    // Maneja cambios para todos inputs (nombre, descripción, etc)
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-        const error = validateName(value);
-        setFormErrors((prev) =>
-            error ? { ...prev, name: error } : { ...prev, name: undefined }
-        );
+        setData(name, value);
+
+        // Validar en tiempo real
+        const error = validateField(name, value);
+        if (error) {
+            setFormErrors((prev) => ({ ...prev, [name]: error }));
+        } else {
+            setFormErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
+
+        // Marcar campos como tocados para mostrar error
+        if (name === "name") setNameTouched(true);
+        if (name === "description") setDescriptionTouched(true);
     };
 
     const handleImageChange = (file) => {
-        if (!file.type.match("image.*")) {
-            setFormErrors((prev) => ({
-                ...prev,
-                image: "El archivo debe ser una imagen",
-            }));
+        if (!file || !file.type.match("image.*")) {
+            setFormErrors({
+                ...formErrors,
+                image: "El archivo debe ser una imagen válida",
+            });
             return;
         }
 
-        setData("image", file);
-        setData("deleted_image", false);
-        setImagePreview(URL.createObjectURL(file));
-        setFormErrors((prev) => ({ ...prev, image: undefined }));
+        setData((prev) => ({
+            ...prev,
+            image: file,
+            deleted_image: false,
+            existing_image: null,
+        }));
+
+        setFileInputKey(Date.now());
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setIsEditMenuOpen(false);
+
+        setFormErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.image;
+            return newErrors;
+        });
     };
 
     const removeImage = () => {
-        if (isEdit && data.existing_image) {
-            setData("deleted_image", true);
-        }
-        setData("image", null);
+        setData((prev) => ({
+            ...prev,
+            image: null,
+            deleted_image: true,
+            existing_image: null,
+        }));
         setImagePreview(null);
+        setIsEditMenuOpen(false);
     };
 
     const handleChangeImage = () => {
         removeImage();
-        setTimeout(() => fileInputRef.current?.click(), 10);
-        setIsEditMenuOpen(false);
+        setTimeout(() => {
+            fileInputRef.current?.click();
+        }, 10);
     };
 
-    const handleDragEvents = (e) => {
+    const handleDragOver = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragging(e.type === "dragover");
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
     };
 
     const handleDrop = (e) => {
-        handleDragEvents(e);
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
         if (e.dataTransfer.files?.[0]) {
             handleImageChange(e.dataTransfer.files[0]);
         }
     };
 
+    // Manejar el envío del formulario - Versión mejorada
+     const handleSubmit = (e) => {
+         e.preventDefault();
+         setNameTouched(true);
+         setDescriptionTouched(true);
+
+         const errorsFound = {};
+         ["name", "description"].forEach((field) => {
+             const error = validateField(field, data[field]);
+             if (error) errorsFound[field] = error;
+         });
+
+         setFormErrors(errorsFound);
+
+         if (Object.keys(errorsFound).length === 0) {
+             // Crear FormData para enviar archivos
+             const formData = new FormData();
+             formData.append("name", data.name);
+             formData.append("description", data.description);
+
+             if (data.parent_id !== null) {
+                 formData.append("parent_id", data.parent_id);
+             }
+
+             // Para edición, usamos el método spoofing de Laravel
+             if (isEdit) {
+                 formData.append("_method", "PUT"); // Esto hará que Laravel lo trate como PUT
+             }
+
+             if (data.deleted_image) {
+                 formData.append("deleted_image", "true");
+             }
+
+             if (data.image) {
+                 formData.append("image", data.image);
+             }
+
+             // Llamar a la función submit con el FormData
+             submit(formData, {
+                 preserveScroll: true,
+                 forceFormData: true, // Asegura que Inertia use FormData
+                 onSuccess: () => {
+                     // Resetear el estado de la imagen después de un envío exitoso
+                     if (data.image) {
+                         setData("image", null);
+                         setFileInputKey(Date.now());
+                     }
+                 },
+             });
+         }
+     };
+
     return (
-        <form onSubmit={submit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Sección de datos de la categoría */}
                 <div className="w-full md:w-[65%] bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
@@ -196,7 +309,7 @@ const Form = ({
                                     ? "border-red-500"
                                     : "border-gray-300 dark:border-gray-600"
                             } rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
-                            onChange={handleNameChange}
+                            onChange={handleChange}
                             onBlur={() => setNameTouched(true)}
                             disabled={isSubmitting}
                             placeholder="Ej: Electrónica, Ropa, Hogar"
@@ -218,14 +331,21 @@ const Form = ({
                             id="description"
                             name="description"
                             value={data.description || ""}
-                            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-40 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                            onChange={(e) =>
-                                setData("description", e.target.value)
-                            }
+                            className={`w-full mt-1 p-2 border ${
+                                (descriptionTouched &&
+                                    formErrors.description) ||
+                                errors.description
+                                    ? "border-red-500"
+                                    : "border-gray-300 dark:border-gray-600"
+                            } rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-40 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+                            onChange={handleChange}
+                            onBlur={() => setDescriptionTouched(true)}
                             disabled={isSubmitting}
                         />
                         <InputError
-                            message={errors.description}
+                            message={
+                                formErrors.description || errors.description
+                            }
                             className="mt-2"
                         />
                     </div>
@@ -286,8 +406,8 @@ const Form = ({
                                 ? "border-transparent"
                                 : "border-dashed border-gray-300 dark:border-gray-600"
                         }`}
-                        onDragOver={handleDragEvents}
-                        onDragLeave={handleDragEvents}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
                         {imagePreview ? (
@@ -315,16 +435,17 @@ const Form = ({
                                     Añadir imagen
                                 </label>
                                 <input
+                                    key={fileInputKey}
                                     id="image-upload"
                                     ref={fileInputRef}
                                     type="file"
                                     name="image"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={(e) =>
-                                        e.target.files[0] &&
-                                        handleImageChange(e.target.files[0])
-                                    }
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) handleImageChange(file);
+                                    }}
                                     disabled={isSubmitting}
                                 />
                                 <p className="text-gray-500 dark:text-gray-400 text-sm">
@@ -357,4 +478,3 @@ const Form = ({
 };
 
 export default Form;
-    

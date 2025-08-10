@@ -1,10 +1,10 @@
-import React from "react"; // Añade esta línea al inicio
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TextInput from "@/Components/TextInput";
 import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { Link } from "@inertiajs/react";
+import { toast } from "sonner";
 
 const BrandForm = ({
     data,
@@ -17,6 +17,7 @@ const BrandForm = ({
     existingNames = [],
 }) => {
     // Estados del componente
+    const [fileInputKey, setFileInputKey] = useState(Date.now());
     const [imagePreview, setImagePreview] = useState(
         isEdit && data.existing_image
             ? `/storage/${data.existing_image.url}`
@@ -25,16 +26,23 @@ const BrandForm = ({
     const [formErrors, setFormErrors] = useState({});
     const [isDragging, setIsDragging] = useState(false);
     const [nameTouched, setNameTouched] = useState(false);
+    const [descriptionTouched, setDescriptionTouched] = useState(false);
     const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
     const fileInputRef = useRef(null);
     const [successMessage, setSuccessMessage] = useState("");
 
     // Efectos secundarios
     useEffect(() => {
-        if (isEdit && data.existing_image) {
+        if (data.image && typeof data.image === "object") {
+            const objectUrl = URL.createObjectURL(data.image);
+            setImagePreview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl);
+        } else if (isEdit && data.existing_image && !data.deleted_image) {
             setImagePreview(`/storage/${data.existing_image.url}`);
+        } else {
+            setImagePreview(null);
         }
-    }, [isEdit, data.existing_image]);
+    }, [data.image, data.existing_image, data.deleted_image, isEdit]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -51,7 +59,12 @@ const BrandForm = ({
     // Validación de nombre
     const validateName = (name) => {
         if (!name) return "El nombre es requerido";
-        if (existingNames.includes(name.trim().toLowerCase())) {
+        if (
+            existingNames.includes(name.trim().toLowerCase()) &&
+            (!isEdit ||
+                name.trim().toLowerCase() !==
+                    (data.originalName || "").toLowerCase())
+        ) {
             return "Ya existe una marca con este nombre";
         }
         return null;
@@ -69,43 +82,72 @@ const BrandForm = ({
         );
     };
 
+    const handleDescriptionChange = (e) => {
+        setData("description", e.target.value);
+        setDescriptionTouched(true);
+    };
+
     const handleImageChange = (file) => {
-        if (!file.type.match("image.*")) {
-            setFormErrors((prev) => ({
-                ...prev,
-                image: "El archivo debe ser una imagen",
-            }));
+        if (!file || !file.type.match("image.*")) {
+            setFormErrors({
+                ...formErrors,
+                image: "El archivo debe ser una imagen válida",
+            });
             return;
         }
 
-        setData("image", file);
-        setData("deleted_image", false);
-        setImagePreview(URL.createObjectURL(file));
-        setFormErrors((prev) => ({ ...prev, image: undefined }));
+        setData((prev) => ({
+            ...prev,
+            image: file,
+            deleted_image: false,
+            existing_image: null,
+        }));
+
+        setFileInputKey(Date.now());
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setIsEditMenuOpen(false);
+
+        setFormErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.image;
+            return newErrors;
+        });
     };
 
     const removeImage = () => {
-        if (isEdit && data.existing_image) {
-            setData("deleted_image", true);
-        }
-        setData("image", null);
+        setData((prev) => ({
+            ...prev,
+            image: null,
+            deleted_image: true,
+            existing_image: null,
+        }));
         setImagePreview(null);
+        setIsEditMenuOpen(false);
     };
 
     const handleChangeImage = () => {
         removeImage();
-        setTimeout(() => fileInputRef.current?.click(), 10);
-        setIsEditMenuOpen(false);
+        setTimeout(() => {
+            fileInputRef.current?.click();
+        }, 10);
     };
 
-    const handleDragEvents = (e) => {
+    const handleDragOver = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragging(e.type === "dragover");
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
     };
 
     const handleDrop = (e) => {
-        handleDragEvents(e);
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
         if (e.dataTransfer.files?.[0]) {
             handleImageChange(e.dataTransfer.files[0]);
         }
@@ -113,11 +155,24 @@ const BrandForm = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        submit(e);
-        setSuccessMessage(
-            isEdit ? "Marca actualizada con éxito" : "Marca creada con éxito"
-        );
-        setTimeout(() => setSuccessMessage(""), 3000);
+        setNameTouched(true);
+        setDescriptionTouched(true);
+
+        const errors = {};
+        if (!data.name) errors.name = "El nombre es requerido";
+        if (validateName(data.name)) errors.name = validateName(data.name);
+
+        setFormErrors(errors);
+
+        if (Object.keys(errors).length === 0) {
+            submit(e);
+            setSuccessMessage(
+                isEdit
+                    ? "Marca actualizada con éxito"
+                    : "Marca creada con éxito"
+            );
+            setTimeout(() => setSuccessMessage(""), 3000);
+        }
     };
 
     return (
@@ -170,10 +225,15 @@ const BrandForm = ({
                             id="description"
                             name="description"
                             value={data.description || ""}
-                            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-40 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                            onChange={(e) =>
-                                setData("description", e.target.value)
-                            }
+                            className={`w-full mt-1 p-2 border ${
+                                (descriptionTouched &&
+                                    formErrors.description) ||
+                                errors.description
+                                    ? "border-red-500"
+                                    : "border-gray-300 dark:border-gray-600"
+                            } rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-40 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+                            onChange={handleDescriptionChange}
+                            onBlur={() => setDescriptionTouched(true)}
                             disabled={isSubmitting}
                         />
                         <InputError
@@ -238,8 +298,8 @@ const BrandForm = ({
                                 ? "border-transparent"
                                 : "border-dashed border-gray-300 dark:border-gray-600"
                         }`}
-                        onDragOver={handleDragEvents}
-                        onDragLeave={handleDragEvents}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
                         {imagePreview ? (
@@ -267,16 +327,17 @@ const BrandForm = ({
                                     Añadir logo
                                 </label>
                                 <input
+                                    key={fileInputKey}
                                     id="image-upload"
                                     ref={fileInputRef}
                                     type="file"
                                     name="image"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={(e) =>
-                                        e.target.files[0] &&
-                                        handleImageChange(e.target.files[0])
-                                    }
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) handleImageChange(file);
+                                    }}
                                     disabled={isSubmitting}
                                 />
                                 <p className="text-gray-500 dark:text-gray-400 text-sm">
