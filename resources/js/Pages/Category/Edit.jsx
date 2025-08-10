@@ -1,19 +1,51 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Form from "@/Components/Category/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Edit({ auth, category }) {
-    const { data, setData, errors, post } = useForm({
+    const { categories } = usePage().props;
+
+    const { data, setData, errors, post, processing } = useForm({
         name: category?.name || "",
         description: category?.description || "",
+        parent_id: category?.parent_id || null,
         existing_image: category?.image || null,
         image: null,
         deleted_image: false,
     });
+
+    // Preparar categorías en estructura jerárquica
+    const preparedCategories = useMemo(() => {
+        if (!categories) return [];
+
+        const categoryMap = {};
+        categories.forEach((cat) => {
+            categoryMap[cat.id] = { ...cat, children: [] };
+        });
+
+        const hierarchy = [];
+        categories.forEach((cat) => {
+            if (cat.parent_id && categoryMap[cat.parent_id]) {
+                categoryMap[cat.parent_id].children.push(categoryMap[cat.id]);
+            } else {
+                hierarchy.push(categoryMap[cat.id]);
+            }
+        });
+
+        return hierarchy;
+    }, [categories]);
+
+    const existingNames = useMemo(() => {
+        return categories
+            ? categories
+                  .filter((c) => c.id !== category.id)
+                  .map((c) => c.name.toLowerCase())
+            : [];
+    }, [categories, category.id]);
 
     const submit = (e) => {
         e.preventDefault();
@@ -21,8 +53,11 @@ export default function Edit({ auth, category }) {
         const formData = new FormData();
         formData.append("name", data.name);
         formData.append("description", data.description);
-        formData.append("_method", "PUT"); // Para método POST que simula PUT
+        formData.append("_method", "PUT"); // Esto simula un método PUT
 
+        if (data.parent_id) {
+            formData.append("parent_id", data.parent_id);
+        }
         if (data.image) {
             formData.append("image", data.image);
         }
@@ -58,9 +93,8 @@ export default function Edit({ auth, category }) {
                 </>
             }
         >
-            <Head title="Crear Categoría" />
+            <Head title="Actualizar Categoría" />
 
-            {/* Contenedor principal con márgenes de 3cm (3rem) */}
             <div className="py-6 px-3">
                 <Link
                     href={route("category.index")}
@@ -78,11 +112,16 @@ export default function Edit({ auth, category }) {
                     setData={setData}
                     submit={submit}
                     isEdit={true}
+                    parentCategories={preparedCategories}
+                    existingNames={existingNames}
+                    isSubmitting={processing}
                 >
                     <div className="w-[65%] ml-auto">
                         <div className="flex justify-end">
-                            <PrimaryButton type="submit">
-                                Actualizar Categoría
+                            <PrimaryButton type="submit" disabled={processing}>
+                                {processing
+                                    ? "Actualizando..."
+                                    : "Actualizar Categoría"}
                             </PrimaryButton>
                         </div>
                     </div>

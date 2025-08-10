@@ -8,6 +8,8 @@ import {
     PlusCircleIcon,
     EyeIcon,
     MagnifyingGlassIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import Pagination from "@/Components/Category/Pagination";
 import ConfirmDeleteModal from "@/Components/Category/ConfirmDeleteModal";
@@ -15,30 +17,71 @@ import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function Index({ auth, categories, can }) {
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(5); // Cambiado a 5 por defecto
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [paginatedCategories, setPaginatedCategories] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [expandedCategories, setExpandedCategories] = useState([]);
 
     const { delete: destroy } = useForm();
 
+    // Obtener solo categorías principales para mostrar inicialmente
+    const mainCategories = categories.filter((category) => !category.parent_id);
+
+    // Función para obtener subcategorías de una categoría específica
+    const getSubcategories = (categoryId) => {
+        return categories.filter(
+            (category) => category.parent_id === categoryId
+        );
+    };
+
+    // Función recursiva para aplanar las categorías mostradas
+    const getDisplayedCategories = () => {
+        let displayed = [];
+
+        const buildCategoryTree = (category, level = 0) => {
+            const hasChildren = getSubcategories(category.id).length > 0;
+
+            displayed.push({
+                ...category,
+                level,
+                isMain: level === 0,
+                hasChildren,
+            });
+
+            // Si está expandida, agregar sus subcategorías
+            if (expandedCategories.includes(category.id) && hasChildren) {
+                const subcategories = getSubcategories(category.id);
+                subcategories.forEach((sub) => {
+                    buildCategoryTree(sub, level + 1);
+                });
+            }
+        };
+
+        mainCategories.forEach((category) => {
+            buildCategoryTree(category);
+        });
+
+        return displayed;
+    };
+
+    // Filtrar y paginar categorías
     useEffect(() => {
-        const filtered = categories.filter((category) =>
+        const filtered = getDisplayedCategories().filter((category) =>
             category.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
         const totalFiltered = filtered.length;
 
-        if (itemsPerPage >= totalFiltered) {
-            setPaginatedCategories(filtered);
-        } else {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            setPaginatedCategories(filtered.slice(startIndex, endIndex));
-        }
-    }, [currentPage, itemsPerPage, categories, searchTerm]);
+        // Calcular los índices de paginación
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
 
-    const filteredCategories = categories.filter((c) =>
+        // Siempre aplicar el slice para mantener consistencia
+        setPaginatedCategories(filtered.slice(startIndex, endIndex));
+    }, [currentPage, itemsPerPage, categories, searchTerm, expandedCategories]);
+
+    const filteredCategories = getDisplayedCategories().filter((c) =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -55,6 +98,10 @@ export default function Index({ auth, categories, can }) {
             destroy(route("category.destroy", selectedCategory.id), {
                 onSuccess: () => {
                     setSelectedCategory(null);
+                    // Limpiar de expandedCategories si estaba expandida
+                    setExpandedCategories((prev) =>
+                        prev.filter((id) => id !== selectedCategory.id)
+                    );
                 },
             });
         }
@@ -62,6 +109,19 @@ export default function Index({ auth, categories, can }) {
 
     const handleCloseModal = () => {
         setSelectedCategory(null);
+    };
+
+    const toggleExpand = (categoryId) => {
+        setExpandedCategories((prev) =>
+            prev.includes(categoryId)
+                ? prev.filter((id) => id !== categoryId)
+                : [...prev, categoryId]
+        );
+        setCurrentPage(1); // Resetear a la primera página al expandir/colapsar
+    };
+
+    const getIndentation = (level) => {
+        return { paddingLeft: `${level * 24}px` };
     };
 
     return (
@@ -90,7 +150,10 @@ export default function Index({ auth, categories, can }) {
                         </h1>
                         {can.category_create && (
                             <button
-                                onClick={() => (window.location.href = route("category.create"))}
+                                onClick={() =>
+                                    (window.location.href =
+                                        route("category.create"))
+                                }
                                 className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-5 py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm"
                             >
                                 <PlusCircleIcon className="w-5 h-5 mr-2" />
@@ -136,69 +199,119 @@ export default function Index({ auth, categories, can }) {
                                 </thead>
                                 <tbody>
                                     {paginatedCategories.length > 0 ? (
-                                        paginatedCategories.map((category, index) => (
-                                            <tr
-                                                key={category.id}
-                                                className={`${
-                                                    index !== paginatedCategories.length - 1
-                                                        ? "border-b border-gray-200 dark:border-gray-700"
-                                                        : ""
-                                                } hover:bg-gray-50 dark:hover:bg-gray-700`}
-                                            >
-                                                <td className="px-4 py-3 align-middle text-gray-900 dark:text-gray-100">
-                                                    {category.name}
-                                                </td>
-                                                <td className="px-4 py-3 align-middle">
-                                                    <p className="line-clamp-2 text-gray-600 dark:text-gray-300">
-                                                        {category.description}
-                                                    </p>
-                                                </td>
-                                                <td className="px-4 py-3 align-middle text-center">
-                                                    <div className="flex justify-center">
-                                                        {category.image ? (
-                                                            <img
-                                                                src={`/storage/${category.image.url}`}
-                                                                alt={`Imagen de ${category.name}`}
-                                                                className="w-12 h-12 object-cover rounded"
-                                                            />
-                                                        ) : (
-                                                            <span className="text-gray-400 dark:text-gray-500 text-sm">
-                                                                Sin imagen
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 align-middle">
-                                                    <div className="flex justify-center space-x-4">
-                                                        <Link
-                                                            href={route("category.show", { category: category.id })}
-                                                            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
-                                                            title="Ver detalle"
+                                        paginatedCategories.map(
+                                            (category, index) => (
+                                                <tr
+                                                    key={`${category.id}-${category.level}`}
+                                                    className={`${
+                                                        index !==
+                                                        paginatedCategories.length -
+                                                            1
+                                                            ? "border-b border-gray-200 dark:border-gray-700"
+                                                            : ""
+                                                    } hover:bg-gray-50 dark:hover:bg-gray-700`}
+                                                >
+                                                    <td className="px-4 py-3 align-middle text-gray-900 dark:text-gray-100">
+                                                        <div
+                                                            className="flex items-center"
+                                                            style={getIndentation(
+                                                                category.level
+                                                            )}
                                                         >
-                                                            <EyeIcon className="w-6 h-6" />
-                                                        </Link>
-                                                        {can.category_edit && (
+                                                            {category.hasChildren && (
+                                                                <button
+                                                                    onClick={() =>
+                                                                        toggleExpand(
+                                                                            category.id
+                                                                        )
+                                                                    }
+                                                                    className="mr-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                                                >
+                                                                    {expandedCategories.includes(
+                                                                        category.id
+                                                                    ) ? (
+                                                                        <ChevronDownIcon className="w-4 h-4" />
+                                                                    ) : (
+                                                                        <ChevronRightIcon className="w-4 h-4" />
+                                                                    )}
+                                                                </button>
+                                                            )}
+                                                            {!category.hasChildren && (
+                                                                <span className="w-6"></span>
+                                                            )}
+                                                            {category.name}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 align-middle">
+                                                        <p className="line-clamp-2 text-gray-600 dark:text-gray-300">
+                                                            {
+                                                                category.description
+                                                            }
+                                                        </p>
+                                                    </td>
+                                                    <td className="px-4 py-3 align-middle text-center">
+                                                        <div className="flex justify-center">
+                                                            {category.image ? (
+                                                                <img
+                                                                    src={`/storage/${category.image.url}`}
+                                                                    alt={`Imagen de ${category.name}`}
+                                                                    className="w-12 h-12 object-cover rounded"
+                                                                />
+                                                            ) : (
+                                                                <span className="text-gray-400 dark:text-gray-500 text-sm">
+                                                                    Sin imagen
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 align-middle">
+                                                        <div className="flex justify-center space-x-4">
                                                             <Link
-                                                                href={route("category.edit", { category: category.id })}
-                                                                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50"
-                                                                title="Editar"
+                                                                href={route(
+                                                                    "category.show",
+                                                                    {
+                                                                        category:
+                                                                            category.id,
+                                                                    }
+                                                                )}
+                                                                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                                title="Ver detalle"
                                                             >
-                                                                <PencilSquareIcon className="w-6 h-6" />
+                                                                <EyeIcon className="w-6 h-6" />
                                                             </Link>
-                                                        )}
-                                                        {can.category_delete && (
-                                                            <button
-                                                                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
-                                                                onClick={() => handleDelete(category)}
-                                                                title="Eliminar"
-                                                            >
-                                                                <TrashIcon className="w-6 h-6" />
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
+                                                            {can.category_edit && (
+                                                                <Link
+                                                                    href={route(
+                                                                        "category.edit",
+                                                                        {
+                                                                            category:
+                                                                                category.id,
+                                                                        }
+                                                                    )}
+                                                                    className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50"
+                                                                    title="Editar"
+                                                                >
+                                                                    <PencilSquareIcon className="w-6 h-6" />
+                                                                </Link>
+                                                            )}
+                                                            {can.category_delete && (
+                                                                <button
+                                                                    className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
+                                                                    onClick={() =>
+                                                                        handleDelete(
+                                                                            category
+                                                                        )
+                                                                    }
+                                                                    title="Eliminar"
+                                                                >
+                                                                    <TrashIcon className="w-6 h-6" />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )
                                     ) : (
                                         <tr>
                                             <td
@@ -219,7 +332,9 @@ export default function Index({ auth, categories, can }) {
                         <div className="px-3 py-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                             <Pagination
                                 currentPage={currentPage}
-                                totalPages={Math.ceil(filteredCategories.length / itemsPerPage)}
+                                totalPages={Math.ceil(
+                                    filteredCategories.length / itemsPerPage
+                                )}
                                 onPageChange={handlePageChange}
                                 itemsPerPage={itemsPerPage}
                                 setItemsPerPage={setItemsPerPage}
