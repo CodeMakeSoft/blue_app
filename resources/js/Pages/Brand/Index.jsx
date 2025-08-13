@@ -1,47 +1,32 @@
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { Head, Link, useForm, usePage, router } from "@inertiajs/react";
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import { Head, Link, useForm } from "@inertiajs/react";
+import React, { useState, useEffect } from "react";
 import {
     PencilSquareIcon,
     TrashIcon,
     PlusCircleIcon,
     EyeIcon,
     MagnifyingGlassIcon,
+    Bars3Icon,
     XMarkIcon,
     FunnelIcon,
 } from "@heroicons/react/24/outline";
-import Pagination from "@/Components/Category/Pagination";
+import Pagination from "@/Components/Brand/Pagination";
 import ConfirmDeleteModal from "@/Components/Brand/ConfirmDeleteModal";
 import Breadcrumb from "@/Components/Breadcrumb";
 import { toast, Toaster } from "sonner";
 
 export default function Index({ auth, brands, can, flash }) {
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [selectedBrand, setSelectedBrand] = useState(null);
+    const [paginatedBrands, setPaginatedBrands] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+
     const { delete: destroy } = useForm();
-    const isMounted = useRef(false);
-
-    // Filtrar marcas basado en el término de búsqueda - SINTAXIS CORRECTA
-    const filteredBrands = useMemo(() => {
-        return brands.data.filter(
-            (brand) =>
-                brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (brand.description &&
-                    brand.description
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase()))
-        );
-    }, [brands.data, searchTerm]);
-
-    // Paginar los resultados
-    const paginatedBrands = useMemo(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        return filteredBrands.slice(startIndex, startIndex + itemsPerPage);
-    }, [filteredBrands, currentPage, itemsPerPage]);
 
     useEffect(() => {
         if (flash?.success) {
@@ -60,20 +45,28 @@ export default function Index({ auth, brands, can, flash }) {
     }, []);
 
     useEffect(() => {
-        if (isMounted.current) {
-            const delay = setTimeout(() => {
-                router.get(
-                    route("brand.index"),
-                    { search: searchTerm },
-                    { preserveState: true, replace: true }
-                );
-            }, 300);
+        const filtered = brands.filter((brand) =>
+            brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
-            return () => clearTimeout(delay);
+        const totalFiltered = filtered.length;
+
+        if (itemsPerPage >= totalFiltered) {
+            setPaginatedBrands(filtered);
         } else {
-            isMounted.current = true;
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            setPaginatedBrands(filtered.slice(startIndex, endIndex));
         }
-    }, [searchTerm]);
+    }, [currentPage, itemsPerPage, brands, searchTerm]);
+
+    const filteredBrands = brands.filter((brand) =>
+        brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
 
     const handleDelete = (brand) => {
         setSelectedBrand(brand);
@@ -84,19 +77,13 @@ export default function Index({ auth, brands, can, flash }) {
             destroy(route("brand.destroy", selectedBrand.id), {
                 onSuccess: () => {
                     setSelectedBrand(null);
-                    toast.success("Marca eliminada correctamente");
-                },
-                onError: () => {
-                    toast.error("Error al eliminar la marca");
                 },
             });
         }
     };
 
-    const handleCloseModal = () => setSelectedBrand(null);
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
+    const handleCloseModal = () => {
+        setSelectedBrand(null);
     };
 
     return (
@@ -108,7 +95,7 @@ export default function Index({ auth, brands, can, flash }) {
                         routes={[{ name: "Admin", link: route("admin.panel") }]}
                         currentPage="Gestión de Marcas"
                     />
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mt-2">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
                         Marcas
                     </h2>
                 </div>
@@ -141,13 +128,16 @@ export default function Index({ auth, brands, can, flash }) {
                             )}
 
                             {can.brand_create && (
-                                <Link
-                                    href={route("brand.create")}
+                                <button
+                                    onClick={() =>
+                                        (window.location.href =
+                                            route("brand.create"))
+                                    }
                                     className="flex items-center justify-center w-full md:w-auto bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-3 py-2 md:px-5 md:py-2.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 shadow-sm text-sm md:text-base"
                                 >
                                     <PlusCircleIcon className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
                                     <span>Nueva Marca</span>
-                                </Link>
+                                </button>
                             )}
                         </div>
                     </div>
@@ -181,7 +171,7 @@ export default function Index({ auth, brands, can, flash }) {
                                                     Descripción
                                                 </th>
                                                 <th className="px-3 py-3 text-center text-xs md:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                                                    Logo
+                                                    Imagen
                                                 </th>
                                             </>
                                         )}
@@ -211,12 +201,13 @@ export default function Index({ auth, brands, can, flash }) {
                                                                                 .image
                                                                                 .url
                                                                         }?t=${new Date().getTime()}`}
-                                                                        alt={`Logo de ${brand.name}`}
+                                                                        alt={`Imagen de ${brand.name}`}
                                                                         className="w-8 h-8 object-cover rounded"
                                                                     />
                                                                 ) : (
                                                                     <span className="text-xs text-gray-400 dark:text-gray-500">
-                                                                        Sin logo
+                                                                        Sin
+                                                                        imagen
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -245,12 +236,12 @@ export default function Index({ auth, brands, can, flash }) {
                                                                             .image
                                                                             .url
                                                                     }?t=${new Date().getTime()}`}
-                                                                    alt={`Logo de ${brand.name}`}
+                                                                    alt={`Imagen de ${brand.name}`}
                                                                     className="w-10 h-10 md:w-12 md:h-12 object-cover rounded mx-auto"
                                                                 />
                                                             ) : (
                                                                 <span className="text-xs md:text-sm text-gray-400 dark:text-gray-500">
-                                                                    Sin logo
+                                                                    Sin imagen
                                                                 </span>
                                                             )}
                                                         </td>
@@ -261,7 +252,9 @@ export default function Index({ auth, brands, can, flash }) {
                                                         <Link
                                                             href={route(
                                                                 "brand.show",
-                                                                brand.id
+                                                                {
+                                                                    brand: brand.id,
+                                                                }
                                                             )}
                                                             className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
                                                             title="Ver detalle"
@@ -272,7 +265,9 @@ export default function Index({ auth, brands, can, flash }) {
                                                             <Link
                                                                 href={route(
                                                                     "brand.edit",
-                                                                    brand.id
+                                                                    {
+                                                                        brand: brand.id,
+                                                                    }
                                                                 )}
                                                                 className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50"
                                                                 title="Editar"
@@ -282,12 +277,12 @@ export default function Index({ auth, brands, can, flash }) {
                                                         )}
                                                         {can.brand_delete && (
                                                             <button
+                                                                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
                                                                 onClick={() =>
                                                                     handleDelete(
                                                                         brand
                                                                     )
                                                                 }
-                                                                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
                                                                 title="Eliminar"
                                                             >
                                                                 <TrashIcon className="w-4 h-4 md:w-5 md:h-5" />

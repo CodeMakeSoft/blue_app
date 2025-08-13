@@ -17,6 +17,7 @@ import Pagination from "@/Components/Category/Pagination";
 import ConfirmDeleteModal from "@/Components/Category/ConfirmDeleteModal";
 import Breadcrumb from "@/Components/Breadcrumb";
 import { toast, Toaster } from "sonner";
+import { router } from "@inertiajs/react";
 
 export default function Index({ auth, categories, can, flash }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -115,11 +116,13 @@ export default function Index({ auth, categories, can, flash }) {
     const handleConfirmDelete = () => {
         if (selectedCategory) {
             destroy(route("category.destroy", selectedCategory.id), {
+                preserveScroll: true,
                 onSuccess: () => {
                     setSelectedCategory(null);
-                    setExpandedCategories((prev) =>
-                        prev.filter((id) => id !== selectedCategory.id)
-                    );
+                    router.reload({ only: ["categories", "filters"] });
+                },
+                onError: () => {
+                    toast.error("No se pudo eliminar la categoría.");
                 },
             });
         }

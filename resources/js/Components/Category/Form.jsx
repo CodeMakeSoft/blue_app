@@ -195,56 +195,46 @@ const Form = ({
     };
 
     // Manejar el envío del formulario - Versión mejorada
-     const handleSubmit = (e) => {
-         e.preventDefault();
-         setNameTouched(true);
-         setDescriptionTouched(true);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setNameTouched(true);
+        setDescriptionTouched(true);
 
-         const errorsFound = {};
-         ["name", "description"].forEach((field) => {
-             const error = validateField(field, data[field]);
-             if (error) errorsFound[field] = error;
-         });
+        const errorsFound = {};
+        ["name", "description"].forEach((field) => {
+            const error = validateField(field, data[field]);
+            if (error) errorsFound[field] = error;
+        });
 
-         setFormErrors(errorsFound);
+        setFormErrors(errorsFound);
 
-         if (Object.keys(errorsFound).length === 0) {
-             // Crear FormData para enviar archivos
-             const formData = new FormData();
-             formData.append("name", data.name);
-             formData.append("description", data.description);
+        if (Object.keys(errorsFound).length === 0) {
+            // Crear FormData para enviar archivos
+            const formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("description", data.description);
 
-             if (data.parent_id !== null) {
-                 formData.append("parent_id", data.parent_id);
-             }
+            if (data.parent_id !== null) {
+                formData.append("parent_id", data.parent_id);
+            }
 
-             // Para edición, usamos el método spoofing de Laravel
-             if (isEdit) {
-                 formData.append("_method", "PUT"); // Esto hará que Laravel lo trate como PUT
-             }
+            // Para edición, usamos el método spoofing de Laravel
+            if (isEdit) {
+                formData.append("_method", "PUT"); // Esto hará que Laravel lo trate como PUT
+            }
 
-             if (data.deleted_image) {
-                 formData.append("deleted_image", "true");
-             }
+            if (data.deleted_image) {
+                formData.append("deleted_image", "true");
+            }
 
-             if (data.image) {
-                 formData.append("image", data.image);
-             }
+            if (data.image) {
+                formData.append("image", data.image);
+            }
 
-             // Llamar a la función submit con el FormData
-             submit(formData, {
-                 preserveScroll: true,
-                 forceFormData: true, // Asegura que Inertia use FormData
-                 onSuccess: () => {
-                     // Resetear el estado de la imagen después de un envío exitoso
-                     if (data.image) {
-                         setData("image", null);
-                         setFileInputKey(Date.now());
-                     }
-                 },
-             });
-         }
-     };
+            // Llamar a la función submit con el FormData
+            submit(e);
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">

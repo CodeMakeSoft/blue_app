@@ -11,7 +11,7 @@ use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Log;
+
 
 class CategoryController extends Controller implements HasMiddleware
 {
@@ -27,6 +27,7 @@ class CategoryController extends Controller implements HasMiddleware
 
     public function index(Request $request): Response 
     {
+        
         $search = $request->input('search');
 
         // Obtener todas las categorías con sus relaciones
@@ -51,6 +52,7 @@ class CategoryController extends Controller implements HasMiddleware
                 'category_delete' => $request->user()?->can('category-delete'),
                 'category_create' => $request->user()?->can('category-create'),
             ],
+            'timestamp' => now()->timestamp,
         ]);
     }
 
@@ -63,10 +65,10 @@ class CategoryController extends Controller implements HasMiddleware
 
     public function create(Request $request)
     {
+        $request->session()->forget(['success', 'error']);
+        
         if ($request->session()->get('recently_created')) {
-            return redirect()
-                ->route('category.index')
-                ->with('info', 'Ya creaste una categoría. Usa el botón "Nueva categoría" si deseas crear otra.');
+            return redirect()->route('category.index');
         }
 
         $categories = Category::with(['image', 'children.image'])
@@ -94,10 +96,12 @@ class CategoryController extends Controller implements HasMiddleware
             $category->image()->create(['url' => $path]);
         }
 
+        $request->session()->put('recently_created', true);
+        $request->session()->forget('category_list_cache');
+
         return redirect()
             ->route('category.index')
-            ->with('success', "¡La categoría fue creada correctamente!")
-            ->with('recently_created', true);
+            ->with('success', "¡La categoría fue creada correctamente!");
     }
 
     public function show($id)
@@ -107,12 +111,7 @@ class CategoryController extends Controller implements HasMiddleware
         if (!$category) {
             return redirect()
                 ->route('category.index')
-                ->with('error', 'La categoría que intentas ver ya no existe.')
-                ->withHeaders([
-                    'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
-                    'Pragma' => 'no-cache',
-                    'Expires' => '0'
-                ]);
+                ->with('error', 'La categoría que intentas ver ya no existe.');
         }
 
         return Inertia::render('Category/Show', [
@@ -122,17 +121,14 @@ class CategoryController extends Controller implements HasMiddleware
 
     public function edit($id)
     {
+        request()->session()->forget(['success', 'error']);
+
         $category = Category::with('image')->find($id);
 
         if (!$category) {
             return redirect()
                 ->route('category.index')
-                ->with('error', 'La categoría que intentas editar ya no existe.')
-                ->withHeaders([
-                    'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
-                    'Pragma' => 'no-cache',
-                    'Expires' => '0'
-                ]);
+                ->with('error', 'La categoría que intentas editar ya no existe.');
         }
 
         // Obtener todas las categorías excepto la actual y sus descendientes
@@ -185,6 +181,9 @@ class CategoryController extends Controller implements HasMiddleware
             $category->image()->create(['url' => $path]);
         }
 
+        $request->session()->put('recently_updated', true);
+        $request->session()->forget('category_list_cache');
+
         return redirect()
             ->route('category.index')
             ->with('success', '¡Categoría actualizada exitosamente!');
@@ -211,12 +210,7 @@ class CategoryController extends Controller implements HasMiddleware
         if ($category->children()->count() > 0) {
             return redirect()
                 ->route('category.index')
-                ->with('error', 'No se puede eliminar una categoría que tiene subcategorías.')
-                ->withHeaders([
-                    'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
-                    'Pragma' => 'no-cache',
-                    'Expires' => '0'
-                ]);
+                ->with('error', 'No se puede eliminar una categoría que tiene subcategorías.');
         }
 
         if ($category->image) {
@@ -226,14 +220,17 @@ class CategoryController extends Controller implements HasMiddleware
 
         $category->delete();
 
+         session()->forget([
+            'success', 
+            'error', 
+            'recently_created', 
+            'recently_updated',
+            'category_list_cache'
+        ]);
+
         return redirect()
             ->route('category.index', ['nocache' => time()])
-            ->with('success', '¡Categoría eliminada exitosamente!')
-            ->withHeaders([
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
-                'Pragma' => 'no-cache',
-                'Expires' => '0'
-            ]);
+            ->with('success', '¡Categoría eliminada exitosamente!');
     }
 
     public function catalog()

@@ -1,34 +1,39 @@
-import React, { useEffect } from "react"; // Añadido useEffect aquí
+import React from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import BrandForm from "@/Components/Brand/Form";
+import { Head, Link, useForm } from "@inertiajs/react";
+import Form from "@/Components/Category/Form"; // Asegúrate de tener este componente
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Breadcrumb from "@/Components/Breadcrumb";
-import { toast } from "sonner";
 
-export default function Edit({ auth, brand, flash }) {
-    const { existingNames } = usePage().props;
-
-    const { data, setData, errors, post, processing, reset } = useForm({
+export default function Edit({ auth, brand }) {
+    const { data, setData, errors, post } = useForm({
         name: brand?.name || "",
         description: brand?.description || "",
-        existing_image: brand?.image || null,
+        existing_image: brand?.image || null, // Cambiado a imagen única
         image: null,
         deleted_image: false,
     });
 
-    useEffect(() => {
-        if (flash?.success) {
-            toast.success(flash.success);
-        }
-    }, [flash]);
+    const submit = (e) => {
+        e.preventDefault();
 
-    const handleSubmit = (formData) => {
+        const formData = new FormData();
+        formData.append("name", data.name);
+        formData.append("description", data.description);
+        formData.append("_method", "PUT");
+
+        if (data.image) {
+            formData.append("image", data.image);
+        }
+        if (data.deleted_image) {
+            formData.append("deleted_image", true);
+        }
+
         post(route("brand.update", brand.id), {
             data: formData,
             preserveScroll: true,
-            onSuccess: () => reset("image"),
+            forceFormData: true,
         });
     };
 
@@ -36,73 +41,51 @@ export default function Edit({ auth, brand, flash }) {
         <AdminLayout
             user={auth.user}
             header={
-                <>
+                <div>
                     <Breadcrumb
                         routes={[
                             { name: "Inicio", link: route("dashboard") },
-                            {
-                                name: "Marcas",
-                                link: route("brand.index"),
-                            },
+                            { name: "Marcas", link: route("brand.index") },
                         ]}
                         currentPage={`Editar: ${brand.name}`}
                     />
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mt-2">
-                        Administración de Marcas
+                        Marcas
                     </h2>
-                </>
+                </div>
             }
         >
-            <Head title={`Editar ${brand.name}`} />
+            <Head title="Editar Marca" />
 
-            <div className="py-6 px-3 max-w-7xl mx-auto">
-                <div className="flex items-center mb-6">
-                    <Link
-                        href={route("brand.index")}
-                        className="flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-                    >
-                        <ChevronLeftIcon className="h-5 w-5 mr-1" />
-                        Volver al listado
-                    </Link>
-                </div>
+            <div className="py-6 px-3">
+                <Link
+                    href={route("brand.index")}
+                    className="inline-flex items-center p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                >
+                    <ChevronLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100" />
+                </Link>
 
-                <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-                        Editar Marca: {brand.name}
-                    </h1>
-
-                    <BrandForm
-                        data={data}
-                        errors={errors}
-                        setData={setData}
-                        submit={handleSubmit}
-                        isEdit={true}
-                        isSubmitting={processing}
-                        existingNames={existingNames}
-                    >
-                        <div className="flex justify-end space-x-4 mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <Link
-                                href={route("brand.index")}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                            >
-                                Cancelar
-                            </Link>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-4 mb-6 ml-1">
+                    Actualizar Marca
+                </h1>
+                <Form
+                    data={data}
+                    errors={errors}
+                    setData={setData}
+                    submit={submit}
+                    isEdit={true}
+                >
+                    <div className="w-[65%] ml-auto">
+                        <div className="flex justify-end">
                             <PrimaryButton
                                 type="submit"
-                                disabled={processing}
-                                className={
-                                    processing
-                                        ? "opacity-75 cursor-not-allowed"
-                                        : ""
-                                }
+                                className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600"
                             >
-                                {processing
-                                    ? "Actualizando..."
-                                    : "Actualizar Marca"}
+                                Actualizar Marca
                             </PrimaryButton>
                         </div>
-                    </BrandForm>
-                </div>
+                    </div>
+                </Form>
             </div>
         </AdminLayout>
     );
