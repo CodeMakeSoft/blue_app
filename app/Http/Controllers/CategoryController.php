@@ -220,7 +220,7 @@ class CategoryController extends Controller implements HasMiddleware
 
         $category->delete();
 
-         session()->forget([
+        session()->forget([
             'success', 
             'error', 
             'recently_created', 

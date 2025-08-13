@@ -31,14 +31,20 @@ class BrandController extends Controller implements HasMiddleware
             'can' => [
                 'brand_edit' => $request->user() ? $request->user()->can('brand-edit') : false,
                 'brand_delete' => $request->user() ? $request->user()->can('brand-delete') : false,
-                'brand_create' => $request->user() ? $request->user()->can('brand-create') : false,
-                
+                'brand_create' => $request->user() ? $request->user()->can('brand-create') : false,     
             ],
+            'timestamp' => now()->timestamp,
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+         $request->session()->forget(['success', 'error']);
+        
+        if ($request->session()->get('recently_created')) {
+            return redirect()->route('brand.index');
+        }
+
         return Inertia::render('Brand/Create');
     }
 
@@ -57,6 +63,9 @@ class BrandController extends Controller implements HasMiddleware
             $brand->image()->create(['url' => $path]);
         }
 
+        $request->session()->put('recently_created', true);
+        $request->session()->forget('brand_list_cache');
+
         return redirect()->route('brand.index')->with('success', 'Marca creada exitosamente.');
     }
 
@@ -69,6 +78,14 @@ class BrandController extends Controller implements HasMiddleware
 
     public function edit(Brand $brand)
     {
+        request()->session()->forget(['success', 'error']);
+
+        if (!$brand) {
+            return redirect()
+                ->route('brand.index')
+                ->with('error', 'La marca que intentas ver ya no existe.');
+        }
+
         return Inertia::render('Brand/Edit', [
             'brand' => $brand->load('image')
         ]);
@@ -82,7 +99,7 @@ class BrandController extends Controller implements HasMiddleware
         ]);
 
         // Eliminar imagen existente si se solicitó
-        if ($request->boolean('remove_picture')) {
+        if ($request->deleted_image) {
             if ($brand->image) {
                 Storage::disk('public')->delete($brand->image->url);
                 $brand->image()->delete();
@@ -102,14 +119,17 @@ class BrandController extends Controller implements HasMiddleware
             $brand->image()->create(['url' => $path]);
         }
 
+        $request->session()->put('recently_updated', true);
+        $request->session()->forget('brand_list_cache');
+
         return redirect()->route('brand.index')->with('success', 'Marca actualizada correctamente');
     }
 
-    /*public function confirmDelete($brandId)
+    public function confirmDelete($brandId)
     {
         $brand = Brand::findOrFail($brandId);
         return response()->json($brand);
-    }*/
+    }
 
     public function destroy(Brand $brand)
     {
@@ -120,7 +140,15 @@ class BrandController extends Controller implements HasMiddleware
         
         $brand->delete();
 
-        return redirect()->route('brand.index')->with('success', '¡Marca eliminada exitosamente!');
+        session()->forget([
+            'success', 
+            'error', 
+            'recently_created', 
+            'recently_updated',
+            'category_list_cache'
+        ]);
+
+        return redirect()->route('brand.index', ['nocache' => time()])->with('success', '¡Marca eliminada exitosamente!');
     }
 
     public function catalog()
