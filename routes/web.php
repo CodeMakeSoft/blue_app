@@ -18,7 +18,18 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\StatisticsController; // ✅ CORREGIDO
+use App\Http\Controllers\Admin\StatisticsController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use App\Mail\TestEmail;
+use Illuminate\Support\Facades\Mail;
+
+Route::get('/test-email', function () {
+    Mail::to('tu_correo_de_destino@gmail.com')
+        ->send(new \App\Mail\TestEmail('¡Hola! Este es un correo de prueba desde Laravel con Gmail.'));
+    return 'Correo enviado ✅ Revisa tu bandeja.';
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -26,21 +37,48 @@ use App\Http\Controllers\Admin\StatisticsController; // ✅ CORREGIDO
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// ✅ Deja una sola ruta raíz (elige la que uses). Mantengo la de HomeController.
+Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+
+// Si quieres la pantalla de Inertia "Welcome" en lugar de HomeController, descomenta esto y elimina la anterior:
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
+
+/*
+|--------------------------------------------------------------------------
+| Verificación de Email
+|--------------------------------------------------------------------------
+*/
+// Vista que indica "verifica tu correo"
+Route::get('/email/verify', function () {
+    // Blade: return view('auth.verify-email');
+    // Inertia: return inertia('Auth/VerifyEmail');
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Link firmado que confirma el correo
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); // setea email_verified_at
+    return redirect()->route('dashboard'); // o donde quieras
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Reenvío del correo de verificación
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Enlace de verificación enviado.');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 /*
 |--------------------------------------------------------------------------
 | Rutas autenticadas y verificadas
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Estadísticas administrativas
@@ -50,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/top-products', [StatisticsController::class, 'topProducts'])->name('topProducts');
         Route::get('/sales-by-brand', [StatisticsController::class, 'salesByBrand'])->name('salesByBrand');
         Route::get('/export-csv', [StatisticsController::class, 'exportCSV'])->name('exportCSV');
+        Route::get('/export-pdf', [StatisticsController::class, 'exportPdf'])->name('exportPdf'); // ⬅️ movido aquí
 
         // 🔍 Autocompletado y búsqueda
         Route::get('/products/search', [StatisticsController::class, 'searchProducts'])->name('products.search');
@@ -144,19 +183,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('admin/permissions', PermissionController::class);
 });
 
-// API interna para carrito
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/api/cart/status', [CartController::class, 'getCartStatus'])->name('api.cart.status');
-});
-
 /*
 |--------------------------------------------------------------------------
-| Auth
+| Auth scaffolding (login/registro olvidé password, etc.)
 |--------------------------------------------------------------------------
 */
+require __DIR__.'/auth.php'; // mantiene tus rutas de auth (Breeze/Fortify/etc.)
 
-// Página principal
-Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
-
-require __DIR__.'/auth.php';
-Route::get('/admin/statistics/export-pdf', [StatisticsController::class, 'exportPdf'])->name('statistics.exportPdf');
+// ❌ Eliminado: Route::get('/admin/statistics/export-pdf', ...) fuera del grupo

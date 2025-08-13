@@ -2,36 +2,31 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail; // Necesario para verificación
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Address;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasApiTokens;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Campos que pueden asignarse masivamente.
      */
     protected $fillable = [
         'name',
         'email',
         'password',
         'phone',
-        'email_verified_at', 
+        // ❌ No incluyas email_verified_at aquí,
+        // este campo lo maneja Laravel al verificar el correo.
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Campos ocultos en serializaciones.
      */
     protected $hidden = [
         'password',
@@ -39,33 +34,40 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Conversión de tipos.
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
+    ];
 
+    /**
+     * Relación con direcciones.
+     */
     public function addresses()
     {
         return $this->hasMany(Address::class);
     }
 
-
+    /**
+     * Relación con el carrito.
+     */
     public function cart()
     {
-        return $this->hasOne(Cart::class); 
+        return $this->hasOne(Cart::class);
     }
 
+    /**
+     * Relación con pedidos.
+     */
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * Relación con ubicaciones.
+     */
     public function locations()
     {
         return $this->hasMany(Location::class);

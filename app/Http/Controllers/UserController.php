@@ -10,6 +10,10 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller implements HasMiddleware
 {
@@ -25,10 +29,7 @@ class UserController extends Controller implements HasMiddleware
             new Middleware('protect.last.admin', only: ['destroy']),
         ];
     }
-    
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(Request $request): Response
     {
         return Inertia::render('Admin/User', [
@@ -36,110 +37,122 @@ class UserController extends Controller implements HasMiddleware
             'roles' => Role::all(),
             'activeRoute' => $request->route()->getName(),
             'can' => [
-                'user_view' => $request->user()?->can('user-view'),
-                'user_create' => $request->user()?->can('user-create'), 
-                'user_edit' => $request->user()?->can('user-edit'),
+                'user_view'   => $request->user()?->can('user-view'),
+                'user_create' => $request->user()?->can('user-create'),
+                'user_edit'   => $request->user()?->can('user-edit'),
                 'user_delete' => $request->user()?->can('user-delete'),
             ],
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
-    }
+        // Normaliza espacios
+        $request->merge([
+            'name' => is_string($request->name) ? trim(preg_replace('/\s+/', ' ', $request->name)) : $request->name,
+            'phone' => is_string($request->phone) ? trim($request->phone) : $request->phone,
+            'email' => is_string($request->email) ? trim($request->email) : $request->email,
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request, User $user)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8',
-            'phone' => 'nullable|string|unique:users,phone',
-            'roles' => 'array',
+        // Solo letras (unicode), números y espacios
+        $nameRule = ['required','string','max:255','regex:/^[\pL\pN\s]+$/u'];
+
+        $validated = $request->validate([
+            'name'     => $nameRule,
+            'email'    => ['required','email','max:255','unique:users,email'],
+            'password' => ['required','string','min:8'],
+            'phone'    => ['nullable','string','unique:users,phone'],
+            'roles'    => ['array'],
+        ], [
+            'name.regex'   => 'El nombre solo puede contener letras, números y espacios.',
             'phone.unique' => 'Ese número de teléfono ya está en uso por otro usuario.',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'email_verified_at' => now() 
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'phone'    => $validated['phone'] ?? null,
+            'password' => Hash::make($validated['password']),
         ]);
-        
-        $user->syncRoles($request->roles);
 
-        return redirect()->back()->with('success', 'User created successfully');
+        $user->syncRoles($validated['roles'] ?? []);
+
+        // 1) Verificación de email (enlace firmado)
+        event(new Registered($user));
+
+        // 2) Bienvenida
+        Mail::to($user->email)->send(new WelcomeMail($user));
+
+        return redirect()->back()->with('success', 'Usuario creado. Enviamos correo de verificación y de bienvenida.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, User $user)
     {
-     $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,'.$user->id,
-        'password' => 'nullable|string|min:8',
-        'phone' => 'nullable|string|unique:users,phone,' . $user->id,
-        'roles' => 'array',
-        'email_verified_at' => 'nullable|date',
-        'phone.unique' => 'Ese número de teléfono ya está en uso por otro usuario.',
-    ]);
+        // Normaliza espacios
+        $request->merge([
+            'name' => is_string($request->name) ? trim(preg_replace('/\s+/', ' ', $request->name)) : $request->name,
+            'phone' => is_string($request->phone) ? trim($request->phone) : $request->phone,
+            'email' => is_string($request->email) ? trim($request->email) : $request->email,
+        ]);
 
-    $data = $request->only(['name', 'email', 'phone','email_verified_at']);
-    if ($request->password) {
-        $data['password'] = $request->password;
+        $nameRule = ['required','string','max:255','regex:/^[\pL\pN\s]+$/u'];
+
+        $validated = $request->validate([
+            'name'  => $nameRule,
+            'email' => ['required','email','max:255', Rule::unique('users','email')->ignore($user->id)],
+            'password' => ['nullable','string','min:8'],
+            'phone' => ['nullable','string', Rule::unique('users','phone')->ignore($user->id)],
+            'roles' => ['array'],
+            'email_verified_at' => ['nullable','date'],
+        ], [
+            'name.regex'   => 'El nombre solo puede contener letras, números y espacios.',
+            'phone.unique' => 'Ese número de teléfono ya está en uso por otro usuario.',
+        ]);
+
+        $emailChanged = $validated['email'] !== $user->email;
+
+        $data = [
+            'name'  => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+        ];
+
+        if (!empty($validated['password'])) {
+            $data['password'] = Hash::make($validated['password']);
+        }
+
+        if ($emailChanged) {
+            $data['email_verified_at'] = null;
+        } elseif (!empty($validated['email_verified_at'])) {
+            $data['email_verified_at'] = $validated['email_verified_at'];
+        }
+
+        $user->update($data);
+        $user->syncRoles($validated['roles'] ?? []);
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+            return redirect()->back()->with('success', 'Usuario actualizado. Reenviamos el enlace de verificación al nuevo correo.');
+        }
+
+        return redirect()->back()->with('success', 'Usuario actualizado correctamente');
     }
 
-    $user->update($data);
-    $user->syncRoles($request->roles);
-
-    return redirect()->back()->with('success', 'User updated successfully');
-}
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $user)
     {
         $adminRole = app('adminRole');
-        // Verificar si el usuario a eliminar es Admin
+
         if ($user->hasRole($adminRole->name)) {
-            // Contar cuántos usuarios tienen el rol Admin
             $adminUsersCount = $adminRole->users()->count();
-            // Si solo queda 1 admin, no permitir eliminarlo
             if ($adminUsersCount <= 1) {
                 return redirect()->back()
                     ->with('error', 'No puedes eliminar al último administrador.');
             }
         }
+
         $user->delete();
+
         return redirect()->route('users.index')
             ->with('success', 'Usuario eliminado correctamente');
-        }
-
+    }
 }
