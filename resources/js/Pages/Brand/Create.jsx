@@ -1,6 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
-import Form from "@/Components/Category/Form";
+import Form from "@/Components/brand/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Breadcrumb from "@/Components/Breadcrumb";
