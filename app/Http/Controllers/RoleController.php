@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Validation\Rule;
 
 class RoleController extends Controller implements HasMiddleware
 {
@@ -18,7 +19,6 @@ class RoleController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            // Ahora cualquier usuario con SuperAdmin o Admin puede acceder
             new Middleware('role:SuperAdmin|Admin'),
             new Middleware('permission:role-create', only: ['store']),
             new Middleware('permission:role-edit', only: ['update']),
@@ -27,66 +27,93 @@ class RoleController extends Controller implements HasMiddleware
     }
 
     public function index(Request $request): Response
-{
-    $roles = Role::with('permissions')->paginate(10);
-    $permissions = Permission::all();
+    {
+        $roles = Role::with('permissions')->paginate(10);
+        $permissions = Permission::all();
 
-    // Roles del usuario autenticado como array de strings
-    $userRoles = $request->user()?->roles->pluck('name') ?? collect();
+        // Roles del usuario autenticado como array de strings
+        $userRoles = $request->user()?->roles->pluck('name') ?? collect();
 
-    return Inertia::render('Admin/Role', [
-        'roles' => $roles,
-        'permissions' => $permissions,
-        'activeRoute' => request()->route()->getName(),
-        'can' => [
-            'role_edit' => $request->user()?->can('role-edit') ?? false,
-            'role_delete' => $request->user()?->can('role-delete') ?? false,
-            'role_create' => $request->user()?->can('role-create') ?? false,
-        ],
-        'auth' => [
-            'user' => [
-                'id' => $request->user()?->id,
-                'name' => $request->user()?->name,
-                'email' => $request->user()?->email,
-                'roles' => $userRoles,
-                'permissions' => $request->user()?->getPermissionNames(),
+        return Inertia::render('Admin/Role', [
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'activeRoute' => request()->route()->getName(),
+            'can' => [
+                'role_edit' => $request->user()?->can('role-edit') ?? false,
+                'role_delete' => $request->user()?->can('role-delete') ?? false,
+                'role_create' => $request->user()?->can('role-create') ?? false,
             ],
-        ],
-    ]);
-}
-
+            'auth' => [
+                'user' => [
+                    'id' => $request->user()?->id,
+                    'name' => $request->user()?->name,
+                    'email' => $request->user()?->email,
+                    'roles' => $userRoles,
+                    'permissions' => $request->user()?->getPermissionNames(),
+                ],
+            ],
+        ]);
+    }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => [
-                'required', 'string', 'max:40', 'unique:roles,name',
-                'not_in:' . implode(',', $this->protectedRoles),
+        $request->validate(
+            [
+                'name' => [
+                    'required',
+                    'string',
+                    'max:40',
+                    'regex:/^[\pL\pN\s]+$/u',
+                    'unique:roles,name',
+                    'not_in:' . implode(',', $this->protectedRoles),
+                ],
+                'permissions' => ['nullable', 'array'],
+                'permissions.*' => ['string', 'distinct'],
             ],
-            'permissions' => 'array',
-        ]);
+            [
+                'name.regex' => 'El nombre solo puede contener letras, números y espacios.',
+            ]
+        );
 
         $role = Role::create(['name' => $request->name]);
-        $role->syncPermissions($request->permissions);
+        if (!empty($request->permissions)) {
+            $role->syncPermissions($request->permissions);
+        }
 
         return redirect()->back()->with('success', 'Role created successfully');
     }
 
     public function update(Request $request, Role $role)
     {
-        $request->validate([
-            'name' => 'required|string|max:40',
-            'permissions' => 'array',
-        ]);
-
         if (in_array($role->name, $this->protectedRoles)) {
+            if ($request->name !== $role->name) {
+                return back()->with('error', "No se puede renombrar el rol {$role->name}");
+            }
+            
             // Solo actualiza permisos para roles protegidos
             $role->syncPermissions($request->permissions);
             return redirect()->back()->with('success', "Permissions updated successfully for {$role->name}");
         }
 
+        $request->validate(
+            [
+                'name' => [
+                    'required',
+                    'string',
+                    'max:40',
+                    'regex:/^[\pL\pN\s]+$/u',
+                    Rule::unique('roles', 'name')->ignore($role->id),
+                ],
+                'permissions' => ['nullable', 'array'],
+                'permissions.*' => ['string', 'distinct'],
+            ],
+            [
+                'name.regex' => 'El nombre solo puede contener letras, números y espacios.',
+            ]
+        );
+
         $role->update(['name' => $request->name]);
-        $role->syncPermissions($request->permissions);
+        $role->syncPermissions($request->permissions ?? []);
 
         return redirect()->back()->with('success', 'Role updated successfully');
     }

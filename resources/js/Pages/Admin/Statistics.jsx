@@ -1,10 +1,9 @@
 import { Head } from "@inertiajs/react";
-import { Bar, Pie } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import axios from "axios";
 import {
     Chart as ChartJS,
     BarElement,
-    ArcElement,
     CategoryScale,
     LinearScale,
     Title,
@@ -18,27 +17,25 @@ ChartJS.register(
     CategoryScale,
     LinearScale,
     BarElement,
-    ArcElement,
     Title,
     Tooltip,
     Legend
 );
 
 export default function Statistics({ activeRoute }) {
+    // ✅ Filtros sin categoría
     const [filters, setFilters] = useState({
         product: "",
         productId: null,
         brand: "",
         brandId: null,
-        category: "",
-        categoryId: null,
         start_date: "",
         end_date: "",
     });
 
     const [suggestions, setSuggestions] = useState([]);
     const [brandSuggestions, setBrandSuggestions] = useState([]);
-    const [categorySuggestions, setCategorySuggestions] = useState([]);
+
     const [salesChartData, setSalesChartData] = useState({
         labels: [],
         datasets: [],
@@ -56,38 +53,32 @@ export default function Statistics({ activeRoute }) {
         const { name, value } = e.target;
         setFilters((prev) => ({ ...prev, [name]: value }));
 
-        if (name === "product" && value.length >= 2) {
-            axios
-                .get("/admin/statistics/autocomplete", {
-                    params: { term: value },
-                })
-                .then((res) => setSuggestions(res.data));
+        // 🔎 Autocomplete producto
+        if (name === "product") {
+            if (value.length >= 2) {
+                axios
+                    .get("/admin/statistics/autocomplete", {
+                        params: { term: value },
+                    })
+                    .then((res) => setSuggestions(res.data));
+            } else {
+                setSuggestions([]);
+                setFilters((prev) => ({ ...prev, productId: null }));
+            }
         }
 
-        if (name === "brand" && value.length >= 2) {
-            axios
-                .get("/admin/statistics/search-brands", {
-                    params: { q: value },
-                })
-                .then((res) => setBrandSuggestions(res.data));
-        }
-
-        if (name === "category" && value.length >= 2) {
-            axios
-                .get("/admin/statistics/search-categories", {
-                    params: { q: value },
-                })
-                .then((res) => setCategorySuggestions(res.data));
-        }
-
-        if (name === "brand" && value.length < 2) {
-            setBrandSuggestions([]);
-            setFilters((prev) => ({ ...prev, brandId: null }));
-        }
-
-        if (name === "category" && value.length < 2) {
-            setCategorySuggestions([]);
-            setFilters((prev) => ({ ...prev, categoryId: null }));
+        // 🔎 Autocomplete marca
+        if (name === "brand") {
+            if (value.length >= 2) {
+                axios
+                    .get("/admin/statistics/search-brands", {
+                        params: { q: value },
+                    })
+                    .then((res) => setBrandSuggestions(res.data));
+            } else {
+                setBrandSuggestions([]);
+                setFilters((prev) => ({ ...prev, brandId: null }));
+            }
         }
     };
 
@@ -109,15 +100,7 @@ export default function Statistics({ activeRoute }) {
         setBrandSuggestions([]);
     };
 
-    const handleCategoryClick = (category) => {
-        setFilters((prev) => ({
-            ...prev,
-            category: category.name,
-            categoryId: category.id,
-        }));
-        setCategorySuggestions([]);
-    };
-
+    // ✅ Ventas con agrupación dinámica (día/semana/mes) → backend devuelve { label, total }
     const fetchSalesData = () => {
         axios
             .get("/admin/statistics/sales-data", {
@@ -126,13 +109,12 @@ export default function Statistics({ activeRoute }) {
                     end_date: filters.end_date,
                     product_id: filters.productId,
                     brand_id: filters.brandId,
-                    category_id: filters.categoryId,
                 },
             })
             .then((res) => {
-                const data = res.data;
+                const data = res.data || [];
                 setSalesChartData({
-                    labels: data.map((item) => item.date),
+                    labels: data.map((item) => item.label ?? item.date), // por compatibilidad
                     datasets: [
                         {
                             label: "Ventas",
@@ -153,7 +135,7 @@ export default function Statistics({ activeRoute }) {
                 },
             })
             .then((res) => {
-                const data = res.data;
+                const data = res.data || [];
                 setBrandChartData({
                     labels: data.map((item) => item.name),
                     datasets: [
@@ -176,11 +158,9 @@ export default function Statistics({ activeRoute }) {
                 },
             })
             .then((res) => {
-                const data = res.data;
-                console.log("Top products data:", data); // 👈 Diagnóstico
+                const data = res.data || [];
                 setProductChartData({
-                    labels: data.map((item) => item.name), // ✅ usa directamente name
-
+                    labels: data.map((item) => item.name),
                     datasets: [
                         {
                             label: "Productos más vendidos",
@@ -194,16 +174,15 @@ export default function Statistics({ activeRoute }) {
                 console.error("Error cargando top products:", err);
             });
     };
+
     const exportCSV = () => {
         const params = new URLSearchParams({
-            start_date: filters.start_date,
-            end_date: filters.end_date,
+            start_date: filters.start_date ?? "",
+            end_date: filters.end_date ?? "",
         });
 
         if (filters.productId) params.append("product_id", filters.productId);
         if (filters.brandId) params.append("brand_id", filters.brandId);
-        if (filters.categoryId)
-            params.append("category_id", filters.categoryId);
 
         const url = `/admin/statistics/export-csv?${params.toString()}`;
         window.open(url, "_blank");
@@ -217,9 +196,11 @@ export default function Statistics({ activeRoute }) {
     };
 
     useEffect(() => {
+        // Carga inicial
         fetchSalesData();
         fetchBrandData();
         fetchTopProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
@@ -296,38 +277,8 @@ export default function Statistics({ activeRoute }) {
                             )}
                         </div>
 
-                        {/* Categoría */}
-                        <div className="relative">
-                            <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-                                Categoría
-                            </label>
-                            <input
-                                name="category"
-                                value={filters.category}
-                                onChange={handleChange}
-                                type="text"
-                                autoComplete="off"
-                                className="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:text-white"
-                            />
-                            {categorySuggestions.length > 0 && (
-                                <ul className="absolute z-10 w-full bg-white border rounded shadow max-h-40 overflow-y-auto dark:bg-gray-800">
-                                    {categorySuggestions.map((item) => (
-                                        <li
-                                            key={item.id}
-                                            onClick={() =>
-                                                handleCategoryClick(item)
-                                            }
-                                            className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
-                                        >
-                                            {item.name}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-
                         {/* Fechas */}
-                        <div>
+                        <div className="md:col-span-2">
                             <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
                                 Rango de fechas
                             </label>
@@ -366,11 +317,10 @@ export default function Statistics({ activeRoute }) {
                             <button
                                 onClick={() => {
                                     const params = new URLSearchParams({
-                                        start_date: filters.start_date,
-                                        end_date: filters.end_date,
+                                        start_date: filters.start_date ?? "",
+                                        end_date: filters.end_date ?? "",
                                         product_id: filters.productId ?? "",
                                         brand_id: filters.brandId ?? "",
-                                        category_id: filters.categoryId ?? "",
                                     });
                                     window.open(
                                         `/admin/statistics/export-pdf?${params.toString()}`,
@@ -390,52 +340,71 @@ export default function Statistics({ activeRoute }) {
                     Estadísticas de Ventas
                 </h1>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <Bar
-                        data={salesChartData}
-                        options={{
-                            responsive: true,
-                            plugins: {
-                                legend: { position: "top" },
-                                title: {
-                                    display: true,
-                                    text: "Ventas por Día",
+                {/* 🧩 Nuevo organizador: 2 columnas + 1 full width */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Ventas por Rango de Tiempo */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 h-[300px]">
+                        <Bar
+                            data={salesChartData}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false, // ✅ clave para altura fija
+                                plugins: {
+                                    legend: { position: "top" },
+                                    title: {
+                                        display: true,
+                                        text: "Ventas por Rango de Tiempo",
+                                    },
                                 },
-                            },
-                        }}
-                    />
-                </div>
+                                scales: {
+                                    x: {
+                                        ticks: {
+                                            autoSkip: true,
+                                            maxRotation: 45,
+                                            minRotation: 20,
+                                            maxTicksLimit: 14,
+                                        },
+                                    },
+                                },
+                            }}
+                        />
+                    </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <Bar
-                        data={brandChartData}
-                        options={{
-                            responsive: true,
-                            plugins: {
-                                legend: { position: "top" },
-                                title: {
-                                    display: true,
-                                    text: "Comparativa de Marcas",
+                    {/* Comparativa de Marcas */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 h-[300px]">
+                        <Bar
+                            data={brandChartData}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: "top" },
+                                    title: {
+                                        display: true,
+                                        text: "Comparativa de Marcas",
+                                    },
                                 },
-                            },
-                        }}
-                    />
-                </div>
+                            }}
+                        />
+                    </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <Bar
-                        data={productChartData}
-                        options={{
-                            responsive: true,
-                            plugins: {
-                                legend: { position: "top" },
-                                title: {
-                                    display: true,
-                                    text: "Productos más Vendidos",
+                    {/* Productos más vendidos - Full width */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 h-[300px] md:col-span-2">
+                        <Bar
+                            data={productChartData}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: "top" },
+                                    title: {
+                                        display: true,
+                                        text: "Productos más Vendidos",
+                                    },
                                 },
-                            },
-                        }}
-                    />
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
         </AdminLayout>
