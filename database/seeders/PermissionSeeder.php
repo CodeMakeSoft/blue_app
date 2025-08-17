@@ -44,16 +44,18 @@ class PermissionSeeder extends Seeder
             'product-create',  
             'product-edit',
             'product-delete',
-            //Admin
+            //Admin, Seller, SuperAdmin
             'can-access-admin-panel',
+            'can-manage-roles&permissions',
             //Super Admin
             'admin-view',
             'admin-create',    
             'admin-edit',
             'admin-delete',
         ];
-        foreach($permissions as $key => $permission){
-            Permission::create(['name' => $permission]);
+        
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
         }
     }
 }

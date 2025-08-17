@@ -9,18 +9,19 @@ use Inertia\Response;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Products\StoreRequest;
 use App\Http\Requests\Products\UpdateRequest;
-use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
 class ProductController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
     {
         return [
-            
+            new Middleware('role:SuperAdmin|Admin|Seller'),
             new Middleware('permission:product-view', only: ['index']),
             new Middleware('permission:product-create', only: ['store']),
             new Middleware('permission:product-edit', only: ['update']),
@@ -30,15 +31,26 @@ class ProductController extends Controller implements HasMiddleware
     /**
      * Display a listing of the products.
      */
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
+        $user = $request->user();
+        
+        // Construir la consulta base
+        $query = Product::with(['images', 'category', 'brand']);
+        
+        // Si el usuario es vendedor (y no admin), filtrar solo sus productos
+        if ($user->hasRole('Seller') && !$user->hasRole('Admin')) {
+            $query->where('user_id', $user->id);
+        }
+        
+        $products = $query->get();
+        
         return Inertia::render('Products/Index', [
-            'products' => Product::with(['images', 'category', 'brand'])->get(),
+            'products' => $products,
             'can' => [
-                'product_edit' => $request->user() ? $request->user()->can('product-edit') : false,
-                'product_delete' => $request->user() ? $request->user()->can('product-delete') : false,
-                'product_create' => $request->user() ? $request->user()->can('product-create') : false,
-                
+                'product_edit' => $user->can('product-edit'),
+                'product_delete' => $user->can('product-delete'),
+                'product_create' => $user->can('product-create'),
             ],
         ]);
     }
@@ -59,7 +71,10 @@ class ProductController extends Controller implements HasMiddleware
      */
     public function store(StoreRequest $request)
     {
-        $product = Product::create($request->validated());
+        $validated = $request->validated();
+        $validated['user_id'] = Auth::id(); 
+        
+        $product = Product::create($validated);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
@@ -77,6 +92,12 @@ class ProductController extends Controller implements HasMiddleware
      */
     public function edit(Product $product)
     {
+        $user = request()->user();
+        
+        if ($user->hasRole('Seller') && !$user->hasRole('Admin') && $product->user_id !== $user->id) {
+            abort(403, 'No tienes permisos para editar este producto.');
+        }
+
         return Inertia::render('Products/Edit', [
             'product' => $product->load(['images', 'category', 'brand']),
             'categories' => Category::all(['id', 'name']),
@@ -89,6 +110,12 @@ class ProductController extends Controller implements HasMiddleware
      */
     public function update(UpdateRequest $request, Product $product)
     {
+        $user = request()->user();
+        
+        if ($user->hasRole('Seller') && !$user->hasRole('Admin') && $product->user_id !== $user->id) {
+            abort(403, 'No tienes permisos para editar este producto.');
+        }
+        
         $product->update($request->validated());
 
         // Eliminar imágenes seleccionadas
@@ -129,6 +156,13 @@ class ProductController extends Controller implements HasMiddleware
      */
     public function destroy(Product $product)
     {
+
+        $user = request()->user();
+        
+        if ($user->hasRole('Seller') && !$user->hasRole('Admin') && $product->user_id !== $user->id) {
+            abort(403, 'No tienes permisos para eliminar este producto.');
+        }
+
         // Eliminar imágenes asociadas
         foreach ($product->images as $image) {
             Storage::disk('public')->delete($image->url);

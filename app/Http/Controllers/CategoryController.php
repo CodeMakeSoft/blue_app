@@ -18,6 +18,7 @@ class CategoryController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
+            new Middleware('role:SuperAdmin|Admin'),
             new Middleware('permission:category-view', only: ['index']),
             new Middleware('permission:category-create', only: ['store']),
             new Middleware('permission:category-edit', only: ['update']),

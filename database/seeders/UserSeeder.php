@@ -7,9 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
-use Database\Factories\CartFactory;
-use App\Models\Product;
-use App\Models\Image;
+use App\Singletons\SuperAdmin;
 
 class UserSeeder extends Seeder
 {
@@ -18,32 +16,29 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'], // Evita duplicados
-            [
-                'name' => 'Admin',
-                'password' => Hash::make('password'), // Contraseña por defecto (cámbiala en producción)
-            ]
-        );
+        $superAdminRole = Role::firstOrCreate(['name' => 'superAdmin']); // Nota: minúscula consistente
+        
+        $superAdminRole->users()->detach();
 
-        $SuperAdmin = User::firstOrCreate(
-            ['email' => 'SuperAdmin@example.com'], // Evita duplicados
+        $superAdminUser = User::firstOrCreate(
+            ['email' => 'superadmin@example.com'], // Email en minúscula para consistencia
             [
                 'name' => 'SuperAdmin',
-                'password' => Hash::make('password'), // Contraseña por defecto (cámbiala en producción)
+                'password' => Hash::make('password'),
             ]
         );
 
+        SuperAdmin::getInstance()->assignTo($superAdminUser);
 
-        // Asignar rol 'Admin' (usando el nombre exacto del rol creado en RoleSeeder)
-        $SuperAdminRole = Role::where('name', 'SuperAdmin')->first();
-        $SuperAdmin->assignRole($SuperAdminRole);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+            ]
+        );
+        $admin->assignRole('admin'); // Nombre de rol en minúscula
 
-        $adminRole = Role::where('name', 'Admin')->first();
-        $admin->assignRole($adminRole);
-
-        $users = User::factory(20)->create(); // Crear 10 usuarios aleatorios
-        
-      
+        User::factory(20)->create();
     }
 }

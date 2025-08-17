@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\ProtectLastAdmin;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             //Singleton
             'protect.last.admin' => \App\Http\Middleware\ProtectLastAdmin::class,
+            'single.superadmin' => \App\Http\Middleware\EnsureSingleSuperAdmin::class,
+            'no_roles' => \App\Http\Middleware\EnsureUserHasNoRoles::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

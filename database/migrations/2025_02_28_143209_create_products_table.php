@@ -22,8 +22,14 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->timestamp('availability')->nullable();
 
+            $table->foreignId('user_id')
+            ->nullable()
+            ->constrained()
+            ->onDelete('restrict');
+
             $table->foreignId('category_id')->constrained('categories')
                 ->onDelete('cascade');
+            
             $table->foreignId('brand_id')->constrained('brands')
                 ->onDelete('cascade');
             

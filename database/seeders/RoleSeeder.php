@@ -34,6 +34,7 @@ class RoleSeeder extends Seeder
             'product-edit',
             'product-delete',
             'can-access-admin-panel',
+            'can-manage-roles&permissions',
         ];
 
         $sellerPermissions = [
@@ -41,6 +42,8 @@ class RoleSeeder extends Seeder
             'product-create',  
             'product-edit',
             'product-delete',
+            'brand-view',
+            'category-view',
             'can-access-admin-panel',
         ];
         

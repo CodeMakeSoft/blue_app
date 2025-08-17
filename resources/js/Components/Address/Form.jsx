@@ -204,62 +204,67 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
     return (
         <form
             onSubmit={onSubmit}
-            className="space-y-6 dark:bg-gray-800 dark:text-white"
+            className="space-y-4 sm:space-y-6 dark:bg-gray-800 dark:text-white p-4 sm:p-6"
         >
-            <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Columna izquierda - Formulario */}
-                    <div className="space-y-6">
-                        <div>
-                            <InputLabel htmlFor="country" value="País *" />
-                            <select
-                                id="country"
-                                value={data.country_code || ""}
-                                onChange={handleCountryChange}
-                                className="mt-1 block w-full dark:bg-gray-700 dark:text-white border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                required
-                            >
-                                <option value="">Seleccione un país</option>
-                                {countryList.map((country) => (
-                                    <option
-                                        key={country.code}
-                                        value={country.code}
-                                    >
-                                        {country.name} ({country.code})
-                                    </option>
-                                ))}
-                            </select>
-                            <InputError message={errors.country} />
+            <div className="space-y-4 sm:space-y-6">
+                {/* Layout responsivo mejorado */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+                    {/* Sección del formulario */}
+                    <div className="order-2 xl:order-1 space-y-4 sm:space-y-6">
+                        {/* País y Alias - Grid responsivo */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="sm:col-span-2">
+                                <InputLabel htmlFor="country" value="País *" />
+                                <select
+                                    id="country"
+                                    value={data.country_code || ""}
+                                    onChange={handleCountryChange}
+                                    className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                >
+                                    <option value="">Seleccione un país</option>
+                                    {countryList.map((country) => (
+                                        <option
+                                            key={country.code}
+                                            value={country.code}
+                                        >
+                                            {country.name} ({country.code})
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.country} />
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <InputLabel
+                                    htmlFor="alias"
+                                    value="Nombre (Alias) *"
+                                />
+                                <TextInput
+                                    id="alias"
+                                    value={data.alias}
+                                    onChange={(e) =>
+                                        setData("alias", e.target.value)
+                                    }
+                                    className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white"
+                                    required
+                                />
+                                <InputError message={errors.alias} />
+                            </div>
                         </div>
 
-                        <div>
-                            <InputLabel
-                                htmlFor="alias"
-                                value="Nombre (Alias) *"
-                            />
-                            <TextInput
-                                id="alias"
-                                value={data.alias}
-                                onChange={(e) =>
-                                    setData("alias", e.target.value)
-                                }
-                                className="mt-1 block w-full dark:bg-gray-700 dark:text-white"
-                                required
-                            />
-                            <InputError message={errors.alias} />
-                        </div>
-
+                        {/* Código Postal */}
                         <div>
                             <InputLabel
                                 htmlFor="postal_code"
                                 value="Código Postal *"
                             />
-                            <div className="flex gap-2 mt-1">
+                            <div className="flex flex-col sm:flex-row gap-2 mt-1">
                                 <TextInput
                                     id="postal_code"
                                     value={data.postal_code}
                                     onChange={handlePostalCodeChange}
-                                    className="flex-1 dark:bg-gray-700 dark:text-white"
+                                    className="flex-1 text-sm sm:text-base dark:bg-gray-700 dark:text-white"
                                     placeholder={`Ej: ${getPostalExample(
                                         data.country_code
                                     )}`}
@@ -274,7 +279,7 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                         !data.postal_code ||
                                         loading
                                     }
-                                    className={`px-4 py-2 rounded-md ${
+                                    className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md whitespace-nowrap ${
                                         !data.country_code ||
                                         !data.postal_code ||
                                         loading
@@ -297,37 +302,41 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                             )}
                         </div>
 
+                        {/* Datos del código postal - Solo mostrar si está validado */}
                         {showPostalData && (
-                            <div className="space-y-4 border p-4 rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-                                {/* Estado */}
-                                <div>
-                                    <InputLabel
-                                        htmlFor="state"
-                                        value="Estado"
-                                    />
-                                    <TextInput
-                                        id="state"
-                                        value={data.state || "No especificado"}
-                                        className="mt-1 block w-full bg-gray-100 dark:bg-gray-600 dark:text-white"
-                                        readOnly
-                                    />
-                                </div>
+                            <div className="space-y-4 border p-3 sm:p-4 rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                {/* Grid responsivo para estado y municipio */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <InputLabel
+                                            htmlFor="state"
+                                            value="Estado"
+                                        />
+                                        <TextInput
+                                            id="state"
+                                            value={
+                                                data.state || "No especificado"
+                                            }
+                                            className="mt-1 block w-full text-sm sm:text-base bg-gray-100 dark:bg-gray-600 dark:text-white"
+                                            readOnly
+                                        />
+                                    </div>
 
-                                {/* Municipio */}
-                                <div>
-                                    <InputLabel
-                                        htmlFor="municipality"
-                                        value="Municipio"
-                                    />
-                                    <TextInput
-                                        id="municipality"
-                                        value={
-                                            data.municipality ||
-                                            "No especificado"
-                                        }
-                                        className="mt-1 block w-full bg-gray-100 dark:bg-gray-600 dark:text-white"
-                                        readOnly
-                                    />
+                                    <div>
+                                        <InputLabel
+                                            htmlFor="municipality"
+                                            value="Municipio"
+                                        />
+                                        <TextInput
+                                            id="municipality"
+                                            value={
+                                                data.municipality ||
+                                                "No especificado"
+                                            }
+                                            className="mt-1 block w-full text-sm sm:text-base bg-gray-100 dark:bg-gray-600 dark:text-white"
+                                            readOnly
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Ciudad - Solo si existe */}
@@ -340,7 +349,7 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                         <TextInput
                                             id="city"
                                             value={data.city}
-                                            className="mt-1 block w-full bg-gray-100 dark:bg-gray-600 dark:text-white"
+                                            className="mt-1 block w-full text-sm sm:text-base bg-gray-100 dark:bg-gray-600 dark:text-white"
                                             readOnly
                                         />
                                     </div>
@@ -357,7 +366,7 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                             id="neighbourhood"
                                             value={data.neighbourhood}
                                             onChange={handleNeighbourhoodChange}
-                                            className="mt-1 block w-full dark:bg-gray-700 dark:text-white border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                             required
                                         >
                                             {neighbourhoods.map(
@@ -376,7 +385,7 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                             id="neighbourhood"
                                             value={data.neighbourhood}
                                             onChange={handleNeighbourhoodChange}
-                                            className="mt-1 block w-full dark:bg-gray-700 dark:text-white"
+                                            className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white"
                                             placeholder="Ingrese el nombre de la colonia"
                                             required
                                         />
@@ -403,14 +412,14 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                         onChange={(e) =>
                                             setData("street", e.target.value)
                                         }
-                                        className="mt-1 block w-full dark:bg-gray-700 dark:text-white"
+                                        className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white"
                                         required
                                     />
                                     <InputError message={errors.street} />
                                 </div>
 
-                                {/* Números */}
-                                <div className="grid grid-cols-2 gap-4">
+                                {/* Números - Grid responsivo */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <InputLabel
                                             htmlFor="ext_number"
@@ -425,7 +434,7 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className="mt-1 block w-full dark:bg-gray-700 dark:text-white"
+                                            className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white"
                                             required
                                         />
                                         <InputError
@@ -446,14 +455,14 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className="mt-1 block w-full dark:bg-gray-700 dark:text-white"
+                                            className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white"
                                         />
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Teléfono y referencias */}
+                        {/* Teléfono */}
                         <div>
                             <InputLabel htmlFor="phone" value="Teléfono *" />
                             <TextInput
@@ -462,12 +471,13 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                                 onChange={(e) =>
                                     setData("phone", e.target.value)
                                 }
-                                className="mt-1 block w-full dark:bg-gray-700 dark:text-white"
+                                className="mt-1 block w-full text-sm sm:text-base dark:bg-gray-700 dark:text-white"
                                 required
                             />
                             <InputError message={errors.phone} />
                         </div>
 
+                        {/* Referencias */}
                         <div>
                             <InputLabel
                                 htmlFor="references"
@@ -475,68 +485,100 @@ export default function Form({ data, setData, errors, isEditing, onSubmit }) {
                             />
                             <textarea
                                 id="references"
-                                name="references" // Asegúrate de incluir esto
+                                name="references"
                                 value={data.references || ""}
                                 onChange={(e) =>
                                     setData("references", e.target.value)
                                 }
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                                className="mt-1 block w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 resize-none"
                                 rows={3}
+                                placeholder="Instrucciones adicionales para el delivery..."
                             />
                         </div>
 
                         {/* Checkbox para dirección predeterminada */}
-                        <div className="flex items-center">
+                        <div className="flex items-center space-x-3">
                             <Checkbox
                                 id="is_default"
                                 checked={data.is_default || false}
                                 onChange={handleDefaultChange}
+                                className="flex-shrink-0"
                             />
                             <InputLabel
                                 htmlFor="is_default"
                                 value="Establecer como dirección predeterminada"
-                                className="ml-2"
+                                className="text-sm sm:text-base cursor-pointer"
                             />
                         </div>
                     </div>
 
-                    {/* Columna derecha - Mapa */}
-                    <div className="h-full min-h-[500px]">
-                        {data.lat && data.lng ? (
-                            <div className="space-y-2">
-                                <MapDisplay
-                                    lat={data.lat}
-                                    lng={data.lng}
-                                    zoom={data.zoom || 4}
-                                    className="h-full w-full rounded-lg border border-gray-300 dark:border-gray-600"
-                                />
-                                <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
-                                    {data.neighbourhood &&
-                                        `${data.neighbourhood}, `}
-                                    {data.municipality &&
-                                        `${data.municipality}, `}
-                                    {data.state}
-                                </p>
+                    {/* Sección del mapa */}
+                    <div className="order-1 xl:order-2">
+                        <div className="sticky top-4">
+                            <div className="h-64 sm:h-80 lg:h-96 xl:h-[500px]">
+                                {data.lat && data.lng ? (
+                                    <div className="space-y-2 h-full">
+                                        <MapDisplay
+                                            lat={data.lat}
+                                            lng={data.lng}
+                                            zoom={data.zoom || 4}
+                                            className="h-full w-full rounded-lg border border-gray-300 dark:border-gray-600"
+                                        />
+                                        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center leading-relaxed">
+                                                {data.neighbourhood &&
+                                                    `${data.neighbourhood}, `}
+                                                {data.municipality &&
+                                                    `${data.municipality}, `}
+                                                {data.state}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
+                                        <div className="text-center max-w-xs">
+                                            <div className="mb-2">
+                                                <svg
+                                                    className="mx-auto h-12 w-12 text-gray-400"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                                    />
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                                                {data.country_code
+                                                    ? "Ingrese un código postal y haga clic en Validar"
+                                                    : "Seleccione un país para habilitar la validación"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        ) : (
-                            <div className="h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
-                                <p className="text-gray-500 dark:text-gray-400">
-                                    {data.country_code
-                                        ? "Ingrese un código postal y haga clic en Validar"
-                                        : "Seleccione un país para habilitar la validación"}
-                                </p>
-                            </div>
-                        )}
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex justify-end pt-4">
+                {/* Botón de envío - Responsivo */}
+                <div className="flex flex-col sm:flex-row justify-end pt-4 space-y-3 sm:space-y-0">
                     <button
                         type="submit"
                         disabled={!addressValidated}
-                        className={`px-6 py-2 rounded-md transition-colors ${
+                        className={`w-full sm:w-auto px-6 py-3 text-sm sm:text-base rounded-md transition-colors font-medium ${
                             addressValidated
-                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                ? "bg-blue-600 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-200"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-600"
                         }`}
                     >

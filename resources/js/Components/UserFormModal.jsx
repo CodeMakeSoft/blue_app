@@ -148,6 +148,19 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
         user ? setShowConfirmEdit(false) : setShowConfirmAdd(false);
     };
 
+    const filterRoles = (allRoles) => {
+    // Obtén el rol del usuario actual (ajusta según tu sistema de autenticación)
+    const currentUserRole = 'user'; // Esto debería venir de tu sistema de autenticación
+    
+    // Si el usuario actual no es admin/superadmin, filtrar esos roles
+    if (!["SuperAdmin"].includes(currentUserRole)) {
+        return allRoles.filter(
+            (role) => !["Admin", "SuperAdmin"].includes(role.name)
+        );
+    }
+    return allRoles;
+};
+
     if (!isOpen) return null;
 
     return (
@@ -204,22 +217,22 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                         )}
                     </div>
                     <div className="mb-4">
-                  <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                   <input
-                    type="checkbox"
-                    checked={!!formData.email_verified_at}
-                    onChange={(e) => {
-                    setFormData((prev) => ({
-                    ...prev,
-                    email_verified_at: e.target.checked
-                        ? new Date().toISOString()
-                        : null,
-                     }));
-                 }}
-                 />
-                   Email Verified
-                </label>
-                </div>
+                        <label className="flex items-center gap-2 text-sm font-medium mb-1">
+                            <input
+                                type="checkbox"
+                                checked={!!formData.email_verified_at}
+                                onChange={(e) => {
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        email_verified_at: e.target.checked
+                                            ? new Date().toISOString()
+                                            : null,
+                                    }));
+                                }}
+                            />
+                            Email Verified
+                        </label>
+                    </div>
 
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1 dark:text-gray-200">
@@ -282,94 +295,97 @@ export default function UserFormModal({ isOpen, closeModal, user, roles, users }
                                     ? "border-red-500"
                                     : "border-gray-300 dark:border-gray-600"
                             }`}
-                            required={!user&& !!formData.password}
-                            />
-                            {errors.password_confirmation && (
-                                <p className="text-red-500 text-xs mt-1">
-                                    {errors.password_confirmation}
-                                </p>
-                            )}
-                        </div>
+                            required={!user && !!formData.password}
+                        />
+                        {errors.password_confirmation && (
+                            <p className="text-red-500 text-xs mt-1">
+                                {errors.password_confirmation}
+                            </p>
+                        )}
+                    </div>
 
                     {/* Selector de Rol Único */}
                     {!isLastAdmin() ? (
-                    <div className="mb-6 relative" ref={dropdownRef}>
-                        <label className="block text-sm font-medium mb-2 dark:text-gray-200">
-                            Role *
-                        </label>
-                        <button
-                            type="button"
-                            onClick={() => setIsRolesOpen(!isRolesOpen)}
-                            className="w-full flex justify-between items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-left text-gray-700 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <span className="truncate">
-                                {formData.roles[0]
-                                    ? roles
-                                          .find(
-                                              (r) => r.id === formData.roles[0]
-                                          )
-                                          ?.name.replace("-", " ")
-                                    : "Select a role"}
-                            </span>
-                            <svg
-                                className={`h-5 w-5 text-gray-400 dark:text-gray-300 transition-transform duration-200 ${
-                                    isRolesOpen ? "transform rotate-180" : ""
-                                }`}
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
+                        <div className="mb-6 relative" ref={dropdownRef}>
+                            <label className="block text-sm font-medium mb-2 dark:text-gray-200">
+                                Role *
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => setIsRolesOpen(!isRolesOpen)}
+                                className="w-full flex justify-between items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-left text-gray-700 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        </button>
-
-                        {isRolesOpen && (
-                            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-md py-1 border border-gray-200 dark:border-gray-600 max-h-60 overflow-y-auto">
-                                <div
-                                    onClick={() => handleRoleSelect(null)}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-600 ${
-                                        formData.roles.length === 0
-                                            ? "bg-blue-50 dark:bg-gray-600"
+                                <span className="truncate">
+                                    {formData.roles[0]
+                                        ? roles
+                                              .find(
+                                                  (r) =>
+                                                      r.id === formData.roles[0]
+                                              )
+                                              ?.name.replace("-", " ")
+                                        : "Select a role"}
+                                </span>
+                                <svg
+                                    className={`h-5 w-5 text-gray-400 dark:text-gray-300 transition-transform duration-200 ${
+                                        isRolesOpen
+                                            ? "transform rotate-180"
                                             : ""
                                     }`}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
                                 >
-                                    No role
-                                </div>
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                            </button>
 
-                                {roles.map((role) => (
+                            {isRolesOpen && (
+                                <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-md py-1 border border-gray-200 dark:border-gray-600 max-h-60 overflow-y-auto">
                                     <div
-                                        key={role.id}
-                                        onClick={() =>
-                                            handleRoleSelect(role.id)
-                                        }
+                                        onClick={() => handleRoleSelect(null)}
                                         className={`px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-600 ${
-                                            formData.roles.includes(role.id)
+                                            formData.roles.length === 0
                                                 ? "bg-blue-50 dark:bg-gray-600"
                                                 : ""
                                         }`}
                                     >
-                                        {role.name.replace("-", " ")}
+                                        No role
                                     </div>
-                                ))}
-                            </div>
-                        )}
 
-                        {errors.roles && (
-                            <p className="text-red-500 text-xs mt-1">
-                                {errors.roles}
-                            </p>
-                        )}
-                    </div>
-                        ) : (
+                                    {filterRoles(roles).map((role) => (
+                                        <div
+                                            key={role.id}
+                                            onClick={() =>
+                                                handleRoleSelect(role.id)
+                                            }
+                                            className={`px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-600 ${
+                                                formData.roles.includes(role.id)
+                                                    ? "bg-blue-50 dark:bg-gray-600"
+                                                    : ""
+                                            }`}
+                                        >
+                                            {role.name.replace("-", " ")}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {errors.roles && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.roles}
+                                </p>
+                            )}
+                        </div>
+                    ) : (
                         <p className="text-sm text-red-600 mb-6">
                             You cannot change the role of the last Admin user.
                         </p>
                     )}
-                    
+
                     {/* Form Actions */}
                     <div className="flex justify-end gap-3 pt-4 border-t dark:border-gray-600">
                         <button

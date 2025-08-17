@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SellerController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -113,12 +114,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    //Vendedor
+    Route::middleware(['auth', 'no_roles'])->group(function () {
+        Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
+        Route::post('/seller/register', [SellerController::class, 'store'])->name('seller.store');
+    });
+
     // CRUD Direcciones
     Route::middleware(['auth'])->group(function () {
     Route::resource('address', ShippingAddressController::class);
     Route::post('address/{id}/default', [ShippingAddressController::class, 'setDefault'])->name('address.set-default');
     });
-     Route::get('/address', [ShippingAddressController::class, 'index'])->name('address.index');
+    Route::get('/address', [ShippingAddressController::class, 'index'])->name('address.index');
     Route::get('/address/create', [ShippingAddressController::class, 'create'])->name('address.create');
     Route::get('/address/{address}/edit', [ShippingAddressController::class, 'edit'])->name('address.edit');
     Route::post('/address', [ShippingAddressController::class, 'store'])->name('address.store');
@@ -146,9 +153,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Recursos Admin
-    Route::resource('admin/users', UserController::class);
+    Route::middleware(['auth', 'single.superadmin'])->group(function () {
+        Route::resource('admin/users', UserController::class);
+    });
+    
     Route::resource('admin/roles', RoleController::class);
     Route::resource('admin/permissions', PermissionController::class);
+
 });
 
 // API interna para carrito

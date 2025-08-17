@@ -110,6 +110,15 @@ class DatabaseSeeder extends Seeder
             return $brand;
         });
 
+        $sellers = \App\Models\User::role('Seller')->get();
+    
+        // Si no hay vendedores, crear algunos
+        if ($sellers->isEmpty()) {
+            $sellers = \App\Models\User::factory(3)->create();
+            $sellerRole = \Spatie\Permission\Models\Role::findByName('Seller');
+            $sellers->each->assignRole($sellerRole);
+        }
+
         // Crear productos con imágenes
         foreach ($this->productNames as $name) {
             $product = Product::create([

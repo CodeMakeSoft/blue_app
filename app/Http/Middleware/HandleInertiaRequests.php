@@ -16,12 +16,18 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
-                //'permissions' es para que solo se muestre el dropdown.link admin en adminLayout
-                'permissions' => $request->user()?->getAllPermissions()->pluck('name')->toArray(),
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->getRoleNames()->toArray(), // 👈 Aquí agregamos los roles
+                ] : null,
+                'permissions' => $user?->getAllPermissions()->pluck('name')->toArray(), // 👈 Ya lo tenías
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
