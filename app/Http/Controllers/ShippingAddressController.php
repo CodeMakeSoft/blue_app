@@ -49,12 +49,16 @@ class ShippingAddressController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+        'phone' => preg_replace('/\D/', '', (string) $request->input('phone', '')),
+        ]);
+
         $validated = $request->validate([
             'alias' => 'required|string|max:255',
             'street' => 'required|string|max:255',
             'ext_number' => 'required|string|max:20',
             'int_number' => 'nullable|string|max:20',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|digits:10',
             'references' => 'nullable|string',
             'is_default' => 'sometimes|boolean',
             'country_code' => 'required|string|max:2',
@@ -66,7 +70,12 @@ class ShippingAddressController extends Controller
             'neighbourhood' => 'required|string|max:255',
             'lat' => 'nullable|numeric',
             'lng' => 'nullable|numeric',
-        ]);
+        ],
+        [
+            'phone.required' => 'El teléfono es obligatorio.',
+            'phone.digits'   => 'El teléfono debe tener exactamente 10 dígitos. Por el momento solo se permiten números de América del Norte.',
+        ]
+        );
 
         DB::transaction(function () use ($validated) {
             $country = Country::firstOrCreate(
@@ -166,12 +175,16 @@ class ShippingAddressController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'phone' => preg_replace('/\D/', '', (string) $request->input('phone', '')),
+        ]);
+
         $validated = $request->validate([
             'alias' => 'required|string|max:255',
             'street' => 'required|string|max:255',
             'ext_number' => 'required|string|max:20',
             'int_number' => 'nullable|string|max:20',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|digits:10',
             'references' => 'nullable|string',
             'is_default' => 'sometimes|boolean',
             // Campos geográficos
@@ -184,7 +197,12 @@ class ShippingAddressController extends Controller
             'neighbourhood' => 'required|string|max:255',
             'lat' => 'nullable|numeric',
             'lng' => 'nullable|numeric',
-        ]);
+        ],
+        [
+            'phone.required' => 'El teléfono es obligatorio.',
+            'phone.digits'   => 'El teléfono debe tener exactamente 10 dígitos. Por el momento solo se permiten números de América del Norte.',
+        ]
+        );
 
         $address = ShippingAddress::where('user_id', Auth::id())->findOrFail($id);
 
