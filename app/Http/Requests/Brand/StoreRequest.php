@@ -24,6 +24,7 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:50', 'unique:categories,name'],
+            'name' => ['required', 'string', 'max:50', 'unique:brands,name'],
             'description' => ['required', 'string', 'max:255'],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];

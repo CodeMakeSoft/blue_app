@@ -32,29 +32,37 @@ class ProductController extends Controller implements HasMiddleware
     /**
      * Display a listing of the products.
      */
-    public function index(Request $request)
-    {
-        $user = $request->user();
-        
-        // Construir la consulta base
-        $query = Product::with(['images', 'category', 'brand']);
-        
-        // Si el usuario es vendedor (y no admin), filtrar solo sus productos
-        if ($user->hasRole('Seller') && !$user->hasRole('Admin')) {
-            $query->where('user_id', $user->id);
-        }
-        
-        $products = $query->get();
-        
-        return Inertia::render('Products/Index', [
-            'products' => $products,
-            'can' => [
-                'product_edit' => $user->can('product-edit'),
-                'product_delete' => $user->can('product-delete'),
-                'product_create' => $user->can('product-create'),
-            ],
-        ]);
+public function index(Request $request): Response
+{
+    $user = $request->user();
+    $search = $request->input('search');
+
+    // Construir la consulta base
+    $query = Product::with(['images', 'category', 'brand']);
+
+    // Si el usuario es vendedor (y no admin), filtrar solo sus productos
+    if ($user->hasRole('Seller') && !$user->hasRole('Admin')) {
+        $query->where('user_id', $user->id);
     }
+
+    // Aplicar búsqueda si existe
+    if ($search) {
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    return Inertia::render('Products/Index', [
+        'products' => $query->get(),
+        'filters' => $request->only(['search']),
+        'can' => [
+            'product_edit' => $user->can('product-edit'),
+            'product_delete' => $user->can('product-delete'),
+            'product_create' => $user->can('product-create'),
+        ],
+    ]);
+}
 
     /**
      * Show the form for creating a new product.

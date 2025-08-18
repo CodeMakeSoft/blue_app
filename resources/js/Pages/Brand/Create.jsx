@@ -1,6 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
-import Form from "@/Components/Category/Form";
+import Form from "@/Components/category/Form";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Breadcrumb from "@/Components/Breadcrumb";
@@ -70,7 +70,7 @@ export default function Create({ auth }) {
                 >
                     <div className="w-[65%] ml-auto">
                         <div className="flex justify-end">
-                            <PrimaryButton 
+                            <PrimaryButton
                                 type="submit"
                                 className="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600"
                             >

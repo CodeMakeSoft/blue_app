@@ -33,6 +33,7 @@ Route::get('/test-email', function () {
         ->send(new \App\Mail\TestEmail('¡Hola! Este es un correo de prueba desde Laravel con Gmail.'));
     return 'Correo enviado ✅ Revisa tu bandeja.';
 });
+use App\Http\Middleware\NoCacheMiddleware;
 
 
 /*
@@ -127,26 +128,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('admin/permissions', PermissionController::class);
 
     // Categorías
-    Route::get('categories', [CategoryController::class, 'index'])->name('category.index');
-    Route::get('categories/create', [CategoryController::class, 'create'])->name('category.create');
-    Route::post('/categories', [CategoryController::class, 'store'])->name('category.store');
-    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('category.edit');
-    Route::post('/categories/{category}', [CategoryController::class, 'update'])->name('category.update');
-    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
-    Route::get('/categories/catalog', [CategoryController::class, 'catalog'])->name('category.catalog');
-    Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('category.show');
-    Route::get('/categories/{category}/products', [CategoryController::class, 'products'])->name('categories.products');
-
+    Route::middleware([NoCacheMiddleware::class])->group(function () {
+        Route::get('categories', [CategoryController::class, 'index'])->name('category.index');
+        Route::get('categories/create', [CategoryController::class, 'create'])->name('category.create');
+        Route::post('/categories', [CategoryController::class, 'store'])->name('category.store');
+        Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('category.edit');
+        Route::post('/categories/{category}', [CategoryController::class, 'update'])->name('category.update');
+        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
+        Route::get('/categories/catalog', [CategoryController::class, 'catalog'])->name('category.catalog');
+        Route::
+        get('/categories/{category}', [CategoryController::class, 'show'])->name('category.show');
+        Route::get('/categories/{category}/products', [CategoryController::class, 'products'])->name('categories.products');
+    });
+    
     // Marcas
-    Route::get('brands', [BrandController::class, 'index'])->name('brand.index');
-    Route::get('brands/create', [BrandController::class, 'create'])->name('brand.create');
-    Route::post('/brands', [BrandController::class, 'store'])->name('brand.store');
-    Route::get('/brands/{brand}/edit', [BrandController::class, 'edit'])->name('brand.edit');
-    Route::post('/brands/{brand}', [BrandController::class, 'update'])->name('brand.update');
-    Route::delete('brands/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
-    Route::get('/brands/catalog', [BrandController::class, 'catalog'])->name('brand.catalog');
-    Route::get('/brands/{brand}', [BrandController::class, 'show'])->name('brand.show');
-    Route::get('/brands/{brand}/products', [BrandController::class, 'products'])->name('brands.products');
+    Route::middleware([NoCacheMiddleware::class])->group(function () {
+        Route::get('brands', [BrandController::class, 'index'])->name('brand.index');
+        Route::get('brands/create', [BrandController::class, 'create'])->name('brand.create');
+        Route::post('/brands', [BrandController::class, 'store'])->name('brand.store');
+        Route::get('/brands/{brand}/edit', [BrandController::class, 'edit'])->name('brand.edit');
+        Route::post('/brands/{brand}', [BrandController::class, 'update'])->name('brand.update');
+        Route::delete('brands/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
+        Route::get('/brands/catalog', [BrandController::class, 'catalog'])->name('brand.catalog');
+        Route::get('/brands/{brand}', [BrandController::class, 'show'])->name('brand.show');
+        Route::get('/brands/{brand}/products', [BrandController::class, 'products'])->name('brands.products');
+    });
 
     // Productos
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');

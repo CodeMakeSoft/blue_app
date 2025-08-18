@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import React from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import TextInput from "@/Components/TextInput";
 import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { Link } from "@inertiajs/react";
-import React from "react";
 
 const Form = ({
     data,
@@ -13,106 +13,164 @@ const Form = ({
     submit,
     isEdit = false,
     existingNames = [],
+    parentCategories = [],
     children,
+    isSubmitting = false,
 }) => {
-    const [successMessage, setSuccessMessage] = useState("");
+    // Estados del componente
+    const [fileInputKey, setFileInputKey] = useState(Date.now());
     const [imagePreview, setImagePreview] = useState(
         isEdit && data.existing_image
             ? `/storage/${data.existing_image.url}`
             : null
     );
     const [formErrors, setFormErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [nameTouched, setNameTouched] = useState(false);
+    const [descriptionTouched, setDescriptionTouched] = useState(false);
     const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Cargar vista previa al editar
-    useEffect(() => {
-        if (isEdit && data.existing_image) {
-            const preview = `/storage/${data.existing_image.url}`;
-            setImagePreview(preview);
-        }
-    }, [isEdit, data.existing_image]);
+    // Preparar categorías para mostrar jerarquía
+    const formattedCategories = useMemo(() => {
+        const formatCategory = (category, depth = 0) => ({
+            ...category,
+            name: `${"— ".repeat(depth)}${category.name}`,
+            depth,
+        });
 
+        const flattenCategories = (categories, depth = 0) => {
+            return categories.reduce((acc, category) => {
+                acc.push(formatCategory(category, depth));
+                if (category.children && category.children.length > 0) {
+                    acc.push(
+                        ...flattenCategories(category.children, depth + 1)
+                    );
+                }
+                return acc;
+            }, []);
+        };
+
+        return flattenCategories(parentCategories);
+    }, [parentCategories]);
+
+    // Manejo vista previa imagen
+    useEffect(() => {
+        if (data.image && typeof data.image === "object") {
+            const objectUrl = URL.createObjectURL(data.image);
+            setImagePreview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl);
+        } else if (isEdit && data.existing_image && !data.deleted_image) {
+            setImagePreview(`/storage/${data.existing_image.url}`);
+        } else {
+            setImagePreview(null);
+        }
+    }, [data.image, data.existing_image, data.deleted_image, isEdit]);
+
+    // Cerrar menú editar imagen si se clickea afuera
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (isEditMenuOpen && !event.target.closest(".relative")) {
                 setIsEditMenuOpen(false);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
-        return () => {
+        return () =>
             document.removeEventListener("mousedown", handleClickOutside);
-        };
     }, [isEditMenuOpen]);
 
-    // Validación en tiempo real para el nombre
-    const validateName = (name) => {
-        if (!name) {
-            return "El nombre es requerido";
+    // Validación por campo
+    const validateField = (fieldName, value) => {
+        switch (fieldName) {
+            case "name":
+                if (!value || value.trim() === "")
+                    return "El nombre es requerido";
+                if (
+                    existingNames.includes(value.trim().toLowerCase()) &&
+                    (!isEdit ||
+                        value.trim().toLowerCase() !==
+                            (data.originalName || "").toLowerCase())
+                ) {
+                    return "Ya existe una categoría con este nombre";
+                }
+                return null;
+
+            case "description":
+                if (!value || value.trim() === "")
+                    return "La descripción es requerida";
+                return null;
+
+            default:
+                return null;
         }
-        if (existingNames.includes(name.trim().toLowerCase())) {
-            return "Ya existe una categoría con este nombre";
-        }
-        return null;
     };
 
-    const handleNameChange = (e) => {
-        const value = e.target.value;
-        setData("name", value);
-        setNameTouched(true);
+    // Maneja cambios para todos inputs (nombre, descripción, etc)
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-        const error = validateName(value);
+        setData(name, value);
+
+        // Validar en tiempo real
+        const error = validateField(name, value);
         if (error) {
-            setFormErrors({ ...formErrors, name: error });
+            setFormErrors((prev) => ({ ...prev, [name]: error }));
         } else {
-            const newErrors = { ...formErrors };
-            delete newErrors.name;
-            setFormErrors(newErrors);
+            setFormErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
         }
+
+        // Marcar campos como tocados para mostrar error
+        if (name === "name") setNameTouched(true);
+        if (name === "description") setDescriptionTouched(true);
     };
 
     const handleImageChange = (file) => {
-        if (!file.type.match("image.*")) {
+        if (!file || !file.type.match("image.*")) {
             setFormErrors({
                 ...formErrors,
-                image: "El archivo debe ser una imagen",
+                image: "El archivo debe ser una imagen válida",
             });
             return;
         }
 
-        setData("image", file);
-        setData("deleted_image", false);
-        const preview = URL.createObjectURL(file);
-        setImagePreview(preview);
+        setData((prev) => ({
+            ...prev,
+            image: file,
+            deleted_image: false,
+            existing_image: null,
+        }));
 
-        const newErrors = { ...formErrors };
-        delete newErrors.image;
-        setFormErrors(newErrors);
+        setFileInputKey(Date.now());
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setIsEditMenuOpen(false);
+
+        setFormErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.image;
+            return newErrors;
+        });
     };
 
     const removeImage = () => {
-        if (isEdit && data.existing_image) {
-            setData("deleted_image", true);
-        }
-        setData("image", null);
+        setData((prev) => ({
+            ...prev,
+            image: null,
+            deleted_image: true,
+            existing_image: null,
+        }));
         setImagePreview(null);
+        setIsEditMenuOpen(false);
     };
 
     const handleChangeImage = () => {
-        // 1. Eliminar la imagen actual
         removeImage();
-
-        // 2. Abrir el selector de archivos después de un pequeño retraso
         setTimeout(() => {
             fileInputRef.current?.click();
         }, 10);
-
-        // 3. Cerrar el menú
-        setIsEditMenuOpen(false);
     };
 
     const handleDragOver = (e) => {
@@ -131,25 +189,100 @@ const Form = ({
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(false);
-
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        if (e.dataTransfer.files?.[0]) {
             handleImageChange(e.dataTransfer.files[0]);
         }
     };
 
+    // Manejar el envío del formulario - Versión mejorada
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setNameTouched(true);
+        setDescriptionTouched(true);
+
+        const errorsFound = {};
+        ["name", "description"].forEach((field) => {
+            const error = validateField(field, data[field]);
+            if (error) errorsFound[field] = error;
+        });
+
+        setFormErrors(errorsFound);
+
+        if (Object.keys(errorsFound).length === 0) {
+            // Crear FormData para enviar archivos
+            const formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("description", data.description);
+
+            if (data.parent_id !== null) {
+                formData.append("parent_id", data.parent_id);
+            }
+
+            // Para edición, usamos el método spoofing de Laravel
+            if (isEdit) {
+                formData.append("_method", "PUT"); // Esto hará que Laravel lo trate como PUT
+            }
+
+            if (data.deleted_image) {
+                formData.append("deleted_image", "true");
+            }
+
+            if (data.image) {
+                formData.append("image", data.image);
+            }
+
+            // Llamar a la función submit con el FormData
+            submit(e);
+        }
+    };
+
     return (
-        <form onSubmit={submit} className="space-y-6">
-            {successMessage && (
-                <div className="p-4 mb-6 text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-900 border border-green-400 rounded-md">
-                    {successMessage}
-                </div>
-            )}
-    
-            {/* Contenedores alineados horizontalmente */}
+        <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6">
-                {/* Contenedor de datos (65%) */}
+                {/* Sección de datos de la categoría */}
                 <div className="w-full md:w-[65%] bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
-                    {/* Campo Nombre */}
+                    {/* Selector de categoría padre */}
+                    <div className="mb-6">
+                        <InputLabel
+                            htmlFor="parent_id"
+                            value="Categoría Padre"
+                            className="text-gray-700 dark:text-gray-200 font-semibold mb-2"
+                        />
+                        <select
+                            id="parent_id"
+                            name="parent_id"
+                            value={data.parent_id || ""}
+                            onChange={(e) =>
+                                setData(
+                                    "parent_id",
+                                    e.target.value
+                                        ? parseInt(e.target.value)
+                                        : null
+                                )
+                            }
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white"
+                            disabled={isSubmitting}
+                        >
+                            <option value="">
+                                Sin categoría padre (categoría raíz)
+                            </option>
+                            {formattedCategories.map((category) => (
+                                <option
+                                    key={category.id}
+                                    value={category.id}
+                                    disabled={isEdit && category.id === data.id}
+                                >
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                        <InputError
+                            message={errors.parent_id}
+                            className="mt-2"
+                        />
+                    </div>
+
+                    {/* Campo de nombre */}
                     <div className="mb-6">
                         <InputLabel
                             htmlFor="name"
@@ -162,31 +295,22 @@ const Form = ({
                             name="name"
                             value={data.name || ""}
                             className={`w-full p-3 border ${
-                                nameTouched && formErrors.name
+                                (nameTouched && formErrors.name) || errors.name
                                     ? "border-red-500"
                                     : "border-gray-300 dark:border-gray-600"
                             } rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
-                            onChange={handleNameChange}
+                            onChange={handleChange}
                             onBlur={() => setNameTouched(true)}
                             disabled={isSubmitting}
-                            placeholder="e.g. Deportes, Electrodomésticos"
+                            placeholder="Ej: Electrónica, Ropa, Hogar"
                         />
-                        {nameTouched && formErrors.name ? (
-                            <InputError
-                                message={formErrors.name}
-                                className="mt-2 text-red-600 dark:text-red-400 text-sm"
-                            />
-                        ) : (
-                            errors.name && (
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2 text-red-600 dark:text-red-400 text-sm"
-                                />
-                            )
-                        )}
+                        <InputError
+                            message={formErrors.name || errors.name}
+                            className="mt-2"
+                        />
                     </div>
-    
-                    {/* Campo Descripción */}
+
+                    {/* Campo de descripción */}
                     <div>
                         <InputLabel
                             htmlFor="description"
@@ -197,29 +321,33 @@ const Form = ({
                             id="description"
                             name="description"
                             value={data.description || ""}
-                            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 h-40 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                            onChange={(e) =>
-                                setData("description", e.target.value)
-                            }
+                            className={`w-full mt-1 p-2 border ${
+                                (descriptionTouched &&
+                                    formErrors.description) ||
+                                errors.description
+                                    ? "border-red-500"
+                                    : "border-gray-300 dark:border-gray-600"
+                            } rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-40 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+                            onChange={handleChange}
+                            onBlur={() => setDescriptionTouched(true)}
+                            disabled={isSubmitting}
                         />
-                        {errors.description && (
-                            <InputError
-                                message={errors.description}
-                                className="mt-2 text-red-600 dark:text-red-400 text-sm"
-                            />
-                        )}
+                        <InputError
+                            message={
+                                formErrors.description || errors.description
+                            }
+                            className="mt-2"
+                        />
                     </div>
                 </div>
-    
-                {/* Contenedor de imagen (35%) */}
+
+                {/* Sección de imagen */}
                 <div className="w-full md:w-[35%] bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
-                    {/* Encabezado con título y botón Editar */}
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                             Imagen
                         </h2>
-    
-                        {/* Menú desplegable Editar */}
+
                         {imagePreview && (
                             <div className="relative">
                                 <button
@@ -228,10 +356,11 @@ const Form = ({
                                     onClick={() =>
                                         setIsEditMenuOpen(!isEditMenuOpen)
                                     }
+                                    disabled={isSubmitting}
                                 >
                                     Editar
                                 </button>
-    
+
                                 {isEditMenuOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-10 border dark:border-gray-600">
                                         <button
@@ -258,8 +387,7 @@ const Form = ({
                             </div>
                         )}
                     </div>
-    
-                    {/* Contenedor de imagen */}
+
                     <div
                         className={`border-2 rounded-lg flex flex-col items-center justify-center p-4 h-64 ${
                             isDragging
@@ -276,11 +404,10 @@ const Form = ({
                             <div className="relative w-full h-full">
                                 <img
                                     src={imagePreview}
-                                    alt="Vista previa de la categoría"
+                                    alt="Vista previa"
                                     className="w-full h-full object-contain"
                                     style={{
                                         maxHeight: "400px",
-                                        maxWidth: "100%",
                                         objectFit: "contain",
                                     }}
                                 />
@@ -298,46 +425,46 @@ const Form = ({
                                     Añadir imagen
                                 </label>
                                 <input
+                                    key={fileInputKey}
                                     id="image-upload"
                                     ref={fileInputRef}
                                     type="file"
                                     name="image"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={(e) =>
-                                        e.target.files[0] &&
-                                        handleImageChange(e.target.files[0])
-                                    }
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) handleImageChange(file);
+                                    }}
                                     disabled={isSubmitting}
                                 />
                                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                                     {isDragging
                                         ? "Suelta la imagen aquí"
-                                        : "Arrastrar una imagen aquí"}
+                                        : "Arrastra una imagen aquí"}
                                 </p>
-                                {formErrors.image && (
-                                    <InputError
-                                        message={formErrors.image}
-                                        className="mt-2 text-red-600 dark:text-red-400 text-sm"
-                                    />
-                                )}
+                                <InputError
+                                    message={formErrors.image}
+                                    className="mt-2"
+                                />
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-    
-            {/* Barra inferior con botones */}
+
+            {/* Acciones del formulario */}
             <div className="flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4 mt-6">
                 {React.cloneElement(children, {
-                    disabled: isSubmitting || Object.keys(formErrors).length > 0,
+                    disabled:
+                        isSubmitting || Object.keys(formErrors).length > 0,
                     className: `${children.props.className || ""} ${
                         isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                     }`,
                 })}
             </div>
         </form>
-    );    
+    );
 };
 
 export default Form;
