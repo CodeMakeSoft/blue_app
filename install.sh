@@ -34,7 +34,7 @@ if ! response "$answer"; then
 else
     echo -e  "${YELLOW}Instalando proyecto...${NC}"
     mkdir P_UPPStore && cd P_UPPStore && \
-    git clone https://github.com/CodeMakeSoft/blue_app.git && \
+    git clone https://github.com/E33-a/blue_app-develop-1.git && \
     cd blue_app && \
     git checkout main && \
     git branch --set-upstream-to=origin/main && \
