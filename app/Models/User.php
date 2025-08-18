@@ -2,37 +2,33 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail; // Necesario para verificación
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Address;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Favorite;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Campos que pueden asignarse masivamente.
      */
     protected $fillable = [
         'name',
         'email',
         'password',
         'phone',
-        'email_verified_at', 
+        //  No incluyas email_verified_at aquí, Laravel lo maneja.
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Campos ocultos en serializaciones.
      */
     protected $hidden = [
         'password',
@@ -40,40 +36,40 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Conversión de tipos.
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
+    ];
+
+    /**
+     * Relaciones
+     */
+
+    // Relación con direcciones de envío
+    public function shippingAddresses()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(ShippingAddress::class);
     }
 
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
-    }
-
-
+    // Relación con carrito
     public function cart()
     {
-        return $this->hasOne(Cart::class); 
+        return $this->hasOne(Cart::class);
     }
 
+    // Relación con pedidos
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
-    public function locations()
+
+    // Relación con productos
+    public function products()
     {
-        return $this->hasMany(Location::class);
+        return $this->hasMany(Product::class);
     }
 
-    public function favorites()
-    {
-        return $this->hasMany(Favorite::class);
-    }
+    
 }

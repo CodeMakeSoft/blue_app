@@ -1,10 +1,11 @@
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage, useForm } from '@inertiajs/react';
 import { useState, lazy, Suspense, useEffect, useTransition } from 'react';
-import { ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid';
+import { ShoppingCartIcon, UserIcon, BuildingStorefrontIcon } from '@heroicons/react/24/solid';
 import { Sidebar } from "@/Components/Sidebar";
 import { Toaster } from "@/Components/ui/toaster";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStore } from "@fortawesome/free-solid-svg-icons";
 import {
     faHouse,
     faBoxOpen,
@@ -102,7 +103,12 @@ export default function AuthenticatedLayout({ header, children }) {
         ? 'purchases.index'
         : '';
 
-    const userCanAccessAdminPanel = auth.permissions.includes("can-access-admin-panel");
+    const userCanAccessAdminPanel = (auth?.permissions || []).includes("can-access-admin-panel");
+    
+    // Safely check roles
+    const userHasNoRoles = () => {
+        return !user?.roles || user.roles.length === 0;
+    };
 
     // Menú items para Sidebar
     const menuItems = [
@@ -163,19 +169,36 @@ export default function AuthenticatedLayout({ header, children }) {
         },
         ...(userCanAccessAdminPanel
             ? [
-                {
-                    href: route("admin.panel"),
-                    icon: (
-                        <FontAwesomeIcon
-                            icon={faUserShield}
-                            className="h-5 w-5 text-gray-800 dark:text-gray-200"
-                        />
-                    ),
-                    text: "Admin",
-                    active: route().current("admin.panel"),
-                },
-            ]
-        : []),
+                  {
+                      href: route("admin.panel"),
+                      icon: (
+                          <FontAwesomeIcon
+                              icon={faUserShield}
+                              className="h-5 w-5 text-gray-800 dark:text-gray-200"
+                          />
+                      ),
+                      text: "Admin",
+                      active: route().current("admin.panel"),
+                  },
+              ]
+            : []),
+        ...(userHasNoRoles()
+            ? [
+                  {
+                      href: route("seller.register"),
+                      icon: (
+                          <BuildingStorefrontIcon
+                              icon={faStore}
+                              className="h-5 w-5 text-gray-800 dark:text-gray-200"
+                          />
+                      ),
+                      text: "Vuélvete Vendedor",
+                      active: route().current("seller.register"),
+                      className:
+                          "bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 mx-2 transition-colors",
+                  },
+              ]
+            : []),
     ];
     
 

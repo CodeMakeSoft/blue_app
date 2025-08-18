@@ -3,17 +3,34 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Events\DiscoverEvents;
 
 class City extends Model
 {
-    public function districts()
-    {
+    protected $fillable = [
+        'name', 
+        'municipality_id', 
+    ];
+
+    public function municipality() {
+        return $this->belongsTo(Municipality::class);
+    }
+
+    public function districts() {
         return $this->hasMany(District::class);
     }
 
-    public function municipality()
+    public function getCountryName()
     {
-        return $this->belongsTo(Municipality::class);
+        return optional($this->municipality)->getCountryName();
+    }
+
+    public function getStateName()
+    {
+        return optional($this->municipality)->getStateName();
+    }
+
+    public function getMunicipalityName()
+    {
+        return optional($this->municipality)->name;
     }
 }

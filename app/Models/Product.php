@@ -20,6 +20,7 @@ class Product extends Model
     'availability',
     'category_id',
     'brand_id',
+    'user_id', 
     'status',
 ];
 
@@ -35,6 +36,11 @@ class Product extends Model
     public function images()
     {
     return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     public function cart()

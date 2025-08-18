@@ -14,28 +14,47 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $adminPermissions = Permission::all(); // Admin tiene todos los permisos
+        $SuperAdminPermissions = Permission::all(); // Admin tiene todos los permisos
 
-        $managerPermissions = [
+        $adminPermissions = [
             'user-view',
+            'user-create',
             'user-edit',
-            'permission-view',
-            'permission-edit',
-            'role-view',
-            'role-edit',
-            'category-view',
-            'category-edit',
+            'user-delete',
+            "category-view",
+            "category-create",
+            "category-edit",
+            "category-delete",
             'brand-view',
+            'brand-create',    
             'brand-edit',
+            'brand-delete',
             'product-view',
+            'product-create',  
             'product-edit',
+            'product-delete',
+            'can-access-admin-panel',
+            'can-manage-roles&permissions',
+        ];
+
+        $sellerPermissions = [
+            'product-view',
+            'product-create',  
+            'product-edit',
+            'product-delete',
+            'brand-view',
+            'category-view',
             'can-access-admin-panel',
         ];
+        
         // Crear roles y asignar permisos
+        $SuperAdmin = Role::firstOrCreate(['name' => 'SuperAdmin']);
+        $SuperAdmin->syncPermissions($SuperAdminPermissions);
+        
         $admin = Role::firstOrCreate(['name' => 'Admin']);
         $admin->syncPermissions($adminPermissions);
 
-        $manager = Role::firstOrCreate(['name' => 'Manager']);
-        $manager->syncPermissions($managerPermissions);
+        $seller = Role::firstOrCreate(['name' => 'Seller']);
+        $seller->syncPermissions($sellerPermissions);
     }
 }

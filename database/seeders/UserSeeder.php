@@ -7,9 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
-use Database\Factories\CartFactory;
-use App\Models\Product;
-use App\Models\Image;
+use App\Singletons\SuperAdmin;
 
 class UserSeeder extends Seeder
 {
@@ -18,21 +16,31 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'], // Evita duplicados
-            [
-                'name' => 'Admin',
-                'password' => Hash::make('password'), // Contraseña por defecto (cámbiala en producción)
+        $superAdminRole = Role::firstOrCreate(['name' => 'superAdmin']); // Nota: minúscula consistente
+        
+        $superAdminRole->users()->detach();
+
+        $superAdminUser = User::firstOrCreate(
+            ['email' => 'superadmin@example.com'], // Condición de búsqueda
+            [ // Datos para crear si no existe
+                'name' => 'SuperAdmin',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
             ]
         );
 
+        SuperAdmin::getInstance()->assignTo($superAdminUser);
 
-        // Asignar rol 'Admin' (usando el nombre exacto del rol creado en RoleSeeder)
-        $adminRole = Role::where('name', 'Admin')->first();
-        $admin->assignRole($adminRole);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $admin->assignRole('admin'); // Nombre de rol en minúscula
 
-        $users = User::factory(20)->create(); // Crear 10 usuarios aleatorios
-        
-      
+        User::factory(20)->create();
     }
 }

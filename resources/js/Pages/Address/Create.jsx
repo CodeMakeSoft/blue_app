@@ -8,29 +8,34 @@ import { Head, useForm, router } from "@inertiajs/react";
 export default function Create({ auth, countries, districts }) {
     const { data, setData, post, processing, errors } = useForm({
         alias: "",
-        street: "",
-        ext_number: "",
-        int_number: "",
+        country_code: "",
+        country: "",
         postal_code: "",
-        district_id: "",
         state: "",
         municipality: "",
         city: "",
         district: "",
-        country_id: "",
+        neighbourhood: "",
+        street: "",
+        ext_number: "",
+        int_number: "",
         phone: "",
-        delivery_instructions: "",
-        districts: [],
+        references: "",
+        is_default: false,
+        lat: null,
+        lng: null,
+        zoom: null,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log("Datos a enviar:", data);
         post(route("address.store"), {
             onSuccess: () => {
-                toast.success("Dirección creada");
+                toast.success("Dirección creada correctamente");
                 router.visit(route("address.index"));
             },
-            onError: () => toast.error("Error al crear"),
+            onError: () => toast.error("Error al crear la dirección"),
         });
     };
 

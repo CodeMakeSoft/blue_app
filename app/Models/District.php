@@ -6,13 +6,36 @@ use Illuminate\Database\Eloquent\Model;
 
 class District extends Model
 {
-    public function locations()
-    {
-        return $this->hasMany(Location::class);
+    protected $fillable = [
+        'postal_code',
+        'neighbourhood', 
+        'city_id',
+    ];
+    public function city() {
+        return $this->belongsTo(City::class);
     }
 
-    public function city()
+    public function shippingAddresses() {
+        return $this->hasMany(ShippingAddress::class);
+    }
+
+    public function getCountryName()
     {
-        return $this->belongsTo(City::class);
+        return optional($this->city)->getCountryName();
+    }
+
+    public function getStateName()
+    {
+        return optional($this->city)->getStateName();
+    }
+
+    public function getMunicipalityName()
+    {
+        return optional($this->city)->getMunicipalityName();
+    }
+
+    public function getCityName()
+    {
+        return optional($this->city)->name;
     }
 }

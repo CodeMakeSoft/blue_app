@@ -1,25 +1,39 @@
 <?php
 
+use Inertia\Inertia;
+use App\Mail\TestEmail;
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
-use Inertia\Inertia;
-
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AddressController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SellerController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\LocationController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\ReturnController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ShippingAddressController;
+use App\Http\Controllers\Admin\StatisticsController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+Route::get('/test-email', function () {
+    Mail::to('tu_correo_de_destino@gmail.com')
+        ->send(new \App\Mail\TestEmail('¡Hola! Este es un correo de prueba desde Laravel con Gmail.'));
+    return 'Correo enviado ✅ Revisa tu bandeja.';
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -27,28 +41,71 @@ use App\Http\Controllers\ReturnController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// ✅ Deja una sola ruta raíz (elige la que uses). Mantengo la de HomeController.
+Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+
+// Si quieres la pantalla de Inertia "Welcome" en lugar de HomeController, descomenta esto y elimina la anterior:
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
+
+/*
+|--------------------------------------------------------------------------
+| Verificación de Email
+|--------------------------------------------------------------------------
+*/
+// Vista que indica "verifica tu correo"
+Route::get('/email/verify', function () {
+    // Blade: return view('auth.verify-email');
+    // Inertia: return inertia('Auth/VerifyEmail');
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Link firmado que confirma el correo
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); // setea email_verified_at
+    return redirect()->route('dashboard'); // o donde quieras
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Reenvío del correo de verificación
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Enlace de verificación enviado.');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 /*
 |--------------------------------------------------------------------------
 | Rutas autenticadas y verificadas
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Estadísticas administrativas
+    Route::prefix('admin/statistics')->name('admin.statistics.')->group(function () {
+        Route::get('/', [StatisticsController::class, 'index'])->name('index');
+        Route::get('/sales-data', [StatisticsController::class, 'salesData'])->name('salesData');
+        Route::get('/top-products', [StatisticsController::class, 'topProducts'])->name('topProducts');
+        Route::get('/sales-by-brand', [StatisticsController::class, 'salesByBrand'])->name('salesByBrand');
+        Route::get('/export-csv', [StatisticsController::class, 'exportCSV'])->name('exportCSV');
+        Route::get('/export-pdf', [StatisticsController::class, 'exportPdf'])->name('exportPdf'); // ⬅️ movido aquí
+
+        // 🔍 Autocompletado y búsqueda
+        Route::get('/products/search', [StatisticsController::class, 'searchProducts'])->name('products.search');
+        Route::get('/autocomplete', [StatisticsController::class, 'autocomplete'])->name('autocomplete');
+        Route::get('/brands/search', [StatisticsController::class, 'searchBrands'])->name('brands.search');
+        Route::get('/categories/search', [StatisticsController::class, 'searchCategories'])->name('categories.search');
+    });
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Cuenta
-    Route::get('/account', fn() => Inertia::render('Account'))->name('account');
+    Route::get('/account', fn () => Inertia::render('Account'))->name('account');
 
     // Admin Panel
     Route::get('/admin', fn () => Inertia::render('Admin/AdminPanel', [
@@ -59,6 +116,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/address', fn () => Inertia::render('Address/AddressForm', [
         'activeRoute' => request()->route()->getName(),
     ]));
+    
+    // Recursos Admin
+    Route::resource('admin/users', UserController::class);
+    Route::middleware(['auth', 'single.superadmin'])->group(function () {
+        Route::resource('admin/users', UserController::class);
+    });
+    
+    Route::resource('admin/roles', RoleController::class);
+    Route::resource('admin/permissions', PermissionController::class);
 
     // Categorías
     Route::get('categories', [CategoryController::class, 'index'])->name('category.index');
@@ -105,13 +171,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    //Vendedor
+    Route::middleware(['auth', 'no_roles'])->group(function () {
+        Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
+        Route::post('/seller/register', [SellerController::class, 'store'])->name('seller.store');
+    });
+
     // CRUD Direcciones
-    Route::get('/address', [LocationController::class, 'index'])->name('address.index');
-    Route::get('/address/create', [LocationController::class, 'create'])->name('address.create');
-    Route::get('/address/{address}/edit', [LocationController::class, 'edit'])->name('address.edit');
-    Route::post('/address', [LocationController::class, 'store'])->name('address.store');
-    Route::put('/address/{address}', [LocationController::class, 'update'])->name('address.update');
-    Route::delete('/address/{address}', [LocationController::class, 'destroy'])->name('address.destroy');
+    Route::middleware(['auth'])->group(function () {
+    Route::resource('address', ShippingAddressController::class);
+    Route::post('address/{id}/default', [ShippingAddressController::class, 'setDefault'])->name('address.set-default');
+    });
+    Route::get('/address', [ShippingAddressController::class, 'index'])->name('address.index');
+    Route::get('/address/create', [ShippingAddressController::class, 'create'])->name('address.create');
+    Route::get('/address/{address}/edit', [ShippingAddressController::class, 'edit'])->name('address.edit');
+    Route::post('/address', [ShippingAddressController::class, 'store'])->name('address.store');
+    Route::put('/address/{address}', [ShippingAddressController::class, 'update'])->name('address.update');
+    Route::delete('/address/{address}', [ShippingAddressController::class, 'destroy'])->name('address.destroy');
+
+
 
     // Carrito
     Route::resource('cart', CartController::class)->only(['index', 'update', 'destroy']);
@@ -142,16 +220,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/api/cart/status', [CartController::class, 'getCartStatus'])->name('api.cart.status');
-});
-
 /*
 |--------------------------------------------------------------------------
-| Auth
+| Auth scaffolding (login/registro olvidé password, etc.)
 |--------------------------------------------------------------------------
 */
-// Ruta para vista home
-Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+require __DIR__.'/auth.php'; // mantiene tus rutas de auth (Breeze/Fortify/etc.)
 
-require __DIR__.'/auth.php';
+// ❌ Eliminado: Route::get('/admin/statistics/export-pdf', ...) fuera del grupo

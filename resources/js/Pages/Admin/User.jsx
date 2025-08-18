@@ -15,7 +15,7 @@ import ConfirmDelete from "@/Components/ConfirmDelete";
 import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function User({ activeRoute, can }) {
-    const { users, roles } = usePage().props;
+    const { users, roles, auth } = usePage().props;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
@@ -52,6 +52,29 @@ export default function User({ activeRoute, can }) {
     const handlePageChange = (url) => {
         router.visit(url);
     };
+
+    const filteredUsers = () => {
+        const currentUserRole = auth.user?.roles?.[0]?.name; // Asume que el usuario tiene al menos un rol
+
+        // Si el usuario actual es SuperAdmin, mostrar todos los usuarios
+        if (currentUserRole === "SuperAdmin") {
+            return users;
+        }
+
+        // Para otros roles, filtrar los usuarios que no sean Admin o SuperAdmin
+        const filteredData = users.data.filter((user) => {
+            return !user.roles?.some((role) =>
+                ["Admin", "SuperAdmin"].includes(role.name)
+            );
+        });
+
+        return {
+            ...users,
+            data: filteredData,
+        };
+    };
+
+    const currentUsers = filteredUsers();
 
     return (
         <AdminLayout
@@ -112,8 +135,8 @@ export default function User({ activeRoute, can }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.data.length ? (
-                                    users.data.map((user) => (
+                                {currentUsers.data.length ? (
+                                    currentUsers.data.map((user) => (
                                         <tr
                                             key={user.id}
                                             className="border-b dark:border-gray-600"
@@ -255,7 +278,10 @@ export default function User({ activeRoute, can }) {
                         )}
                     </div>
 
-                    <Pagination data={users} onPageChange={handlePageChange} />
+                    <Pagination
+                        data={currentUsers}
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             </div>
             <UserFormModal

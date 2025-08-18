@@ -14,13 +14,15 @@ class PermissionController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('role:Admin|Manager'),
+            // Updated to match your RoleSeeder: SuperAdmin, Admin, Seller
+            new Middleware('role:SuperAdmin'),
             new Middleware('permission:permission-view', only: ['index']),
             new Middleware('permission:permission-create', only: ['store']),
             new Middleware('permission:permission-edit', only: ['update']),
             new Middleware('permission:permission-delete', only: ['destroy']),
         ];
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -32,10 +34,11 @@ class PermissionController extends Controller implements HasMiddleware
             'permissions' => $permissions,
             'activeRoute' => $request->route()->getName(),
             'can' => [
-                'permission_edit' => $request->user() ? $request->user()->can('permission-edit') : false,
-                'permission_delete' => $request->user() ? $request->user()->can('permission-delete') : false,
-                'permission_create' => $request->user() ? $request->user()->can('permission-create') : false,
-                
+                // Fixed naming consistency - using underscores to match frontend
+                'permission_edit' => $request->user()?->can('permission-edit') ?? false,
+                'permission_delete' => $request->user()?->can('permission-delete') ?? false,
+                'permission_create' => $request->user()?->can('permission-create') ?? false,
+                'permission_view' => $request->user()?->can('permission-view') ?? false,
             ],
         ]);
     }
@@ -51,16 +54,21 @@ class PermissionController extends Controller implements HasMiddleware
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Permission $permission)
+    public function store(Request $request)
     {
+        // Fixed validation - removed Permission parameter since it's for creating new permissions
         $request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name,'.$permission->id,
+            'name' => 'required|string|max:255|unique:permissions,name',
         ]);
 
         $data = $request->only(['name']);
 
         Permission::create($data);
-        return redirect()->route('permissions.index')->with('success', 'Permission Created Succesfully.');
+        
+        // Return JSON response for better frontend handling
+        return response()->json([
+            'message' => 'Permission created successfully.'
+        ]);
     }
 
     /**
@@ -85,13 +93,17 @@ class PermissionController extends Controller implements HasMiddleware
     public function update(Request $request, Permission $permission)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name,'.$permission->id,
+            'name' => 'required|string|max:255|unique:permissions,name,' . $permission->id,
         ]);
 
         $data = $request->only(['name']);
 
         $permission->update($data);
-        return redirect()->route('permissions.index')->with('success', 'Permission Updated Succesfully.');
+        
+        // Return JSON response for better frontend handling
+        return response()->json([
+            'message' => 'Permission updated successfully.'
+        ]);
     }
 
     /**
@@ -100,6 +112,10 @@ class PermissionController extends Controller implements HasMiddleware
     public function destroy(Permission $permission)
     {
         $permission->delete();
-        return redirect()->route('permissions.index')->with('success', 'Permission Deleted Succesfully.');
+        
+        // Return JSON response for better frontend handling
+        return response()->json([
+            'message' => 'Permission deleted successfully.'
+        ]);
     }
 }

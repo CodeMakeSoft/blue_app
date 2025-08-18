@@ -25,7 +25,15 @@ export default function Index({ products, can }) {
     const carouselRefs = useRef({});
     const [scrollStates, setScrollStates] = useState({});
 
-    const filteredProducts = products.filter((product) =>
+    // Verificar si el usuario es seller
+    const isSeller = auth.user.roles?.some((role) => role.name === "seller");
+
+    // Filtrar productos por usuario si es seller, o mostrar todos si es admin
+    const userFilteredProducts = isSeller
+        ? products.filter((product) => product.user_id === auth.user.id)
+        : products;
+
+    const filteredProducts = userFilteredProducts.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -134,10 +142,13 @@ export default function Index({ products, can }) {
                                 link: route("products.index"),
                             },
                         ]}
-                        currentPage="Lista de Productos"
+                        currentPage={
+                            isSeller ? "Mis Productos" : "Lista de Productos"
+                        }
                     />
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 leading-tight mt-2">
                         Gestión de Productos
+                        {isSeller ? "Mis Productos" : "Lista de Productos"}
                     </h2>
                 </div>
             }
@@ -146,6 +157,11 @@ export default function Index({ products, can }) {
                 <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
                     {/* Header con título y botón */}
                     <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                            {isSeller
+                                ? "Mis Productos"
+                                : "Gestión de Productos"}
+                        </h1>
                         {can.product_create && (
                             <Link
                                 href={route("products.create")}
@@ -173,133 +189,151 @@ export default function Index({ products, can }) {
 
                     {/* Contenedor de la tabla */}
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
-                            <table className="w-full text-left">
-                                <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                                    <tr>
-                                        <th className="px-6 py-3 text-sm font-semibold">
-                                            Nombre
-                                        </th>
-                                        <th className="px-6 py-3 text-sm font-semibold">
-                                            Precio
-                                        </th>
-                                        <th className="px-6 py-3 text-sm font-semibold">
-                                            Imágenes
-                                        </th>
-                                        <th className="px-6 py-3 text-sm font-semibold text-center">
-                                            Acciones
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                    {paginatedProducts.map((product) => (
-                                        <tr
-                                            key={product.id}
-                                            className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200"
-                                        >
-                                            <td className="px-6 py-4">
-                                                {product.name}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                ${product.price}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {product.images?.length > 0 ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <button
-                                                            onClick={() =>
-                                                                scrollCarousel(
-                                                                    product.id,
-                                                                    "left"
-                                                                )
-                                                            }
-                                                            className="p-1 rounded-full bg-gray-700 dark:bg-gray-600 text-white hover:bg-gray-600 dark:hover:bg-gray-500"
-                                                        >
-                                                            <ChevronLeftIcon className="w-5 h-5" />
-                                                        </button>
-                                                        <div
-                                                            ref={(el) =>
-                                                                (carouselRefs.current[
-                                                                    product.id
-                                                                ] = el)
-                                                            }
-                                                            onScroll={() =>
-                                                                handleScroll(
-                                                                    product.id
-                                                                )
-                                                            }
-                                                            className="flex gap-2 overflow-hidden max-w-[250px]"
-                                                        >
-                                                            {product.images.map(
-                                                                (
-                                                                    img,
-                                                                    index
-                                                                ) => (
-                                                                    <img
-                                                                        key={
-                                                                            index
+                        {filteredProducts.length > 0 ? (
+                            <>
+                                <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                            <tr>
+                                                <th className="px-6 py-3 text-sm font-semibold">
+                                                    Nombre
+                                                </th>
+                                                <th className="px-6 py-3 text-sm font-semibold">
+                                                    Precio
+                                                </th>
+                                                <th className="px-6 py-3 text-sm font-semibold">
+                                                    Imágenes
+                                                </th>
+                                                <th className="px-6 py-3 text-sm font-semibold text-center">
+                                                    Acciones
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                            {paginatedProducts.map(
+                                                (product) => (
+                                                    <tr
+                                                        key={product.id}
+                                                        className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200"
+                                                    >
+                                                        <td className="px-6 py-4">
+                                                            {product.name}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            ${product.price}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {product.images
+                                                                ?.length > 0 ? (
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            scrollCarousel(
+                                                                                product.id,
+                                                                                "left"
+                                                                            )
                                                                         }
-                                                                        src={`/storage/${img.url}`}
-                                                                        alt={`Producto ${product.id} - ${index}`}
-                                                                        className="h-20 w-20 object-cover rounded-md border border-gray-300 dark:border-gray-600 flex-shrink-0"
-                                                                    />
-                                                                )
+                                                                        className="p-1 rounded-full bg-gray-700 dark:bg-gray-600 text-white hover:bg-gray-600 dark:hover:bg-gray-500"
+                                                                    >
+                                                                        <ChevronLeftIcon className="w-5 h-5" />
+                                                                    </button>
+                                                                    <div
+                                                                        ref={(
+                                                                            el
+                                                                        ) =>
+                                                                            (carouselRefs.current[
+                                                                                product.id
+                                                                            ] =
+                                                                                el)
+                                                                        }
+                                                                        onScroll={() =>
+                                                                            handleScroll(
+                                                                                product.id
+                                                                            )
+                                                                        }
+                                                                        className="flex gap-2 overflow-hidden max-w-[250px]"
+                                                                    >
+                                                                        {product.images.map(
+                                                                            (
+                                                                                img,
+                                                                                index
+                                                                            ) => (
+                                                                                <img
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                    src={`/storage/${img.url}`}
+                                                                                    alt={`Producto ${product.id} - ${index}`}
+                                                                                    className="h-20 w-20 object-cover rounded-md border border-gray-300 dark:border-gray-600 flex-shrink-0"
+                                                                                />
+                                                                            )
+                                                                        )}
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            scrollCarousel(
+                                                                                product.id,
+                                                                                "right"
+                                                                            )
+                                                                        }
+                                                                        className="p-1 rounded-full bg-gray-700 dark:bg-gray-600 text-white hover:bg-gray-600 dark:hover:bg-gray-500"
+                                                                    >
+                                                                        <ChevronRightIcon className="w-5 h-5" />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-sm text-gray-400 dark:text-gray-500">
+                                                                    Sin imágenes
+                                                                </span>
                                                             )}
-                                                        </div>
-                                                        <button
-                                                            onClick={() =>
-                                                                scrollCarousel(
-                                                                    product.id,
-                                                                    "right"
-                                                                )
-                                                            }
-                                                            className="p-1 rounded-full bg-gray-700 dark:bg-gray-600 text-white hover:bg-gray-600 dark:hover:bg-gray-500"
-                                                        >
-                                                            <ChevronRightIcon className="w-5 h-5" />
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-sm text-gray-400 dark:text-gray-500">
-                                                        Sin imágenes
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 text-center space-x-2">
-                                                {can.product_edit && (
-                                                    <Link
-                                                        href={`/products/${product.id}/edit`}
-                                                        className="inline-flex items-center text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
-                                                    >
-                                                        <PencilSquareIcon className="w-5 h-5" />
-                                                    </Link>
-                                                )}
-                                                {can.product_delete && (
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                product
-                                                            )
-                                                        }
-                                                        className="inline-flex items-center text-red-500 hover:text-red-700 dark:hover:text-red-400"
-                                                    >
-                                                        <TrashIcon className="w-5 h-5" />
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center space-x-2">
+                                                            {can.product_edit && (
+                                                                <Link
+                                                                    href={`/products/${product.id}/edit`}
+                                                                    className="inline-flex items-center text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
+                                                                >
+                                                                    <PencilSquareIcon className="w-5 h-5" />
+                                                                </Link>
+                                                            )}
+                                                            {can.product_delete && (
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleDelete(
+                                                                            product
+                                                                        )
+                                                                    }
+                                                                    className="inline-flex items-center text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                                                                >
+                                                                    <TrashIcon className="w-5 h-5" />
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                        {/* Pagination */}
-                        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setCurrentPage}
-                            />
-                        </div>
+                                {/* Pagination */}
+                                <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        totalPages={totalPages}
+                                        onPageChange={setCurrentPage}
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-12">
+                                <div className="text-gray-500 dark:text-gray-400 text-lg">
+                                    {isSeller
+                                        ? "No tienes productos registrados"
+                                        : "No hay productos disponibles"}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

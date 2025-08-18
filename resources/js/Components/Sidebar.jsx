@@ -43,6 +43,7 @@ export function Sidebar({ children }) {
     const toggleMobileSidebar = () => {
         setMobileVisible((prev) => !prev);
     };
+    
 
     return (
         <>
@@ -195,10 +196,12 @@ Sidebar.Item = function SidebarItem({
             {children && expanded && isExpanded && (
                 <div className="ml-6 pl-2 mt-1 space-y-1 border-l-2 border-indigo-200 dark:border-gray-600">
                     {React.Children.map(children, (child) =>
-                        React.cloneElement(child, {
-                            className:
-                                "w-full flex items-center text-left p-2 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-md text-sm",
-                        })
+                        React.isValidElement(child)
+                            ? React.cloneElement(child, {
+                                  className:
+                                      "w-full flex items-center text-left p-2 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-md text-sm",
+                              })
+                            : null
                     )}
                 </div>
             )}

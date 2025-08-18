@@ -2,14 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -109,6 +110,15 @@ class DatabaseSeeder extends Seeder
             
             return $brand;
         });
+
+        $sellers = User::role('Seller')->get();
+    
+        // Si no hay vendedores, crear algunos
+        if ($sellers->isEmpty()) {
+            $sellers = \App\Models\User::factory(3)->create();
+            $sellerRole = \Spatie\Permission\Models\Role::findByName('Seller');
+            $sellers->each->assignRole($sellerRole);
+        }
 
         // Crear productos con imágenes
         foreach ($this->productNames as $name) {

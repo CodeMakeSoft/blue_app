@@ -8,32 +8,28 @@ import Breadcrumb from "@/Components/Breadcrumb";
 export default function Edit({ auth, location, countries, districts }) {
     const { data, setData, put, processing, errors } = useForm({
         alias: location.alias,
+        contact_name: location.contact_name || "",
+        contact_phone: location.phone || "",
         street: location.street,
         ext_number: location.ext_number,
         int_number: location.int_number || "",
-        postal_code: location.district?.postal_code || "",
-        district_id: location.district_id,
-        phone: location.phone || "",
-        delivery_instructions: location.delivery_instructions || "",
-        districts:
-            districts.filter(
-                (d) => d.postal_code === location.district?.postal_code
-            ) || [],
-        state: location.district?.city?.municipality?.state?.name || "",
-        municipality: location.district?.city?.municipality?.name || "",
-        city: location.district?.city?.name || "",
-        country:
-            location.district?.city?.municipality?.state?.country?.name || "",
+        neighborhood: location.district || "",
+        zip_code: location.postal_code || "",
+        city: location.city || "",
+        state: location.state || "",
+        country: location.country || "",
+        references: location.delivery_instructions || "",
+        is_default: location.is_default || false,
+        districts: districts.filter((d) => d.city === location.city) || [],
     });
 
     useEffect(() => {
-        if (location.district?.postal_code) {
+        if (location.district) {
             const initialDistricts = districts.filter(
-                (d) => d.postal_code === location.district.postal_code
+                (d) => d.city === location.city
             );
             if (initialDistricts.length > 0) {
                 setData("districts", initialDistricts);
-                setShowPostalData(true);
             }
         }
     }, []);
@@ -41,9 +37,11 @@ export default function Edit({ auth, location, countries, districts }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        put(route("address.update", location.id), data, {
-            onSuccess: () =>
-                toast.success("Dirección actualizada exitosamente"),
+        put(route("address.update", location.id), {
+            onSuccess: () => {
+                toast.success("Dirección actualizada correctamente");
+                router.visit(route("address.index"));
+            },
             onError: () => toast.error("Error al actualizar la dirección"),
         });
     };
@@ -56,7 +54,10 @@ export default function Edit({ auth, location, countries, districts }) {
                     <Breadcrumb
                         routes={[
                             { name: "Inicio", link: route("dashboard") },
-                            { name: "Mis Direcciones", link: route("address.index") },
+                            {
+                                name: "Mis Direcciones",
+                                link: route("address.index"),
+                            },
                         ]}
                         currentPage="Editar Dirección"
                     />
@@ -68,21 +69,19 @@ export default function Edit({ auth, location, countries, districts }) {
         >
             <Head title="Editar Dirección" />
             <Toaster position="top-right" richColors />
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                            <Form
-                                data={data}
-                                setData={setData}
-                                errors={errors}
-                                countries={countries}
-                                districts={districts}
-                                isEditing={true}
-                                onSubmit={handleSubmit}
-                                processing={processing}
-                            />
-                        </div>
+            <div className="py-8 px-4 max-w-7xl mx-auto">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                    <div className="p-6">
+                        <Form
+                            data={data}
+                            setData={setData}
+                            errors={errors}
+                            countries={countries}
+                            districts={districts}
+                            isEditing={true}
+                            onSubmit={handleSubmit}
+                            processing={processing}
+                        />
                     </div>
                 </div>
             </div>

@@ -17,6 +17,7 @@ class BrandController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
+            new Middleware('role:SuperAdmin|Admin'),
             new Middleware('permission:brand-view', only: ['index']),
             new Middleware('permission:brand-create', only: ['store']),
             new Middleware('permission:brand-edit', only: ['update']),
