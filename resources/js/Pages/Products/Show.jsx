@@ -80,7 +80,7 @@ export default function Show({ product }) {
                     <Breadcrumb
                         routes={[
                             { name: "Dashboard", link: route("dashboard") },
-                            { name: "Productos", link: route("products.index") },
+                            { name: "Productos", link: route("products.view") },
                         ]}
                         currentPage={product.name}
                     />
@@ -93,7 +93,7 @@ export default function Show({ product }) {
         >
             <Head title={`Detalle - ${product.name}`} />
 
-            <div className="py-12 flex justify-center">
+            <div className="flex justify-center">
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-10 w-full max-w-5xl transition-all duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                         <img

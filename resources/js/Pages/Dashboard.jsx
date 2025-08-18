@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import Confirm from '@/Components/Confirm';
-import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faEye, 
@@ -13,7 +12,8 @@ import {
     faLayerGroup,
     faTrademark,
     faBoxes,
-    faFilter
+    faFilter,
+    faHeart
 } from '@fortawesome/free-solid-svg-icons';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Asegúrate de importar el layout
 import Breadcrumb from '@/Components/Breadcrumb';
@@ -30,6 +30,7 @@ export default function Dashboard({ auth, products, brands, categories, filters 
         brands: [],
         categories: []
     });
+    const [favoriteState, setFavoriteState] = useState({});
 
     const handleItemClick = (type, e) => {
         if (e) e.stopPropagation();
@@ -133,6 +134,51 @@ export default function Dashboard({ auth, products, brands, categories, filters 
         router.get(route('brands.products', brand.id));
     };
 
+    const handleLike = (product) => {
+        if (!favoriteState[product.id]) {
+            axios.post(route("favorites.store"), {
+                product_id: product.id,
+            })
+            .then(() => {
+                setFavoriteState((prev) => ({
+                    ...prev,
+                    [product.id]: true,
+                }));
+            })
+            .catch((err) => {
+                console.error('Error al agregar a favoritos:', err);
+            });
+        } else {
+            axios.delete(route("favorites.destroy", product.id))
+            .then(() => {
+                setFavoriteState((prev) => ({
+                    ...prev,
+                    [product.id]: false,
+                }));
+            })
+            .catch((err) => {
+                console.error('Error al quitar de favoritos:', err);
+            });
+        }
+    };
+
+    // Al montar, consulta favoritos:
+    useEffect(() => {
+        products.data.forEach((product) => {
+            axios
+                .get(route("favorites.contains", product.id))
+                .then((res) => {
+                    setFavoriteState((prevState) => ({
+                        ...prevState,
+                        [product.id]: res.data.liked,
+                    }));
+                })
+                .catch((error) => {
+                    console.error("Error al verificar favoritos: ", error);
+                });
+        });
+    }, [products.data]);
+
     return (
         <AuthenticatedLayout
             header={
@@ -235,6 +281,23 @@ export default function Dashboard({ auth, products, brands, categories, filters 
                                             className={`text-xl ${
                                                 cartState[product.id]
                                                     ? "text-gray-400"
+                                                    : "text-gray-700 dark:text-gray-300 group-hover:text-white"
+                                            }`}
+                                        />
+                                    </button>
+                                    <button
+                                        onClick={() => handleLike(product)}
+                                        className={`absolute top-2 right-12 bg-white dark:bg-gray-700 p-2 rounded-full group transition-all duration-200 hover:scale-110 ${
+                                            favoriteState[product.id]
+                                                ? "bg-red-100 dark:bg-red-200"
+                                                : "hover:bg-blue-600"
+                                        }`}
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={faHeart}
+                                            className={`text-xl ${
+                                                favoriteState[product.id]
+                                                    ? "text-red-700"
                                                     : "text-gray-700 dark:text-gray-300 group-hover:text-white"
                                             }`}
                                         />

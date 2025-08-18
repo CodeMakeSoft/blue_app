@@ -122,7 +122,7 @@ export default function AuthenticatedLayout({ header, children }) {
             icon: (
                 <FontAwesomeIcon
                     icon={faHeart}
-                    className="h-5 w-5 text-red-600"
+                    className="h-5 w-5"
                 />
             ),
             text: "Favoritos",

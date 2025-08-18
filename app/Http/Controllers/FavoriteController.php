@@ -11,7 +11,9 @@ use function PHPUnit\Framework\returnArgument;
 class FavoriteController extends Controller
 {
     public function index() {
-        $favorites = Auth::user()->favorites()->get();
+        $favorites = Favorite::where('user_id', Auth::id())
+            ->with(['product.images'])
+            ->get();
         return inertia('Favorites/Index', [
             'favorites' => $favorites
         ]);
@@ -23,8 +25,9 @@ class FavoriteController extends Controller
         ]);
         $user = Auth::user();
         $productId = $request->product_id;
-
-        $exists = $user->favorites()->where('product_id', $productId)->exists();
+        $exists = Favorite::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->exists();
 
         if(!$exists) {
             Favorite::create([
@@ -37,8 +40,12 @@ class FavoriteController extends Controller
     }
 
     public function contains(Product $product) {
-        $liked = auth()->user()->favorites()->where('product_id', $product->id)->exists();
-        return response()->json(['liked' => $liked]);
+        $user = Auth::user();
+        $exists = Favorite::where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
+
+        return response()->json(['liked' => $exists]);
     }
 
     public function destroy(Product $product) {
@@ -46,6 +53,18 @@ class FavoriteController extends Controller
         Favorite::where('user_id', $user->id)
             ->where('product_id', $product->id)
             ->delete();
-        return response()->json(['success' => true]);
+
+        if (request()->header('X-Inertia')) {
+            // Petición Inertia: redirige usando Inertia::location para evitar error
+            return \Inertia\Inertia::location(url()->previous());
+        }
+
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back()->with('success', 'Producto eliminado de favoritos.');
     }
 }
+
+

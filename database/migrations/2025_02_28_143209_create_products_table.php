@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->decimal('price',8,2);// Precio del Producto
-            $table->integer('stock');
+            $table->decimal('price',11,2);
+            $table->integer('stock')->unsigned();
             $table->string('size')->nullable();
             $table->string('color')->nullable();
             $table->boolean('status')->default(true);

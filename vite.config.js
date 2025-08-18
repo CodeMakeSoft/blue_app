@@ -10,6 +10,7 @@ export default defineConfig({
         }),
         react(),
     ],
+
     resolve: {
         alias: {
             '@': '/resources/js',
@@ -26,6 +27,9 @@ export default defineConfig({
         hmr: {
             host: 'localhost',
         },
+            host: '0.0.0.0', // permite conexiones externas
+        port: 5173,
+        cors: true, // habilita CORS para cualquier origen
     },
     build: {
         chunkSizeWarningLimit: 1000,
