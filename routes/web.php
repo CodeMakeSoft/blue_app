@@ -21,6 +21,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ShippingAddressController;
 use App\Http\Controllers\Admin\StatisticsController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -113,6 +114,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/address', fn () => Inertia::render('Address/AddressForm', [
         'activeRoute' => request()->route()->getName(),
     ]));
+    
+    // Recursos Admin
+    Route::resource('admin/users', UserController::class);
+    Route::middleware(['auth', 'single.superadmin'])->group(function () {
+        Route::resource('admin/users', UserController::class);
+    });
+    
+    Route::resource('admin/roles', RoleController::class);
+    Route::resource('admin/permissions', PermissionController::class);
 
     // Categorías
     Route::get('categories', [CategoryController::class, 'index'])->name('category.index');

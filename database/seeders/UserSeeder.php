@@ -21,10 +21,11 @@ class UserSeeder extends Seeder
         $superAdminRole->users()->detach();
 
         $superAdminUser = User::firstOrCreate(
-            ['email' => 'superadmin@example.com'], // Email en minúscula para consistencia
-            [
+            ['email' => 'superadmin@example.com'], // Condición de búsqueda
+            [ // Datos para crear si no existe
                 'name' => 'SuperAdmin',
                 'password' => Hash::make('password'),
+                'email_verified_at' => now(),
             ]
         );
 
@@ -35,6 +36,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Admin',
                 'password' => Hash::make('password'),
+                'email_verified_at' => now(),
             ]
         );
         $admin->assignRole('admin'); // Nombre de rol en minúscula
