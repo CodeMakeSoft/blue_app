@@ -73,7 +73,7 @@ class User extends Authenticatable
     }
 
     public function favorites()
-{
-    return $this->hasMany(\App\Models\Favorite::class);
-}
+    {
+        return $this->hasMany(Favorite::class);
+    }
 }

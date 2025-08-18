@@ -25,8 +25,9 @@ class FavoriteController extends Controller
         ]);
         $user = Auth::user();
         $productId = $request->product_id;
-
-        $exists = Favorite::where('user_id', $user->id)->where('product_id', $productId)->exists();
+        $exists = Favorite::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->exists();
 
         if(!$exists) {
             Favorite::create([
@@ -39,12 +40,13 @@ class FavoriteController extends Controller
     }
 
     public function contains(Product $product) {
-    $liked = Favorite::where('user_id', Auth::id())
-                     ->where('product_id', $product->id)
-                     ->exists();
+        $user = Auth::user();
+        $exists = Favorite::where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
 
-    return response()->json(['liked' => $liked]);
-}
+        return response()->json(['liked' => $exists]);
+    }
 
     public function destroy(Product $product) {
         $user = Auth::user();
@@ -64,3 +66,5 @@ class FavoriteController extends Controller
         return redirect()->back()->with('success', 'Producto eliminado de favoritos.');
     }
 }
+
+

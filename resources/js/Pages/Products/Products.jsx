@@ -10,15 +10,17 @@ import {
     faStar,
     faBox,
     faSearch,
-    faFilter
+    faFilter,
+    faHeart
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import Breadcrumb from "@/Components/Breadcrumb";
 
 export default function View({ products = [] }) {
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [likes, setLikes] = useState({});
+    const [liked, setLiked] = useState(false);
     const [cartState, setCartState] = useState({});
+    const [favoriteState, setFavoriteState] = useState({});
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [showFilters, setShowFilters] = useState(false);
@@ -36,14 +38,32 @@ export default function View({ products = [] }) {
         setSelectedProduct(null);
     };
 
-    const handleLike = (id) => {
-        setLikes((prevLikes) => {
-            if (prevLikes[id]) return prevLikes; // Si ya hay "me gusta", no hacer nada
-            return {
-                ...prevLikes,
-                [id]: 1, // Establece el "me gusta" en 1
-            };
-        });
+    const handleLike = (product) => {
+        if (!favoriteState[product.id]) {
+            axios.post(route("favorites.store"), {
+                product_id: product.id,
+            })
+            .then(() => {
+                setFavoriteState((prev) => ({
+                    ...prev,
+                    [product.id]: true,
+                }));
+            })
+            .catch((err) => {
+                console.error('Error al agregar a favoritos:', err);
+            });
+        } else {
+            axios.delete(route("favorites.destroy", product.id))
+            .then(() => {
+                setFavoriteState((prev) => ({
+                    ...prev,
+                    [product.id]: false,
+                }));
+            })
+            .catch((err) => {
+                console.error('Error al quitar de favoritos:', err);
+            });
+        }
     };
 
     const handleAddToCart = (product) => {
@@ -75,10 +95,26 @@ export default function View({ products = [] }) {
                     }));
                 })
                 .catch((error) => {
-                    console.error("Error al verificar carrito:", error);
+                    console.error("Error al verificar carrito: ", error);
                 });
         });
     }, [products]);
+
+    useEffect(() => {
+        products.forEach((product) => {
+            axios
+                .get(route("favorites.contains", product.id))
+                .then((res) => {
+                    setFavoriteState((prevState) => ({
+                        ...prevState,
+                        [product.id]: res.data.liked,
+                    }));
+                })
+                .catch((error) => {
+                    console.error("Error al verificar favoritos: ", error);
+                });
+        });
+    }, [products]); 
 
     return (
         <AuthenticatedLayout
@@ -167,11 +203,30 @@ export default function View({ products = [] }) {
                                             ${product.price}
                                         </span>
                                     </div>
+                                    {/* Boton de favoritos */}
+                                    <button
+                                        onClick={() => handleLike(product)}
+                                        className={`absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full group transition-all duration-200 hover:scale-110 ${
+                                            favoriteState[product.id]
+                                                ? "bg-red-100 dark:bg-red-200"
+                                                : "hover:bg-blue-600"
+                                        }`}
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={faHeart}
+                                            className={`text-xl ${
+                                                favoriteState[product.id]
+                                                    ? "text-red-700"
+                                                    : "text-gray-700 dark:text-gray-300 group-hover:text-white"
+                                            }`}
+                                        />
+                                    </button>
+
                                     {/* Botón de carrito */}
                                     <button
                                         onClick={() => handleAddToCart(product)}
                                         disabled={cartState[product.id]}
-                                        className={`absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full group transition-all duration-200 hover:scale-110 ${
+                                        className={`absolute top-2 right-12 bg-white dark:bg-gray-700 p-2 rounded-full group transition-all duration-200 hover:scale-110 ${
                                             cartState[product.id]
                                                 ? "cursor-not-allowed opacity-50"
                                                 : "hover:bg-blue-600"
