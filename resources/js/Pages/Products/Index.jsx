@@ -137,20 +137,15 @@ export default function Index({ products, can }) {
                         currentPage="Lista de Productos"
                     />
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 leading-tight mt-2">
-                        Lista de Productos
+                        Gestión de Productos
                     </h2>
                 </div>
             }
         >
             <Head title="Productos" />
-
-            <div className="py-5">
                 <div className="mx-auto max-w-6xl sm:px-6 lg:px-3">
                     {/* Header con título y botón */}
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                            Gestión de Productos
-                        </h1>
                         {can.product_create && (
                             <Link
                                 href={route("products.create")}
@@ -307,7 +302,6 @@ export default function Index({ products, can }) {
                         </div>
                     </div>
                 </div>
-            </div>
 
             <ConfirmDeleteModal
                 product={selectedProduct}

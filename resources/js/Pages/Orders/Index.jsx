@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import React from 'react';
-import { Head } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -17,8 +17,6 @@ import {
     faFileInvoice
 } from '@fortawesome/free-solid-svg-icons';
 import Confirm from '@/Components/Confirm';
-import { useState } from 'react';
-import { router } from '@inertiajs/react';
 import Breadcrumb from '@/Components/Breadcrumb';
 
 export default function Index({ orders }) {
@@ -71,24 +69,24 @@ export default function Index({ orders }) {
     };
 
     const content = !Array.isArray(orders) || orders.length === 0 ? (
-        <div className="text-center text-gray-600 dark:text-gray-300 space-y-4">
+        <div className="space-y-4 text-center text-gray-600 dark:text-gray-300">
             <p className="text-lg">No tienes compras registradas.</p>
             <a
                 href={route('dashboard')}
-                className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
+                className="inline-block px-4 py-2 text-white transition bg-blue-600 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
                 Ir a comprar
             </a>
         </div>
     ) : (
-        <div className="p-6 max-w-5xl mx-auto">
+        <div className="max-w-5xl p-6 mx-auto">
             <div className="space-y-6">
                 {orders.map(order => (
                     <div
                         key={order.id}
-                        className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700"
+                        className="p-6 bg-white border border-gray-200 shadow-md dark:bg-gray-800 rounded-xl dark:border-gray-700"
                     >
-                        <div className="flex justify-between items-start flex-wrap gap-2">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
                             <div>
                                 <h3 className="text-lg font-bold text-gray-800 dark:text-white">
                                     <FontAwesomeIcon icon={faShoppingBag} className="mr-2 text-blue-500" />
@@ -100,8 +98,8 @@ export default function Index({ orders }) {
                                 </p>
                             </div>
 
-                            <div className="text-right space-y-1">
-                                <span className="inline-flex items-center text-sm px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                            <div className="space-y-1 text-right">
+                                <span className="inline-flex items-center px-2 py-1 text-sm text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
                                     <FontAwesomeIcon icon={faCreditCard} className="mr-1" />
                                     {order.payment_method.toUpperCase()}
                                 </span>
@@ -118,14 +116,14 @@ export default function Index({ orders }) {
                                     {getStatusIcon(order.status)}
                                     {order.status}
                                 </span>
-                                <p className="text-md font-semibold text-gray-800 dark:text-white">
+                                <p className="font-semibold text-gray-800 text-md dark:text-white">
                                     <FontAwesomeIcon icon={faDollarSign} className="mr-1 text-green-500" />
                                     {parseFloat(order.total).toFixed(2)}
                                 </p>
                             </div>
                         </div>
 
-                        <ul className="mt-4 pl-4 list-disc text-gray-700 dark:text-gray-200">
+                        <ul className="pl-4 mt-4 text-gray-700 list-disc dark:text-gray-200">
                             {order.products.map(product => (
                                 <li key={product.id}>
                                     {product.name} × {product.pivot.quantity} = ${(
@@ -135,21 +133,30 @@ export default function Index({ orders }) {
                             ))}
                         </ul>
 
-                        <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-4">
-                            <button className="text-sm flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+                        <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:gap-4">
+                            <button className="flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline">
                                 <FontAwesomeIcon icon={faEye} className="mr-1" />
                                 Ver Detalles
                             </button>
 
-                            <button className="text-sm flex items-center text-gray-600 dark:text-gray-300 hover:underline">
+                            <button className="flex items-center text-sm text-gray-600 dark:text-gray-300 hover:underline">
                                 <FontAwesomeIcon icon={faFileInvoice} className="mr-1" />
                                 Descargar Factura
                             </button>
 
+                            {/* Botón de Devolución */}
+                            <a
+                                href={route('return.form', { order: order.id })}
+                                className="flex items-center text-sm text-orange-600 dark:text-orange-400 hover:underline"
+                            >
+                                <FontAwesomeIcon icon={faBoxOpen} className="mr-1" />
+                                Devolver Producto
+                            </a>
+
                             {order.status === 'pending' && (
                                 <button
                                     onClick={() => handleCancelOrder(order.id)}
-                                    className="text-sm flex items-center text-red-600 dark:text-red-400 hover:underline"
+                                    className="flex items-center text-sm text-red-600 dark:text-red-400 hover:underline"
                                 >
                                     <FontAwesomeIcon icon={faTimesCircle} className="mr-1" />
                                     Cancelar Orden
@@ -173,7 +180,7 @@ export default function Index({ orders }) {
                         ]}
                         currentPage="Mis Compras"
                     />
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-2 flex items-center gap-2">
+                    <h2 className="flex items-center gap-2 mt-2 text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                         <FontAwesomeIcon icon={faReceipt} className="text-blue-600 dark:text-blue-500" />
                         Mis Compras
                     </h2>

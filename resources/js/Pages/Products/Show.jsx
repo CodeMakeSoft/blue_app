@@ -16,11 +16,30 @@ export default function Show({ product }) {
 
     const handleLike = () => {
         if (!liked) {
-            setLiked(true);
+            axios.post(route("favorites.store"), {
+                product_id: product.id,
+            })
+            .then(() => {setLiked(true);})
+            .catch((err) => {
+                console.error('Error avoid adding to favorites:', err);
+            });
+        } else {
+            axios.delete(route("favorites.destroy", product.id))
+            .then(() => setLiked(false))
+            .catch((err) => {
+                console.error('Error avoid deleting to favorites:', err);
+            });
         }
     };
 
     useEffect(() => {
+        axios.get(route("favorites.contains", product.id))
+            .then((res) => {
+                setLiked(res.data.liked);
+            })
+            .catch((err) => {
+                console.error("Error in verification", err);
+            });
         axios.get(route("cart.contains", product.id))
             .then((res) => {
                 setInCart(res.data.inCart);
@@ -61,7 +80,7 @@ export default function Show({ product }) {
                     <Breadcrumb
                         routes={[
                             { name: "Dashboard", link: route("dashboard") },
-                            { name: "Productos", link: route("products.index") },
+                            { name: "Productos", link: route("products.view") },
                         ]}
                         currentPage={product.name}
                     />
@@ -74,7 +93,7 @@ export default function Show({ product }) {
         >
             <Head title={`Detalle - ${product.name}`} />
 
-            <div className="py-12 flex justify-center">
+            <div className="flex justify-center">
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-10 w-full max-w-5xl transition-all duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                         <img
@@ -107,10 +126,9 @@ export default function Show({ product }) {
                                 {/* Me gusta */}
                                 <button
                                     onClick={handleLike}
-                                    disabled={liked}
-                                    className={`p-2 rounded-full border ${
+                                    className={`p-2 rounded-full border transition ${
                                         liked
-                                            ? "opacity-50 cursor-not-allowed"
+                                            ? "bg-red-100 dark:bg-red-200"
                                             : "hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                                 >
