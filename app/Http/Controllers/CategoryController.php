@@ -67,9 +67,9 @@ class CategoryController extends Controller implements HasMiddleware
     {
         $request->session()->forget(['success', 'error']);
         
-        if ($request->session()->get('recently_created')) {
+        /*if ($request->session()->get('recently_created')) {
             return redirect()->route('category.index');
-        }
+        }*/
 
         $categories = Category::with(['image', 'children.image'])
             ->whereNull('parent_id')
@@ -220,7 +220,7 @@ class CategoryController extends Controller implements HasMiddleware
 
         $category->delete();
 
-         session()->forget([
+        session()->forget([
             'success', 
             'error', 
             'recently_created', 
